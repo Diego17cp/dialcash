@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.dialcadev.dialcash.ui.HomeFragment"
+        tools:layout="@layout/fragment_home"
+        android:label="Inicio" />
+    <fragment
+        android:id="@+id/transactionsFragment"
+        android:name="com.dialcadev.dialcash.ui.TransactionsFragment"
+        tools:layout="@layout/fragment_transactions"
+        android:label="Transacciones" />
+    <fragment
+        android:id="@+id/accountsFragment"
+        android:name="com.dialcadev.dialcash.ui.AccountsFragment"
+        tools:layout="@layout/fragment_accounts"
+        android:label="Cuentas" />
+    <fragment
+        android:id="@+id/incomesFragment"
+        android:name="com.dialcadev.dialcash.ui.IncomesFragment"
+        tools:layout="@layout/fragment_incomes"
+        android:label="Ingresos Especiales" />
+    <fragment
+        android:id="@+id/checkpointFragment"
+        android:name="com.dialcadev.dialcash.ui.CheckpointFragment"
+        tools:layout="@layout/fragment_checkpoint"
+        android:label="Checkpoint" />
+</navigation>
