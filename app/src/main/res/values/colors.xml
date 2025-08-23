@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Main theme-->
+    <color name="colorPrimary">#085691</color>
+    <color name="colorPrimaryVariant">#063f61</color>
+    <color name="colorSecondary">#d79b5f</color>
+    <color name="colorSecondaryVariant">#b07d4a</color>
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#F2F2F2</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#333333</color>
+    <!--  Helper colors  -->
     <color name="positive_balance">#4CAF50</color>
     <color name="negative_balance">#F44336</color>
     <color name="positive_amount">#4CAF50</color>
