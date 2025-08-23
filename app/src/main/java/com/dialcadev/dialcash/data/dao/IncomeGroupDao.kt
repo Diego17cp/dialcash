@@ -33,11 +33,11 @@ interface IncomeGroupDao {
 
     @Query(
         """
-        SELECT ig.id, ig.name,
+        SELECT ig.id, ig.name, ig.amount,
         IFNULL(SUM(
             CASE WHEN t.type = 'income' THEN t.amount
                  WHEN t.type = 'expense' THEN -t.amount
-                 ELSE 0 END), 0) AS restante
+                 ELSE 0 END), 0) AS remaining
                  FROM income_groups ig
         LEFT JOIN transactions t ON ig.id = t.related_income_id
         GROUP BY ig.id
