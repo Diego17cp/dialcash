@@ -6,7 +6,7 @@
     app:startDestination="@id/homeFragment">
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.dialcadev.dialcash.ui.HomeFragment"
+        android:name="com.dialcadev.dialcash.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home"
         android:label="Inicio" />
     <fragment
