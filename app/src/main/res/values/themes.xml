@@ -3,7 +3,7 @@
     <style name="Base.Theme.Dialcash" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Material3 colores -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorOnPrimary">@color/surface</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/text_primary</item>
 
