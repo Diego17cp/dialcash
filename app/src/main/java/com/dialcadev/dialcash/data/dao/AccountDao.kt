@@ -38,16 +38,34 @@ interface AccountDao {
     fun getMainAccounts(): Flow<List<Account>>
 
     @Query("""
-    SELECT a.id, a.name, a.type,
-    IFNULL(SUM(
-        CASE WHEN t.type = 'income' THEN t.amount
-             WHEN t.type = 'expense' THEN -t.amount
-             WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
-             WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
-             ELSE 0 END), 0) AS saldo
-    FROM accounts a
-    LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
-    GROUP BY a.id
-""")
+        SELECT a.id, a.name, a.type,
+        IFNULL(SUM(
+            CASE 
+                WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 
+            END
+        ), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        WHERE a.type IN ('bank', 'card', 'cash', 'wallet')
+        GROUP BY a.id
+    """)
+    fun getMainAccountBalances(): Flow<List<AccountBalance>>
+
+    @Query("""
+        SELECT a.id, a.name, a.type,
+        IFNULL(SUM(
+            CASE WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 END), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        GROUP BY a.id
+    """)
     fun getAccountBalances(): Flow<List<AccountBalance>>
 }

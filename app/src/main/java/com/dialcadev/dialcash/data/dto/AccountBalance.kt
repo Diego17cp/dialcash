@@ -4,5 +4,5 @@ data class AccountBalance (
     val id: Int,
     val name: String,
     val type: String, // "bank" | "card" | "cash" |
-    val saldo: Double,
+    val balance: Double,
 )
