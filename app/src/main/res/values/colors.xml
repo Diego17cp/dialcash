@@ -2,4 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="positive_balance">#4CAF50</color>
+    <color name="negative_balance">#F44336</color>
+    <color name="positive_amount">#4CAF50</color>
+    <color name="negative_amount">#F44336</color>
 </resources>
