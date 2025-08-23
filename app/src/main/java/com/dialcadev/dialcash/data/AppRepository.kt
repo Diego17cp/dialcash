@@ -121,6 +121,8 @@ class AppRepository(private val db: AppDB) {
     suspend fun getTotalTransactions(): Int = transactionDao.getTransactionCount()
     fun getTotalIncome(): Flow<Double> = transactionDao.getTotalIncome()
     fun getTotalExpense(): Flow<Double> = transactionDao.getTotalExpense()
+    fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>> =
+        transactionDao.getRecentTransactions(limit)
 
     // ==================== ACCOUNT OPERATIONS ====================
     suspend fun createIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.insert(incomeGroup)

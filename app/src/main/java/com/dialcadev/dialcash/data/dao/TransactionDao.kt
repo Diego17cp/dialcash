@@ -58,6 +58,18 @@ interface TransactionDao {
         JOIN accounts a ON t.account_id = a.id
         LEFT JOIN income_groups ig ON t.related_income_id = ig.id
         ORDER BY t.date DESC
+        LIMIT :limit
+    """)
+    fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>>
+
+    @Query("""
+        SELECT t.id, t.amount, t.type, t.date, t.description,
+        a.name AS accountName,
+        ig.name AS incomeGroupName
+        FROM transactions t
+        JOIN accounts a ON t.account_id = a.id
+        LEFT JOIN income_groups ig ON t.related_income_id = ig.id
+        ORDER BY t.date DESC
     """)
     fun getTransactionWithDetails(): Flow<List<TransactionWithDetails>>
 
