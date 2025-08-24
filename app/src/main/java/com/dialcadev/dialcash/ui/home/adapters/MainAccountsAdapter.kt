@@ -27,14 +27,14 @@ class MainAccountsAdapter(private val onAccountClick: (AccountBalance) -> Unit) 
             binding.apply {
                 textAccountName.text = account.name
                 textAccountBalance.text = root.context.getString(R.string.currency_format, account.balance)
-//                val iconRes = when (account.type) {
-//                    "bank" -> R.drawable.ic_bank
-//                    "cash" -> R.drawable.ic_cash
-//                    "card" -> R.drawable.ic_card
-//                    "wallet" -> R.drawable.ic_wallet
-//                    else -> R.drawable.ic_account_default
-//                }
-//                imageAccountIcon.setImageResource(iconRes)
+                val iconRes = when (account.type) {
+                    "bank" -> R.drawable.ic_bank
+                    "cash" -> R.drawable.ic_cash
+                    "card" -> R.drawable.ic_card
+                    "wallet" -> R.drawable.ic_accounts_outline
+                    else -> R.drawable.ic_account_default
+                }
+                imageAccountIcon.setImageResource(iconRes)
                 val colorRes = if (account.balance >= 0) R.color.positive_balance else R.color.negative_balance
                 textAccountBalance.setTextColor(root.context.getColor(colorRes))
                 root.setOnClickListener { onAccountClick(account) }
