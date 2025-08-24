@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/homeFragment"
-        android:icon="@drawable/ic_home_outline"
+        android:icon="@drawable/ic_home_selector"
         android:title="Inicio" />
     <item
         android:id="@+id/transactionsFragment"
-        android:icon="@drawable/ic_transactions_outline"
+        android:icon="@drawable/ic_transactions_selector"
         android:title="Transacciones" />
     <item
         android:id="@+id/accountsFragment"
-        android:icon="@drawable/ic_accounts_outline"
+        android:icon="@drawable/ic_accounts_selector"
         android:title="Cuentas" />
     <item
         android:id="@+id/incomesFragment"
-        android:icon="@drawable/ic_incomes_outline"
+        android:icon="@drawable/ic_incomes_selector"
         android:title="Ingresos" />
 </menu>
