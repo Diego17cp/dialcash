@@ -9,14 +9,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.dialcadev.dialcash.databinding.FirstAccountActicityBinding
+import com.dialcadev.dialcash.databinding.FirstAccountActivityBinding
 import com.dialcadev.dialcash.ui.viewmodel.FirstAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FirstAccountActivity : AppCompatActivity() {
-    private lateinit var binding: FirstAccountActicityBinding
+    private lateinit var binding: FirstAccountActivityBinding
     private val viewModel: FirstAccountViewModel by viewModels()
 
     private val accountTypeLabels = arrayOf(
@@ -37,7 +37,7 @@ class FirstAccountActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = FirstAccountActicityBinding.inflate(layoutInflater)
+        binding = FirstAccountActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupViews()
