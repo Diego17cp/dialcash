@@ -15,10 +15,11 @@
 
         <ImageView
             android:id="@+id/imageAccountIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_accounts_outline" />
+            android:src="@drawable/ic_accounts_outline"
+            app:tint="?attr/colorOnSurface" />
 
         <TextView
             android:id="@+id/textAccountName"
