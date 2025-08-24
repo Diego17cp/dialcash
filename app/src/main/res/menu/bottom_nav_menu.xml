@@ -16,8 +16,4 @@
         android:id="@+id/incomesFragment"
         android:icon="@drawable/ic_incomes_outline"
         android:title="Ingresos" />
-    <item
-        android:id="@+id/checkpointFragment"
-        android:icon="@drawable/ic_checkpoint_outline"
-        android:title="Checkpoints" />
 </menu>
