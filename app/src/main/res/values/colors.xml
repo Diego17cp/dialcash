@@ -2,7 +2,7 @@
 <resources>
     <!-- Main theme-->
     <color name="colorPrimary">#085691</color>
-    <color name="colorPrimaryLight">#3a7fc1</color>
+    <color name="colorPrimaryLight">#803a7fc1</color>
     <color name="colorPrimaryVariant">#063f61</color>
     <color name="colorSecondary">#d79b5f</color>
     <color name="colorSecondaryVariant">#b07d4a</color>

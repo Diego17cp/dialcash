@@ -1,6 +1,6 @@
 <resources>
     <color name="colorPrimary">#63a3d7</color>
-    <color name="colorPrimaryLight">#95c8f0</color>
+    <color name="colorPrimaryLight">#336a91CC</color>
     <color name="colorPrimaryVariant">#085691</color>
     <color name="colorSecondary">#f0c78b</color>
     <color name="colorSecondaryVariant">#d79b5f</color>
