@@ -39,7 +39,7 @@ interface AccountDao {
 
     @Query("""
         SELECT a.id, a.name, a.type,
-        IFNULL(SUM(
+        a.balance + IFNULL(SUM(
             CASE 
                 WHEN t.type = 'income' THEN t.amount
                 WHEN t.type = 'expense' THEN -t.amount
@@ -57,7 +57,7 @@ interface AccountDao {
 
     @Query("""
         SELECT a.id, a.name, a.type,
-        IFNULL(SUM(
+        a.balance + IFNULL(SUM(
             CASE WHEN t.type = 'income' THEN t.amount
                 WHEN t.type = 'expense' THEN -t.amount
                 WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
