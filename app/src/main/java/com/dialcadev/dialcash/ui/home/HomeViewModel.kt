@@ -8,6 +8,7 @@ import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -44,13 +45,12 @@ class HomeViewModel @Inject constructor(
             _errorMessage.value = null
 
             try {
-                repository.getMainAccounts().collect { accounts ->
-                    _mainAccounts.value = accounts
-                    _totalBalance.value = accounts.sumOf { it.balance }
-                }
-                repository.getRecentTransactions(limit = 10).collect { transactions ->
-                    _recentTransactions.value = transactions
-                }
+                val accounts = repository.getMainAccounts().first()
+                _mainAccounts.value = accounts
+                _totalBalance.value = accounts.sumOf { it.balance }
+
+                val transactions = repository.getRecentTransactions(limit = 10).first()
+                _recentTransactions.value = transactions
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching data: ${e.message}"
             } finally {
