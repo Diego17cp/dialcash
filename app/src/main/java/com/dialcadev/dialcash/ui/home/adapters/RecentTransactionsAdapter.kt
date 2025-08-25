@@ -41,7 +41,7 @@ class RecentTransactionsAdapter(private val onTransactionClick: (TransactionWith
             binding.apply {
                 textTransactionDate.text = dateFormat.format(transaction.date)
                 textTransactionDescription.text = transaction.description ?: "No Description"
-                textTransactionAccount.text = transaction.accountName
+                textTransactionAccount.text = "${transaction.accountName} -"
                 val amount = if (transaction.type == "income") "+${
                     root.context.getString(
                         R.string.currency_format,
@@ -51,11 +51,26 @@ class RecentTransactionsAdapter(private val onTransactionClick: (TransactionWith
                 else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
                 textTransactionAmount.text = amount
                 val colorRes =
-                    if (transaction.type == "income") R.color.positive_amount else R.color.negative_amount
+                    when (transaction.type) {
+                        "income" -> R.color.positive_amount
+                        "transfer" -> R.color.colorPrimary
+                        else -> R.color.negative_amount
+                    }
                 textTransactionAmount.setTextColor(root.context.getColor(colorRes))
-//                val iconRes = if (transaction.type == "income") R.drawable.ic_arrow_up_green else R.drawable.ic_arrow_down_red
-//
-//                imageTransactionIcon.setImageResource(iconRes)
+                val iconRes =
+                    when (transaction.type) {
+                        "income" -> R.drawable.ic_income
+                        "expense" -> R.drawable.ic_expense
+                        else -> R.drawable.ic_transactions_outline
+                    }
+                imageTransactionIcon.setImageResource(iconRes)
+                val iconColor =
+                    when (transaction.type) {
+                        "income" -> R.color.positive_amount
+                        "transfer" -> R.color.colorPrimary
+                        else -> R.color.negative_amount
+                    }
+                imageTransactionIcon.setColorFilter(root.context.getColor(iconColor))
 
                 root.setOnClickListener {
                     onTransactionClick(transaction)
