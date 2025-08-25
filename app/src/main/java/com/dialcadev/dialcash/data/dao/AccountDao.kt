@@ -73,6 +73,7 @@ interface AccountDao {
 data class AccountBalanceWithOriginal(
     val id: Int,
     val name: String,
+    val type: String,
     val balance: Double,
     val originalBalance: Double
 )
