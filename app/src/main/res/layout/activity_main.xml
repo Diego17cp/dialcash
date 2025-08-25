@@ -12,7 +12,8 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:backgroundTint="@color/background"
+        app:title="DialCash"
         app:titleTextColor="?attr/colorOnSurface" />
 
     <androidx.fragment.app.FragmentContainerView
@@ -28,11 +29,12 @@
         android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
         app:itemIconTint="@drawable/bottom_nav_colors"
+        app:itemRippleColor="@color/colorPrimaryVariant"
         app:itemTextColor="@drawable/bottom_nav_colors"
         app:labelVisibilityMode="labeled"
-        app:itemRippleColor="@color/colorPrimaryVariant"
-        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
+        app:backgroundTint="@color/background"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
