@@ -1,5 +1,6 @@
 package com.dialcadev.dialcash.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.dialcadev.dialcash.ui.home.adapters.RecentTransactionsAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.dialcadev.dialcash.NewTransactionActivity
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -71,13 +73,13 @@ class HomeFragment : Fragment() {
 
     private fun setupOnClickListeners() {
         binding.btnQuickIncome.setOnClickListener {
-            findNavController().navigate(R.id.transactionsFragment)
+            navigateToTransactionType("income")
         }
         binding.btnQuickExpense.setOnClickListener {
-            findNavController().navigate(R.id.transactionsFragment)
+            navigateToTransactionType("expense")
         }
         binding.btnQuickTransfer.setOnClickListener {
-            findNavController().navigate(R.id.transactionsFragment)
+            navigateToTransactionType("transfer")
         }
         binding.btnViewAllTransactions.setOnClickListener {
             findNavController().navigate(R.id.transactionsFragment)
@@ -85,6 +87,11 @@ class HomeFragment : Fragment() {
         binding.btnViewAllAccounts.setOnClickListener {
             findNavController().navigate(R.id.accountsFragment)
         }
+    }
+    private fun navigateToTransactionType(transactionType: String) {
+        val intent = Intent(this.context, NewTransactionActivity::class.java)
+        intent.putExtra("transaction_type", transactionType)
+        startActivity(intent)
     }
 
     private fun observeViewModel() {
