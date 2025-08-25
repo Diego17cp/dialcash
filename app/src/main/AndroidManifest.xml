@@ -32,6 +32,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Dialcash"
             android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".NewTransactionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Base.Theme.Dialcash"
+            tools:ignore="Instantiatable" />
 
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
