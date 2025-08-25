@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.AppRepository
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.db.AppDB
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.entities.Account
@@ -23,11 +24,11 @@ class NewTransactionActivity : AppCompatActivity() {
     private lateinit var transactionType: String
 
     private var selectedDate: Long? = null
-    private var selectedAccountFrom: AccountBalance? = null
-    private var selectedAccountTo: AccountBalance? = null
+    private var selectedAccountFrom: AccountBalanceWithOriginal? = null
+    private var selectedAccountTo: AccountBalanceWithOriginal? = null
     private var selectedIncomeGroup: IncomeGroup? = null
 
-    private var accountsList: List<AccountBalance> = emptyList()
+    private var accountsList: List<AccountBalanceWithOriginal> = emptyList()
     private var incomeGroupsList: List<IncomeGroup> = emptyList()
 
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy")
@@ -106,7 +107,7 @@ class NewTransactionActivity : AppCompatActivity() {
             }
         }
     }
-    private fun setupAccountDropdowns(accounts: List<AccountBalance>) {
+    private fun setupAccountDropdowns(accounts: List<AccountBalanceWithOriginal>) {
         val accountNames = accounts.map { it.name }
         val fromAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, accountNames)
         binding.dropdownAccountFrom.setAdapter(fromAdapter)
