@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Dialcash</string>
-    <string name="currency_format">$%.2f</string>
+    <string name="currency_format">S/. %.2f</string>
 </resources>
