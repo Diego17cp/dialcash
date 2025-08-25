@@ -35,13 +35,14 @@ class AppRepository(private val db: AppDB) {
         accountId: Int,
         amount: Double,
         description: String?,
-        relatedIncomeId: Int? = null
+        relatedIncomeId: Int? = null,
+        date: Long? = null
     ) {
         val transaction = Transaction(
             accountId = accountId,
             type = "income",
             amount = amount,
-            date = System.currentTimeMillis(),
+            date = date ?: System.currentTimeMillis(),
             description = description,
             relatedIncomeId = relatedIncomeId
         )
@@ -52,13 +53,14 @@ class AppRepository(private val db: AppDB) {
         accountId: Int,
         amount: Double,
         description: String?,
-        relatedIncomeId: Int? = null
+        relatedIncomeId: Int? = null,
+        date: Long? = null
     ) {
         val transaction = Transaction(
             accountId = accountId,
             type = "expense",
             amount = amount,
-            date = System.currentTimeMillis(),
+            date = date ?: System.currentTimeMillis(),
             description = description,
             relatedIncomeId = relatedIncomeId
         )
@@ -69,7 +71,8 @@ class AppRepository(private val db: AppDB) {
         fromAccount: Account,
         toAccount: Account,
         amount: Double,
-        description: String?
+        description: String?,
+        date: Long? = null
     ) {
         db.withTransaction {
             val updatedFrom = fromAccount.copy(balance = fromAccount.balance - amount)
@@ -80,7 +83,7 @@ class AppRepository(private val db: AppDB) {
             val transfer = Transaction(
                 amount = amount,
                 type = "transfer",
-                date = System.currentTimeMillis(),
+                date = date ?: System.currentTimeMillis(),
                 description = description,
                 accountId = fromAccount.id,
                 transferAccountId = toAccount.id
