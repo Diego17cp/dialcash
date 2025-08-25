@@ -16,7 +16,7 @@
         android:label="Transacciones" />
     <fragment
         android:id="@+id/accountsFragment"
-        android:name="com.dialcadev.dialcash.ui.AccountsFragment"
+        android:name="com.dialcadev.dialcash.ui.accounts.AccountsFragment"
         tools:layout="@layout/fragment_accounts"
         android:label="Cuentas" />
     <fragment
