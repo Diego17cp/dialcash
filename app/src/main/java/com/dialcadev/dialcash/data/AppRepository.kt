@@ -1,6 +1,7 @@
 package com.dialcadev.dialcash.data
 
 import androidx.room.withTransaction
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.db.AppDB
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.dto.IncomeGroupRemaining
@@ -23,7 +24,7 @@ class AppRepository(private val db: AppDB) {
     suspend fun updateAccount(account: Account) = accountDao.updateAccount(account)
     suspend fun deleteAccount(account: Account) = accountDao.delete(account)
     fun getAllAccounts(): Flow<List<Account>> = accountDao.getAllAccounts()
-    fun getAllAccountBalances(): Flow<List<AccountBalance>> = accountDao.getAccountBalances()
+    fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> = accountDao.getAccountBalances()
     fun getMainAccounts(): Flow<List<AccountBalance>> = accountDao.getMainAccountBalances()
     suspend fun getAccountById(accountId: Long): Account? = accountDao.getAccountById(accountId)
     suspend fun getAccountByName(name: String): Account? = accountDao.getAccountByName(name)
