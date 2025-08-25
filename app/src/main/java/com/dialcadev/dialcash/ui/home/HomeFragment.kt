@@ -17,6 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dialcadev.dialcash.NewTransactionActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -82,7 +83,8 @@ class HomeFragment : Fragment() {
             navigateToTransactionType("transfer")
         }
         binding.btnViewAllTransactions.setOnClickListener {
-            findNavController().navigate(R.id.transactionsFragment)
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
+            bottomNav.selectedItemId = R.id.transactionsFragment
         }
         binding.btnViewAllAccounts.setOnClickListener {
             findNavController().navigate(R.id.accountsFragment)
