@@ -6,6 +6,7 @@
     <color name="colorPrimaryVariant">#063f61</color>
     <color name="colorSecondary">#d79b5f</color>
     <color name="colorSecondaryVariant">#b07d4a</color>
+    <color name="colorPositive">#81C784</color>
     <color name="background">#FFFFFF</color>
     <color name="surface">#F2F2F2</color>
     <color name="text_primary">#000000</color>

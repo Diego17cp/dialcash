@@ -4,6 +4,7 @@
     <color name="colorPrimaryVariant">#085691</color>
     <color name="colorSecondary">#f0c78b</color>
     <color name="colorSecondaryVariant">#d79b5f</color>
+    <color name="colorPositive">#255d27</color>
     <color name="background">#121212</color>
     <color name="surface">#1E1E1E</color>
     <color name="text_primary">#FFFFFF</color>
