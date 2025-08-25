@@ -56,7 +56,7 @@ interface AccountDao {
     fun getMainAccountBalances(): Flow<List<AccountBalance>>
 
     @Query("""
-        SELECT a.id, a.name, a.type,
+        SELECT a.id, a.name, a.type, a.balance as originalBalance,
         a.balance + IFNULL(SUM(
             CASE WHEN t.type = 'income' THEN t.amount
                 WHEN t.type = 'expense' THEN -t.amount
@@ -67,5 +67,12 @@ interface AccountDao {
         LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
         GROUP BY a.id
     """)
-    fun getAccountBalances(): Flow<List<AccountBalance>>
+    fun getAccountBalances(): Flow<List<AccountBalanceWithOriginal>>
 }
+
+data class AccountBalanceWithOriginal(
+    val id: Int,
+    val name: String,
+    val balance: Double,
+    val originalBalance: Double
+)
