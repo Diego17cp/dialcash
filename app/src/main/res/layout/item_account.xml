@@ -1,59 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:orientation="horizontal"
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/imageAccountIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:layout_gravity="center_vertical"
         android:src="@drawable/ic_cash"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/colorPrimary" />
 
-    <TextView
-        android:id="@+id/textAccountName"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintStart_toEndOf="@id/imageAccountIcon"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/textCurrentBalance"
-        tools:text="Cuenta Corriente" />
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textOriginalBalance"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:textSize="12sp"
-        android:textColor="?android:attr/textColorSecondary"
-        app:layout_constraintStart_toEndOf="@id/imageAccountIcon"
-        app:layout_constraintTop_toBottomOf="@id/textAccountName"
-        app:layout_constraintEnd_toStartOf="@id/textCurrentBalance"
-        tools:text="Balance original: $1,000.00" />
+        <TextView
+            android:id="@+id/textAccountName"
+            tools:text="Cuenta Corriente"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textOriginalBalance"
+            tools:text="Balance original: $1,000.00"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="12sp" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/textCurrentBalance"
+        tools:text="$1,250.00"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
         android:textColor="@color/colorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:text="$1,250.00" />
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
