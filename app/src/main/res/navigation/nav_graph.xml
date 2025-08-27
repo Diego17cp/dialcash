@@ -8,25 +8,25 @@
         android:id="@+id/homeFragment"
         android:name="com.dialcadev.dialcash.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="Inicio" />
+        android:label="Home" />
     <fragment
         android:id="@+id/transactionsFragment"
         android:name="com.dialcadev.dialcash.ui.transactions.TransactionsFragment"
         tools:layout="@layout/fragment_transactions"
-        android:label="Transacciones" />
+        android:label="Transactions" />
     <fragment
         android:id="@+id/accountsFragment"
         android:name="com.dialcadev.dialcash.ui.accounts.AccountsFragment"
         tools:layout="@layout/fragment_accounts"
-        android:label="Cuentas" />
+        android:label="Accounts" />
     <fragment
         android:id="@+id/incomesFragment"
         android:name="com.dialcadev.dialcash.ui.IncomesFragment"
         tools:layout="@layout/fragment_incomes"
-        android:label="Ingresos Especiales" />
+        android:label="Special Incomes" />
     <fragment
         android:id="@+id/checkpointFragment"
         android:name="com.dialcadev.dialcash.ui.CheckpointFragment"
         tools:layout="@layout/fragment_checkpoint"
-        android:label="Checkpoint" />
+        android:label="Checkpoints" />
 </navigation>
