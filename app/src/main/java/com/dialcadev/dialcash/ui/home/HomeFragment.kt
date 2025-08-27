@@ -87,7 +87,8 @@ class HomeFragment : Fragment() {
             bottomNav.selectedItemId = R.id.transactionsFragment
         }
         binding.btnViewAllAccounts.setOnClickListener {
-            findNavController().navigate(R.id.accountsFragment)
+            val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
+            bottomNav.selectedItemId = R.id.accountsFragment
         }
     }
     private fun navigateToTransactionType(transactionType: String) {
