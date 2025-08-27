@@ -32,6 +32,7 @@ class AccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -
                     "cash" -> com.dialcadev.dialcash.R.drawable.ic_cash
                     "bank" -> com.dialcadev.dialcash.R.drawable.ic_bank
                     "card" -> com.dialcadev.dialcash.R.drawable.ic_card
+                    "wallet" -> com.dialcadev.dialcash.R.drawable.ic_accounts_filled
                     else -> com.dialcadev.dialcash.R.drawable.ic_account_default
                 }
                 imageAccountIcon.setImageResource(iconRes)
