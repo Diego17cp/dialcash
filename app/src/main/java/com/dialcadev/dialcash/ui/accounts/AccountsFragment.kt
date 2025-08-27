@@ -1,5 +1,6 @@
 package com.dialcadev.dialcash.ui.accounts
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -32,6 +33,7 @@ class AccountsFragment : Fragment() {
         setupRecyclerView()
         observeViewModel()
         setupSwipeToRefresh()
+        setupListeners()
     }
 
     private fun setupSwipeToRefresh() {
@@ -47,6 +49,12 @@ class AccountsFragment : Fragment() {
         binding.recyclerViewAccounts.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = accountsAdapter
+        }
+    }
+    private fun setupListeners() {
+        binding.btnNewAccount.setOnClickListener {
+            val intent = Intent(requireContext(), NewAccountActivity::class.java)
+            startActivity(intent)
         }
     }
 
