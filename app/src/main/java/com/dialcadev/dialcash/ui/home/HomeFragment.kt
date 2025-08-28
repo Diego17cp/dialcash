@@ -54,8 +54,7 @@ class HomeFragment : Fragment() {
     }
     private fun setupRecyclerViews() {
         accountsAdapter = MainAccountsAdapter { account ->
-            // Navegación temporal hasta que se genere HomeFragmentDirections
-            findNavController().navigate(R.id.accountsFragment)
+            // aqui deberia mostrar un fragment o activity con la info del elemento seleccionado
         }
         binding.recyclerViewAccounts.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -63,8 +62,7 @@ class HomeFragment : Fragment() {
         }
 
         transactionsAdapter = RecentTransactionsAdapter { transaction ->
-            // Navegación temporal
-            findNavController().navigate(R.id.transactionsFragment)
+            // aqui deberia mostrar un fragment o activity con la info del elemento seleccionado
         }
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(context)
