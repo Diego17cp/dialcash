@@ -57,12 +57,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        val navController = findNavController(R.id.nav_host_fragment)
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        bottomNav.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            supportActionBar?.title = destination.label
+        try {
+            val navController = findNavController(R.id.nav_host_fragment)
+            val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+            bottomNav.setupWithNavController(navController)
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                supportActionBar?.title = destination.label
+            }
+        } catch (e: IllegalStateException) {
+            // Si el NavController no está listo, programar para el siguiente frame
+            findViewById<android.view.View>(android.R.id.content).postDelayed({
+                setupNavigation()
+            }, 100)
         }
     }
 
