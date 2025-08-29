@@ -28,13 +28,9 @@ abstract class AppDB : RoomDatabase() {
 
         fun getInstance(context: Context): AppDB {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDB::class.java,
-                    "dialcash_db"
-                ).fallbackToDestructiveMigration().build()
-                INSTANCE = instance
-                instance
+                INSTANCE ?: Room.databaseBuilder(
+                    context.applicationContext, AppDB::class.java, "dialcash_db"
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
             }
         }
     }
