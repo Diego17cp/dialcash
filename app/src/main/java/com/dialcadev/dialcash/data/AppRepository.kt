@@ -57,15 +57,30 @@ class AppRepository(private val db: AppDB) {
         relatedIncomeId: Int? = null,
         date: Long? = null
     ) {
-        val transaction = Transaction(
-            accountId = accountId,
-            type = "expense",
-            amount = amount,
-            date = date ?: System.currentTimeMillis(),
-            description = description,
-            relatedIncomeId = relatedIncomeId
-        )
-        transactionDao.insert(transaction)
+        db.withTransaction {
+            if (relatedIncomeId != null) {
+                val incomeGroup = incomeGroupDao.getIncomeGroupById(relatedIncomeId.toLong())
+                    ?: throw IllegalArgumentException("Income group with ID $relatedIncomeId not found")
+                val remaining = incomeGroupDao.getRemainingForGroup(incomeGroup.id.toInt())
+                val updatedRemaining = (remaining ?: 0.0) - amount
+
+                if (updatedRemaining < 0) {
+                    throw IllegalArgumentException("Insufficient funds in income group. Available: $remaining, Required: $amount")
+                }
+
+                val updatedIncomeGroup = incomeGroup.copy(remaining = updatedRemaining)
+                incomeGroupDao.update(updatedIncomeGroup)
+            }
+            val transaction = Transaction(
+                accountId = accountId,
+                type = "expense",
+                amount = amount,
+                date = date ?: System.currentTimeMillis(),
+                description = description,
+                relatedIncomeId = relatedIncomeId
+            )
+            transactionDao.insert(transaction)
+        }
     }
 
     suspend fun makeTransfer(
@@ -127,8 +142,9 @@ class AppRepository(private val db: AppDB) {
     suspend fun createIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.insert(incomeGroup)
     suspend fun updateIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.update(incomeGroup)
     suspend fun deleteIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.delete(incomeGroup)
-    fun getAllIncomeGroups(): Flow<List<IncomeGroupRemaining>> =
+    fun getAllIncomeGroupsWithRemaining(): Flow<List<IncomeGroupRemaining>> =
         incomeGroupDao.getIncomeGroupsRemaining()
+    fun getAllIncomeGroups(): Flow<List<IncomeGroup>> = incomeGroupDao.getAllIncomeGroups()
 
     suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup? =
         incomeGroupDao.getIncomeGroupById(incomeGroupId)
