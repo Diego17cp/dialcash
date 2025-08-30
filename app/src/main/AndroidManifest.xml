@@ -40,6 +40,8 @@
         <activity
             android:name=".ui.accounts.NewAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
+        <activity android:name=".SettingsActivity"
+            android:theme="@style/Base.Theme.Dialcash" />
 
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
