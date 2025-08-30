@@ -20,14 +20,11 @@ class FirstAccountViewModel @Inject constructor(private val repository: AppRepos
     fun createAccount(name: String, type: String, balance: Double) {
         viewModelScope.launch {
             try {
-                Log.d("FirstAccountVM", "Creating account: $name, $type, $balance")
                 _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
                 val account = Account(name = name, type = type, balance = balance)
                 val accountId = repository.createAccount(account)
-                Log.d("FirstAccountVM", "Account created with ID: $accountId")
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true, errorMessage = null)
             } catch (e: Exception) {
-                Log.e("FirstAccountVM", "Error creating account", e)
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = false, errorMessage = e.message ?: "An error occurred")
             }
         }
