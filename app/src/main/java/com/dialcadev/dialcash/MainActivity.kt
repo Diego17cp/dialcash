@@ -2,12 +2,19 @@ package com.dialcadev.dialcash
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.size
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -48,6 +55,33 @@ class MainActivity : AppCompatActivity() {
 
             val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
             setSupportActionBar(toolbar)
+            addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.main_menu, menu)
+                }
+
+                override fun onPrepareMenu(menu: Menu) {
+                    val typedValue = TypedValue()
+                    val attRes = com.google.android.material.R.attr.colorOnSurface
+                    if (theme.resolveAttribute(attRes, typedValue, true)) {
+                        val color = typedValue.data
+                        for (i in 0 until menu.size) {
+                            menu.getItem(i).icon?.mutate()?.setTint(color)
+                        }
+                    }
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.action_settings -> {
+                            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
+                            startActivity(intent)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }, this@MainActivity, Lifecycle.State.RESUMED)
 
             findViewById<android.view.View>(android.R.id.content).post {
                 setupNavigation()
