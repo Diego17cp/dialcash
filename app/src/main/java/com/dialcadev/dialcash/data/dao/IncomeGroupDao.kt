@@ -23,7 +23,7 @@ interface IncomeGroupDao {
     suspend fun delete(incomeGroup: IncomeGroup)
 
     @Query("SELECT * FROM income_groups ORDER BY id ASC")
-    suspend fun getAllIncomeGroups(): List<IncomeGroup>
+    fun getAllIncomeGroups(): Flow<List<IncomeGroup>>
 
     @Query("SELECT * FROM income_groups WHERE id = :incomeGroupId LIMIT 1")
     suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup?
