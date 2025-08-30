@@ -191,18 +191,8 @@ class NewTransactionActivity : AppCompatActivity() {
                     }
                     "transfer" -> {
                         repository.makeTransfer(
-                            fromAccount = Account(
-                                id = selectedAccountFrom!!.id,
-                                name = selectedAccountFrom!!.name,
-                                type = selectedAccountFrom!!.type,
-                                balance = selectedAccountFrom!!.balance
-                            ),
-                            toAccount = Account(
-                                id = selectedAccountTo!!.id,
-                                name = selectedAccountTo!!.name,
-                                type = selectedAccountTo!!.type,
-                                balance = selectedAccountTo!!.balance
-                            ),
+                            fromAccountId = selectedAccountFrom!!.id,
+                            toAccountId = selectedAccountTo!!.id,
                             amount = amount,
                             description = description,
                             date = finalDate

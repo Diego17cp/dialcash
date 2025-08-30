@@ -69,25 +69,20 @@ class AppRepository(private val db: AppDB) {
     }
 
     suspend fun makeTransfer(
-        fromAccount: Account,
-        toAccount: Account,
+        fromAccountId: Int,
+        toAccountId: Int,
         amount: Double,
         description: String?,
         date: Long? = null
     ) {
         db.withTransaction {
-            val updatedFrom = fromAccount.copy(balance = fromAccount.balance - amount)
-            val updatedTo = toAccount.copy(balance = toAccount.balance + amount)
-            accountDao.updateAccount(updatedFrom)
-            accountDao.updateAccount(updatedTo)
-
             val transfer = Transaction(
                 amount = amount,
                 type = "transfer",
                 date = date ?: System.currentTimeMillis(),
                 description = description,
-                accountId = fromAccount.id,
-                transferAccountId = toAccount.id
+                accountId = fromAccountId,
+                transferAccountId = toAccountId
             )
             transactionDao.insert(transfer)
         }
