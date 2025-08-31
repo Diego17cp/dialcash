@@ -21,7 +21,7 @@
         android:label="Accounts" />
     <fragment
         android:id="@+id/incomesFragment"
-        android:name="com.dialcadev.dialcash.ui.IncomesFragment"
+        android:name="com.dialcadev.dialcash.ui.incomegroup.IncomesFragment"
         tools:layout="@layout/fragment_incomes"
         android:label="Special Incomes" />
     <fragment
