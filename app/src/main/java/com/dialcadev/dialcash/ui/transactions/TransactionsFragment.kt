@@ -15,6 +15,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,7 +45,7 @@ class TransactionsFragment : Fragment() {
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_filters -> {
-                        // manejo de clic en el ícono de filtros
+                        showFiltersBottomSheet()
                         true
                     }
                     else -> false
@@ -59,6 +60,14 @@ class TransactionsFragment : Fragment() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshTransactions()
         }
+    }
+    private fun showFiltersBottomSheet(){
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+        val bottomSheetView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.bottom_sheet_filters, null)
+
+        bottomSheetDialog.setContentView(bottomSheetView)
+        bottomSheetDialog.show()
     }
     private fun setupRecyclerView(){
         transactionsAdapter = TransactionsAdapter { transaction ->
