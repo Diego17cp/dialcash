@@ -150,6 +150,15 @@ class NewTransactionActivity : AppCompatActivity() {
             Toast.makeText(this, "Please select an account", Toast.LENGTH_SHORT).show()
             return
         }
+        if (transactionType == "expense" && selectedIncomeGroup != null) {
+            if (selectedIncomeGroup!!.remaining < amount) {
+                Toast.makeText(this, "Insufficient funds in income group. Available: ${selectedIncomeGroup!!.remaining}, Required: $amount", Toast.LENGTH_SHORT).show()
+                binding.dropdownIncomeGroup.text.clear()
+                binding.dropdownIncomeGroup.clearFocus()
+                selectedIncomeGroup = null
+                return
+            }
+        }
         if (transactionType == "transfer") {
             if (selectedAccountTo == null) {
                 Toast.makeText(this, "Please select destination account", Toast.LENGTH_SHORT).show()
