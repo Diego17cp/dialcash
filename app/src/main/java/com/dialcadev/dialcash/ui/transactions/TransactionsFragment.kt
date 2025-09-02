@@ -10,6 +10,8 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
@@ -96,6 +99,40 @@ class TransactionsFragment : Fragment() {
         val cbIncome = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbIncome)
         val cbExpense = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbExpense)
         val cbTransfer = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbTransfer)
+        val cardIncome = bottomSheetView.findViewById<MaterialCardView>(R.id.cardIncome)
+        val cardExpense = bottomSheetView.findViewById<MaterialCardView>(R.id.cardExpense)
+        val cardTransfer = bottomSheetView.findViewById<MaterialCardView>(R.id.cardTransfer)
+
+        fun updateCardBg(card: MaterialCardView, isChecked: Boolean) {
+            if (isChecked) {
+                val primaryColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+                val transparentBg =
+                    ColorUtils.setAlphaComponent(primaryColor, (0.10f * 255).toInt())
+                card.setCardBackgroundColor(transparentBg)
+                card.strokeColor = primaryColor
+            } else {
+                card.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.surface
+                    )
+                )
+                card.strokeColor = ContextCompat.getColor(requireContext(), R.color.surface)
+            }
+        }
+        cardIncome.setOnClickListener {
+            cbIncome.isChecked = !cbIncome.isChecked
+            updateCardBg(cardIncome, cbIncome.isChecked)
+        }
+        cardExpense.setOnClickListener {
+            cbExpense.isChecked = !cbExpense.isChecked
+            updateCardBg(cardExpense, cbExpense.isChecked)
+        }
+        cardTransfer.setOnClickListener {
+            cbTransfer.isChecked = !cbTransfer.isChecked
+            updateCardBg(cardTransfer, cbTransfer.isChecked)
+        }
+
 
         fun updateTypesFilter() {
             val selected = mutableListOf<String>()
@@ -132,7 +169,6 @@ class TransactionsFragment : Fragment() {
                     }
                     val selectedTimestamp = calendar.timeInMillis
                     val formattedDate = dateFormat.format(calendar.time)
-                    Log.d("TransactionsFragment", "Selected date: $selectedTimestamp")
                     if (isStart) {
                         etStartDate.setText(formattedDate)
                         viewModel.setStartDate(selectedTimestamp)
