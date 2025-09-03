@@ -20,13 +20,17 @@ class RegisterActivity : AppCompatActivity() {
     private var selectedImageUri: Uri? = null
 
     private val selectImageLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                selectedImageUri = uri
-                binding.ivProfilePicture.setImageURI(uri)
-            }
+        ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            try {
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (ignored: Exception) { }
+            selectedImageUri = uri
+            binding.ivProfilePicture.setImageURI(uri)
         }
     }
 
@@ -59,8 +63,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun selectProfileImage() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        selectImageLauncher.launch(intent)
+        selectImageLauncher.launch(arrayOf("image/*"))
     }
 
     private fun validateForm(): Boolean {
