@@ -73,27 +73,22 @@
                             android:text="username"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                             android:textColor="?attr/colorOnSurface" />
-
-                        <ImageButton
-                            android:id="@+id/btn_edit_username"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:contentDescription="Edit username"
-                            android:padding="8dp"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/ic_edit"
-                            app:tint="?attr/colorOnSurfaceVariant" />
-
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_edit_profile"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Name"
+                        android:layout_marginTop="14dp"
+                        android:background="@drawable/ripple_item_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="6dp"
+                        android:text="Edit profile"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        android:textColor="?attr/colorPrimary" />
 
                 </LinearLayout>
 
