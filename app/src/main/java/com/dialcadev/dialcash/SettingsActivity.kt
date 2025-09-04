@@ -1,7 +1,6 @@
 package com.dialcadev.dialcash
 
-import android.graphics.BitmapFactory
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
@@ -13,11 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.SettingsActivityBinding
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import com.dialcadev.dialcash.data.UserData
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: SettingsActivityBinding
     private lateinit var userDataStore: UserDataStore
+    var userData: UserData? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +37,7 @@ class SettingsActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowHomeEnabled(true)
         userDataStore = UserDataStore.getInstance(this)
         setupViews()
+        setupListeners()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -48,12 +51,23 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupViews() {
         lifecycleScope.launch {
             userDataStore.getUserData().collect { user ->
+                userData = user
                 binding.tvUsername.text = user.name
                 val uri = user.photoUri
-                    .takeIf { it.isNotBlank() }
-                    ?.let { Uri.parse(it) }
+                    .takeIf { it.isNotBlank() }?.toUri()
                 binding.imageProfile.setImageURI(uri)
             }
         }
+    }
+
+    private fun setupListeners() {
+        binding.tvEditProfile.setOnClickListener { navigateToEditProfile() }
+    }
+
+    private fun navigateToEditProfile() {
+        val intent = Intent(this, EditProfileActivity::class.java)
+        intent.putExtra("userName", userData?.name)
+        intent.putExtra("userPhotoUri", userData?.photoUri)
+        startActivity(intent)
     }
 }
