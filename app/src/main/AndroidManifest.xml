@@ -44,7 +44,8 @@
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".NewIncomeActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-
+        <activity android:name=".EditProfileActivity"
+            android:theme="@style/Base.Theme.Dialcash" />
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
