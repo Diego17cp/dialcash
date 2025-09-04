@@ -37,6 +37,17 @@ class UserDataStore(private val context: Context) {
             prefs[IS_REGISTERED] = true
         }
     }
+    suspend fun updateUserData(
+        name: String,
+        photoUri: String? = null
+    ) {
+        context.dataStore.edit { prefs ->
+            prefs[USER_NAME] = name
+            if (photoUri != null) {
+                prefs[USER_PHOTO_URI] = photoUri
+            }
+        }
+    }
 
     fun getUserData(): Flow<UserData> {
         return context.dataStore.data.map { prefs ->
