@@ -59,10 +59,14 @@ class IncomesFragment : Fragment() {
             startActivity(intent)
         }
     }
+    private fun updateEmptyState(isEmpty: Boolean){
+        binding.layoutIncomes.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        binding.layoutNoIncomes.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
     private fun observeViewModel() {
         viewModel.incomes.observe(viewLifecycleOwner) { incomes ->
             incomesAdapter.submitList(incomes)
-            binding.layoutIncomes.visibility = if (incomes.isEmpty()) View.GONE else View.VISIBLE
+            updateEmptyState(incomes.isEmpty())
         }
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefreshLayout.isRefreshing = isLoading
