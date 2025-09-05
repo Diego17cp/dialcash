@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
+import com.dialcadev.dialcash.data.entities.Account
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -16,6 +17,8 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
     ViewModel() {
     private val _transactions = MutableLiveData<List<TransactionWithDetails>>()
     val transactions: LiveData<List<TransactionWithDetails>> = _transactions
+    private val _accounts = MutableLiveData<List<Account>>()
+    val accounts: LiveData<List<Account>> = _accounts
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -27,6 +30,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
     private val _typesFilter = MutableLiveData<List<String>>(emptyList())
     private val _startDate = MutableLiveData<Long?>(null)
     private val _endDate = MutableLiveData<Long?>(null)
+    val _accountNames = MutableLiveData<List<String>>(emptyList())
 
     private val _isFiltered = MutableLiveData<Boolean>(false)
     val isFiltered: LiveData<Boolean> = _isFiltered
@@ -36,6 +40,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
 
     init {
         fetchTransactions()
+        fetchAccounts()
     }
 
     fun fetchTransactions() {
@@ -52,6 +57,18 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
                 _errorMessage.value = "Error fetching transactions: ${e.message}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+    fun fetchAccounts() {
+        viewModelScope.launch {
+            _errorMessage.value = null
+            try {
+                repository.getAllAccounts().collect { accounts ->
+                    _accounts.value = accounts
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching accounts: ${e.message}"
             }
         }
     }
@@ -76,11 +93,17 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
         applyFilters()
     }
 
+    fun setAccountFilter(accountNames: List<String>) {
+        _accountNames.value = accountNames
+        applyFilters()
+    }
+
     private fun applyFilters() {
         val query = _searchQuery.value ?: ""
         val types = _typesFilter.value ?: emptyList()
         val startDate = _startDate.value
         val endDate = _endDate.value
+        val accountNames = _accountNames.value ?: emptyList()
 
         val filteredTransactions = allTransactions.filter { transaction ->
             val matchesQuery = if (query.isBlank()) true
@@ -105,7 +128,12 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
                 afterStart && beforeEnd
             }
 
-            matchesQuery && matchesTypes && matchesDate
+            val matchesAccount = if (accountNames.isEmpty()) true
+            else accountNames.any { accName ->
+                transaction.accountName?.equals(accName, ignoreCase = true) == true
+            }
+
+            matchesQuery && matchesTypes && matchesDate && matchesAccount
         }
 
         _transactions.value = filteredTransactions
@@ -119,6 +147,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
         _startDate.value = null
         _endDate.value = null
         _isFiltered.value = false
+        _accountNames.value = emptyList()
         allTransactions = initialTransactions
         applyFilters()
     }
