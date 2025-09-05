@@ -57,11 +57,14 @@ class AccountsFragment : Fragment() {
             startActivity(intent)
         }
     }
-
+    private fun updateEmptyState(isEmpty: Boolean) {
+        binding.layoutAccounts.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        binding.layoutNoAccounts.visibility = if (isEmpty) View.VISIBLE else View.GONE
+    }
     private fun observeViewModel() {
         viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
             accountsAdapter.submitList(accounts)
-            binding.layoutAccounts.visibility = if (accounts.isEmpty()) View.GONE else View.VISIBLE
+            updateEmptyState(accounts.isEmpty())
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
