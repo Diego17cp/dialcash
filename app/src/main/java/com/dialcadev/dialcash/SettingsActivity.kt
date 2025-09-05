@@ -2,9 +2,13 @@ package com.dialcadev.dialcash
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
+import android.view.WindowManager
+import android.widget.RadioGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,6 +18,8 @@ import com.dialcadev.dialcash.databinding.SettingsActivityBinding
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.dialcadev.dialcash.data.UserData
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -62,6 +68,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         binding.tvEditProfile.setOnClickListener { navigateToEditProfile() }
+        binding.layoutThemeSelector.setOnClickListener { openThemeSelector() }
     }
 
     private fun navigateToEditProfile() {
@@ -69,5 +76,36 @@ class SettingsActivity : AppCompatActivity() {
         intent.putExtra("userName", userData?.name)
         intent.putExtra("userPhotoUri", userData?.photoUri)
         startActivity(intent)
+    }
+    private fun openThemeSelector() {
+        val view = layoutInflater.inflate(R.layout.theme_picker_sheet, null)
+        val radioGroup = view.findViewById<RadioGroup>(R.id.rg_theme)
+        when (AppCompatDelegate.getDefaultNightMode()) {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> radioGroup.check(R.id.rb_system)
+            AppCompatDelegate.MODE_NIGHT_NO -> radioGroup.check(R.id.rb_light)
+            AppCompatDelegate.MODE_NIGHT_YES -> radioGroup.check(R.id.rb_dark)
+            else -> radioGroup.check(R.id.rb_system)
+        }
+        val dialog = MaterialAlertDialogBuilder(this)
+            .setTitle("Select Theme")
+            .setView(view)
+            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton("Ok") { dialog, _ ->
+                when (radioGroup.checkedRadioButtonId) {
+                    R.id.rb_system -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    R.id.rb_light -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    R.id.rb_dark -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+                dialog.dismiss()
+            }
+            .create()
+
+        dialog.window?.apply {
+            setBackgroundDrawableResource(R.drawable.dialog_background)
+            val params = attributes
+            params.width = (resources.displayMetrics.widthPixels * 0.8).toInt()
+            attributes = params
+        }
+        dialog.show()
     }
 }
