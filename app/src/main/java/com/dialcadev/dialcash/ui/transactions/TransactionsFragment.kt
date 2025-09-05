@@ -35,6 +35,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import androidx.core.view.isVisible
 
 @AndroidEntryPoint
 class TransactionsFragment : Fragment() {
@@ -277,12 +278,20 @@ class TransactionsFragment : Fragment() {
             binding.btnClearFilters.visibility = if (filtered) View.VISIBLE else View.GONE
         }
     }
-
+    private fun updateEmptyState(transactionsEmpty: Boolean, filtered: Boolean) {
+        binding.layoutTransactions.visibility = if (transactionsEmpty) View.GONE else View.VISIBLE
+        binding.layoutNoTransactions.visibility = if (transactionsEmpty) View.VISIBLE else View.GONE
+        if (transactionsEmpty) {
+            binding.tvEmptyTitle.text = if (filtered) "No results found" else "No transactions yet"
+            binding.tvEmptySubtitle.text = if (filtered) "Try adjusting your filters or clear them to see all transactions."
+            else "Add your first transaction to get started."
+        }
+    }
     private fun observeViewModel() {
         viewModel.transactions.observe(viewLifecycleOwner) { transactions ->
             transactionsAdapter.submitList(transactions)
-            binding.layoutTransactions.visibility =
-                if (transactions.isEmpty()) View.GONE else View.VISIBLE
+            val filtered = viewModel.isFiltered.value ?: false
+            updateEmptyState(transactions.isEmpty(), filtered)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefreshLayout.isRefreshing = isLoading
@@ -295,6 +304,14 @@ class TransactionsFragment : Fragment() {
                     .setAction("Retry") { viewModel.refreshTransactions() }
                     .show()
                 viewModel.clearError()
+            }
+        }
+        viewModel.isFiltered.observe(viewLifecycleOwner) { filtered ->
+            binding.btnClearFilters.visibility = if (filtered) View.VISIBLE else View.GONE
+            if (binding.layoutNoTransactions.isVisible) {
+                binding.tvEmptyTitle.text = if (filtered) "No results found" else "No transactions yet"
+                binding.tvEmptySubtitle.text = if (filtered) "Try adjusting your filters or clear them to see all transactions."
+                else "Add your first transaction to get started."
             }
         }
         try {
