@@ -1,6 +1,7 @@
 package com.dialcadev.dialcash.ui.transactions
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -18,10 +19,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
@@ -38,6 +42,7 @@ class TransactionsFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: TransactionsViewModel by viewModels()
     private lateinit var transactionsAdapter: TransactionsAdapter
+    private var selectedAccountsChips: List<String> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -185,8 +190,74 @@ class TransactionsFragment : Fragment() {
         }
         etStartDate.setOnClickListener { openDatePicker(true) }
         etEndDate.setOnClickListener { openDatePicker(false) }
-    }
 
+        val chipGroup = bottomSheetView.findViewById<ChipGroup>(R.id.chipGroupAccounts)
+        viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
+            val currentSelection = try {
+                viewModel._accountNames.value ?: selectedAccountsChips
+            } catch (e: Exception) {
+                selectedAccountsChips
+            }
+            populateAccountsChips(chipGroup, accounts, currentSelection)
+        }
+    }
+    private fun populateAccountsChips(chipGroup: ChipGroup, accounts: List<Account>, selectedAccounts: List<String>) {
+        chipGroup.removeAllViews()
+        val allChip = Chip(requireContext()).apply {
+            text = "All"
+            isCheckable = true
+            isChecked = selectedAccounts.isEmpty()
+            id = View.generateViewId()
+            setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.chip_text_color))
+            chipBackgroundColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_background)
+        }
+        chipGroup.addView(allChip)
+        accounts.forEach { account ->
+            val chip = Chip(requireContext()).apply {
+                text = account.name
+                isCheckable = true
+                isChecked = selectedAccounts.contains(account.name)
+                tag = account.name
+                id = View.generateViewId()
+                setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.chip_text_color))
+                chipBackgroundColor = ContextCompat.getColorStateList(requireContext(), R.color.chip_background)
+            }
+            chipGroup.addView(chip)
+        }
+        allChip.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                for (i in 0 until chipGroup.childCount) {
+                    val child = chipGroup.getChildAt(i)
+                    if (child is Chip && child != allChip) child.isChecked = false
+                }
+                selectedAccountsChips = emptyList()
+                viewModel.setAccountFilter(emptyList())
+            }
+        }
+        for (i in 0 until chipGroup.childCount) {
+            val child = chipGroup.getChildAt(i)
+            if (child is Chip && child != allChip) {
+                child.setOnCheckedChangeListener { _, _ ->
+                    if (child.isChecked) allChip.isChecked = false
+
+                    val selected = mutableListOf<String>()
+                    for (j in 0 until chipGroup.childCount) {
+                        val c = chipGroup.getChildAt(j)
+                        if (c is Chip && c != allChip && c.isChecked) selected.add(c.tag as String)
+                    }
+
+                    if (selected.isEmpty()) {
+                        allChip.isChecked = true
+                        selectedAccountsChips = emptyList()
+                        viewModel.setAccountFilter(emptyList())
+                    } else {
+                        selectedAccountsChips = selected.toList()
+                        viewModel.setAccountFilter(selected)
+                    }
+                }
+            }
+        }
+    }
     private fun setupRecyclerView() {
         transactionsAdapter = TransactionsAdapter { transaction ->
             // Aquí puedes manejar el clic en la transacción si es necesario
@@ -198,7 +269,10 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.btnClearFilters.setOnClickListener { viewModel.clearFilters() }
+        binding.btnClearFilters.setOnClickListener {
+            viewModel.clearFilters()
+            selectedAccountsChips = emptyList()
+        }
         viewModel.isFiltered.observe(viewLifecycleOwner) { filtered ->
             binding.btnClearFilters.visibility = if (filtered) View.VISIBLE else View.GONE
         }
@@ -223,6 +297,11 @@ class TransactionsFragment : Fragment() {
                 viewModel.clearError()
             }
         }
+        try {
+            viewModel._accountNames.observe(viewLifecycleOwner) { selected ->
+                selectedAccountsChips = selected ?: emptyList()
+            }
+        } catch (_: Exception) {}
     }
 
     override fun onResume() {
