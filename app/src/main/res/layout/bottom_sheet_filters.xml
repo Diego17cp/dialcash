@@ -43,7 +43,7 @@
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Buscar transacciones..."
+            android:hint="Search..."
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Tipos de transacción"
+            android:text="Transaction types"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -103,7 +103,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Ingresos"
+                    android:text="Incomes"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -151,7 +151,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Gastos"
+                    android:text="Expenses"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -199,7 +199,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Transferencias"
+                    android:text="Transfers"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -218,7 +218,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Rango de fechas"
+            android:text="Date range"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -251,7 +251,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="Fecha inicio"
+                    android:hint="Start date"
                     android:paddingVertical="14dp"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/colorPrimary" />
@@ -279,7 +279,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="Fecha fin"
+                    android:hint="End date"
                     android:paddingVertical="14dp"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/colorPrimary" />
@@ -287,6 +287,26 @@
 
         </LinearLayout>
 
+        <!--  Accounts Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"
+            android:text="Accounts Selector"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupAccounts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:chipSpacingHorizontal="8dp"
+            app:chipSpacingVertical="8dp"
+            app:singleSelection="false"
+            app:selectionRequired="false">
+        </com.google.android.material.chip.ChipGroup>
     </LinearLayout>
 
 </LinearLayout>
