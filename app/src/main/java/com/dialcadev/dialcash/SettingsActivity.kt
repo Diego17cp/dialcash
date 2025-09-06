@@ -85,6 +85,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.tvEditProfile.setOnClickListener { navigateToEditProfile() }
         binding.layoutThemeSelector.setOnClickListener { openThemeSelector() }
         binding.layoutDeleteAccount.setOnClickListener { navigateToDeleteAccount() }
+        binding.layoutExportData.setOnClickListener { navigateToExportData() }
     }
 
     private fun navigateToEditProfile() {
@@ -96,6 +97,10 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun navigateToDeleteAccount() {
         val intent = Intent(this, DeleteAccountActivity::class.java)
+        startActivity(intent)
+    }
+    private fun navigateToExportData() {
+        val intent = Intent(this, DownloadDataActivity::class.java)
         startActivity(intent)
     }
 
