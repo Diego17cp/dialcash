@@ -64,6 +64,12 @@ class UserDataStore(private val context: Context) {
             prefs[IS_REGISTERED] ?: false
         }
     }
+    suspend fun clearUserProfile() {
+        context.dataStore.edit { prefs ->
+            prefs[USER_NAME] = ""
+            prefs[USER_PHOTO_URI] = ""
+        }
+    }
     suspend fun clearUserData() {
         context.dataStore.edit { prefs ->
             prefs.clear()
