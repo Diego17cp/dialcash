@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userDataStore: UserDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splash = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         userDataStore = UserDataStore.getInstance(this)
 
