@@ -162,4 +162,9 @@ class AppRepository(private val db: AppDB) {
 
     suspend fun getLastCheckpointBefore(date: Long): Checkpoint? =
         checkpointDao.getLastCheckpointBefore(date)
+
+    // ==================== UTILITY OPERATIONS====================
+    suspend fun wipeDatabase() {
+        db.clearAllTables()
+    }
 }
