@@ -16,4 +16,6 @@
     <color name="negative_balance">#F44336</color>
     <color name="positive_amount">#4CAF50</color>
     <color name="negative_amount">#F44336</color>
+
+    <color name="ic_launcher_background">#01223f</color>
 </resources>
