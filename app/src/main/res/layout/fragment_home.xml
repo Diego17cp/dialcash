@@ -40,35 +40,35 @@
                         android:id="@+id/btnQuickIncome"
                         android:layout_width="0dp"
                         android:layout_height="48dp"
-                        android:layout_weight="1"
                         android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
                         android:minHeight="48dp"
                         android:text="Income"
-                        android:textSize="12sp"
-                        android:textAllCaps="false" />
+                        android:textAllCaps="false"
+                        android:textSize="12sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnQuickExpense"
                         android:layout_width="0dp"
                         android:layout_height="48dp"
-                        android:layout_weight="1"
                         android:layout_marginStart="4dp"
                         android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
                         android:minHeight="48dp"
                         android:text="Expense"
-                        android:textSize="12sp"
-                        android:textAllCaps="false" />
+                        android:textAllCaps="false"
+                        android:textSize="12sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnQuickTransfer"
                         android:layout_width="0dp"
                         android:layout_height="48dp"
-                        android:layout_weight="1"
                         android:layout_marginStart="4dp"
+                        android:layout_weight="1"
                         android:minHeight="48dp"
                         android:text="Transfer"
-                        android:textSize="12sp"
-                        android:textAllCaps="false" />
+                        android:textAllCaps="false"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 
@@ -148,6 +148,44 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/layoutNoInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:visibility="gone"
+                    android:layout_marginTop="64dp">
+
+                    <ImageView
+                        android:id="@+id/ivEmptyState"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:layout_marginBottom="16dp"
+                        android:contentDescription="No Info"
+                        android:src="@drawable/ic_error"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/tvEmptyTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textAlignment="center"
+                        android:text="There are no accounts or transactions to display."
+                        android:textAppearance="?attr/textAppearanceHeadline6"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <TextView
+                        android:id="@+id/tvEmptySubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pull down to refresh or add a new transaction or account."
+                        android:textAlignment="center"
+                        android:textAppearance="?attr/textAppearanceBody2"
+                        android:textColor="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

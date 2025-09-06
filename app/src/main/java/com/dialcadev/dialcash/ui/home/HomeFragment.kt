@@ -94,18 +94,34 @@ class HomeFragment : Fragment() {
         intent.putExtra("transaction_type", transactionType)
         startActivity(intent)
     }
-
+    private fun updateEmptyState() {
+        val isAccountsEmpty = accountsAdapter.currentList.isEmpty()
+        val isTransactionsEmpty = transactionsAdapter.currentList.isEmpty()
+        if (isAccountsEmpty) {
+            binding.btnQuickIncome.isEnabled = false
+            binding.btnQuickExpense.isEnabled = false
+            binding.btnQuickTransfer.isEnabled = false
+        } else {
+            binding.btnQuickIncome.isEnabled = true
+            binding.btnQuickExpense.isEnabled = true
+            binding.btnQuickTransfer.isEnabled = true
+        }
+        binding.layoutNoInfo.visibility =
+            if (isAccountsEmpty && isTransactionsEmpty) View.VISIBLE else View.GONE
+    }
     private fun observeViewModel() {
         viewModel.totalBalance.observe(viewLifecycleOwner) { total ->
             binding.textTotalBalance.text = getString(R.string.currency_format, total)
         }
         viewModel.mainAccounts.observe(viewLifecycleOwner) { accounts ->
             accountsAdapter.submitList(accounts)
+            updateEmptyState()
             binding.layoutMainAccounts.visibility =
                 if (accounts.isEmpty()) View.GONE else View.VISIBLE
         }
         viewModel.recentTransactions.observe(viewLifecycleOwner) { transactions ->
             transactionsAdapter.submitList(transactions)
+            updateEmptyState()
             binding.layoutRecentTransactions.visibility =
                 if (transactions.isEmpty()) View.GONE else View.VISIBLE
         }
