@@ -58,7 +58,7 @@ class SettingsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             userDataStore.getUserData().collect { user ->
                 userData = user
-                binding.tvUsername.text = user.name
+                binding.tvUsername.text = user.name?.takeIf { it.isNotBlank() } ?: "User"
                 val uri = user.photoUri
                     .takeIf { it.isNotBlank() }?.toUri()
                 binding.imageProfile.setImageURI(uri)
@@ -69,12 +69,17 @@ class SettingsActivity : AppCompatActivity() {
     private fun setupListeners() {
         binding.tvEditProfile.setOnClickListener { navigateToEditProfile() }
         binding.layoutThemeSelector.setOnClickListener { openThemeSelector() }
+        binding.layoutDeleteAccount.setOnClickListener { navigateToDeleteAccount() }
     }
 
     private fun navigateToEditProfile() {
         val intent = Intent(this, EditProfileActivity::class.java)
         intent.putExtra("userName", userData?.name)
         intent.putExtra("userPhotoUri", userData?.photoUri)
+        startActivity(intent)
+    }
+    private fun navigateToDeleteAccount() {
+        val intent = Intent(this, DeleteAccountActivity::class.java)
         startActivity(intent)
     }
     private fun openThemeSelector() {
