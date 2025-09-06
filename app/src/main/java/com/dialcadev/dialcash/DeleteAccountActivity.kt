@@ -17,11 +17,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class DeleteAccountActivity : AppCompatActivity() {
-    private lateinit var binding: DeleteAccountActivityBinding
-    private lateinit var userDataStore: UserDataStore
+    lateinit var binding: DeleteAccountActivityBinding
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
     private val viewModel: DeleteAccountViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +40,6 @@ class DeleteAccountActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        userDataStore = UserDataStore.getInstance(this)
         setupListeners()
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

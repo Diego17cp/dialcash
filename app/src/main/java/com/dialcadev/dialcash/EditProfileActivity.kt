@@ -15,7 +15,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.EditProfileActivityBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@AndroidEntryPoint
 
 class EditProfileActivity : AppCompatActivity() {
     private lateinit var binding: EditProfileActivityBinding
@@ -36,7 +40,9 @@ class EditProfileActivity : AppCompatActivity() {
                 binding.ivProfilePicture.setImageURI(uri)
             }
         }
-    private lateinit var userDataStore: UserDataStore
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,7 +50,6 @@ class EditProfileActivity : AppCompatActivity() {
         binding = EditProfileActivityBinding.inflate(layoutInflater)
         userName = intent.getStringExtra("userName") ?: ""
         userPhotoUri = intent.getStringExtra("userPhotoUri") ?: ""
-        userDataStore = UserDataStore.getInstance(this)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

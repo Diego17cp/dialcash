@@ -12,11 +12,17 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.RegisterActivityBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@AndroidEntryPoint
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: RegisterActivityBinding
-    private lateinit var userDataStore: UserDataStore
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
     private var selectedImageUri: Uri? = null
 
     private val selectImageLauncher = registerForActivityResult(
@@ -38,8 +44,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = RegisterActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        userDataStore = UserDataStore.getInstance(this)
         setupViews()
         setupListeners()
     }

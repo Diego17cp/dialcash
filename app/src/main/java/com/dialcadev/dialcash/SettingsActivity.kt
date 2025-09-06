@@ -20,11 +20,17 @@ import androidx.core.net.toUri
 import com.dialcadev.dialcash.data.UserData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+
+@AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: SettingsActivityBinding
-    private lateinit var userDataStore: UserDataStore
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
     var userData: UserData? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +47,6 @@ class SettingsActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        userDataStore = UserDataStore.getInstance(this)
         setupViews()
         setupListeners()
     }

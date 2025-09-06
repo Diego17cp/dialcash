@@ -24,16 +24,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var userDataStore: UserDataStore
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        userDataStore = UserDataStore.getInstance(this)
-
         lifecycleScope.launch {
             val isRegistered = userDataStore.isUserRegistered().first()
             if (!isRegistered) {
