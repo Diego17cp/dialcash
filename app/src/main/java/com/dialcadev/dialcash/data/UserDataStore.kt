@@ -9,22 +9,15 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class UserDataStore(private val context: Context) {
+class UserDataStore @Inject constructor(private val context: Context) {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
     companion object {
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_PHOTO_URI = stringPreferencesKey("user_photo_uri")
         private val IS_REGISTERED = booleanPreferencesKey("is_registered")
-
-        @Volatile
-        private var INSTANCE: UserDataStore? = null
-        fun getInstance(context: Context): UserDataStore {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: UserDataStore(context.applicationContext).also { INSTANCE = it }
-            }
-        }
     }
 
     suspend fun saveUserData(

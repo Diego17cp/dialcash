@@ -2,6 +2,7 @@ package com.dialcadev.dialcash.di
 
 import android.content.Context
 import com.dialcadev.dialcash.data.AppRepository
+import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.data.db.AppDB
 import dagger.Module
 import dagger.Provides
@@ -23,5 +24,11 @@ object DatabaseModule{
     @Singleton
     fun provideAppRepository(db: AppDB): AppRepository {
         return AppRepository(db)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserDataStore(@ApplicationContext context: Context): UserDataStore {
+        return UserDataStore(context)
     }
 }
