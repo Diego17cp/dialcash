@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.Dialcash.Splash" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background -->
+        <item name="windowSplashScreenBackground">#01223f</item>
+        <!-- Set the splash screen icon -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_dialcash_logo</item>
+        <!-- Set the icon animation duration -->
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <!-- Set the post-splash screen theme -->
+        <item name="postSplashScreenTheme">@style/Base.Theme.Dialcash</item>
+    </style>
+</resources>
