@@ -60,6 +60,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("com.google.code.gson:gson:2.13.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
