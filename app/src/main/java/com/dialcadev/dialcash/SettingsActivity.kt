@@ -66,7 +66,17 @@ class SettingsActivity : AppCompatActivity() {
                 binding.tvUsername.text = user.name?.takeIf { it.isNotBlank() } ?: "User"
                 val uri = user.photoUri
                     .takeIf { it.isNotBlank() }?.toUri()
-                binding.imageProfile.setImageURI(uri)
+                if (uri != null) {
+                    try {
+                        binding.imageProfile.setImageURI(uri)
+                    } catch (e: Exception) {
+                        binding.imageProfile.setImageResource(R.drawable.ic_account_circle)
+                    } catch (e: Exception) {
+                        binding.imageProfile.setImageResource(R.drawable.ic_account_circle)
+                    }
+                } else {
+                    binding.imageProfile.setImageResource(R.drawable.ic_account_circle)
+                }
             }
         }
     }
@@ -83,10 +93,12 @@ class SettingsActivity : AppCompatActivity() {
         intent.putExtra("userPhotoUri", userData?.photoUri)
         startActivity(intent)
     }
+
     private fun navigateToDeleteAccount() {
         val intent = Intent(this, DeleteAccountActivity::class.java)
         startActivity(intent)
     }
+
     private fun openThemeSelector() {
         val view = layoutInflater.inflate(R.layout.theme_picker_sheet, null)
         val radioGroup = view.findViewById<RadioGroup>(R.id.rg_theme)

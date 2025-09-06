@@ -74,7 +74,15 @@ class EditProfileActivity : AppCompatActivity() {
     private fun setupViews() {
         binding.etName.setText(userName)
         val uri = userPhotoUri.takeIf { it.isNotBlank() }?.toUri()
-        binding.ivProfilePicture.setImageURI(uri)
+        if (uri != null) {
+            try {
+                binding.ivProfilePicture.setImageURI(uri)
+            } catch (e: SecurityException) {
+                binding.ivProfilePicture.setImageResource(R.drawable.ic_account_circle)
+            } catch (e: Exception) {
+                binding.ivProfilePicture.setImageResource(R.drawable.ic_account_circle)
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -108,9 +116,14 @@ class EditProfileActivity : AppCompatActivity() {
                     name = updatedName,
                     photoUri = updatedPhotoUri.takeIf { it.isNotBlank() }
                 )
-                Toast.makeText(this@EditProfileActivity, "Profile updated", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@EditProfileActivity, "Profile updated", Toast.LENGTH_SHORT)
+                    .show()
             } catch (e: Exception) {
-                Toast.makeText(this@EditProfileActivity, "Failed to update profile", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@EditProfileActivity,
+                    "Failed to update profile",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
