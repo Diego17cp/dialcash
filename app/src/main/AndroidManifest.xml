@@ -51,6 +51,8 @@
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".DownloadDataActivity"
             android:theme="@style/Base.Theme.Dialcash" />
+        <activity android:name=".ImportDataActivity"
+            android:theme="@style/Base.Theme.Dialcash" />
     </application>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
