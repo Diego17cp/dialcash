@@ -86,6 +86,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.layoutThemeSelector.setOnClickListener { openThemeSelector() }
         binding.layoutDeleteAccount.setOnClickListener { navigateToDeleteAccount() }
         binding.layoutExportData.setOnClickListener { navigateToExportData() }
+        binding.layoutImportData.setOnClickListener { navigateToImportData() }
     }
 
     private fun navigateToEditProfile() {
@@ -101,6 +102,10 @@ class SettingsActivity : AppCompatActivity() {
     }
     private fun navigateToExportData() {
         val intent = Intent(this, DownloadDataActivity::class.java)
+        startActivity(intent)
+    }
+    private fun navigateToImportData() {
+        val intent = Intent(this, ImportDataActivity::class.java)
         startActivity(intent)
     }
 
