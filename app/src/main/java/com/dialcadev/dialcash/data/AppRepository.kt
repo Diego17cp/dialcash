@@ -12,6 +12,7 @@ import com.dialcadev.dialcash.data.entities.Checkpoint
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.data.entities.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlin.text.insert
 
 class AppRepository(private val db: AppDB) {
     private val accountDao = db.accountDao()
@@ -24,11 +25,20 @@ class AppRepository(private val db: AppDB) {
     suspend fun updateAccount(account: Account) = accountDao.updateAccount(account)
     suspend fun deleteAccount(account: Account) = accountDao.delete(account)
     fun getAllAccounts(): Flow<List<Account>> = accountDao.getAllAccounts()
-    fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> = accountDao.getAccountBalances()
+    fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> =
+        accountDao.getAccountBalances()
+
     fun getMainAccounts(): Flow<List<AccountBalance>> = accountDao.getMainAccountBalances()
     suspend fun getAccountById(accountId: Long): Account? = accountDao.getAccountById(accountId)
     suspend fun getAccountByName(name: String): Account? = accountDao.getAccountByName(name)
     suspend fun getAccountCount(): Int = accountDao.getAccountCount()
+    suspend fun insertAccountsBatch(accounts: List<Account>) {
+        db.withTransaction {
+            accounts.forEach { account ->
+                accountDao.insert(account)
+            }
+        }
+    }
 
     // Transaction  operations
 
@@ -138,16 +148,33 @@ class AppRepository(private val db: AppDB) {
     fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>> =
         transactionDao.getRecentTransactions(limit)
 
-    // ==================== ACCOUNT OPERATIONS ====================
+    suspend fun insertTransactionsBatch(transactions: List<Transaction>) {
+        db.withTransaction {
+            transactions.forEach { transaction ->
+                transactionDao.insert(transaction)
+            }
+        }
+    }
+
+    // ==================== SPECIAL INCOMES OPERATIONS ====================
     suspend fun createIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.insert(incomeGroup)
     suspend fun updateIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.update(incomeGroup)
     suspend fun deleteIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.delete(incomeGroup)
     fun getAllIncomeGroupsWithRemaining(): Flow<List<IncomeGroupRemaining>> =
         incomeGroupDao.getIncomeGroupsRemaining()
+
     fun getAllIncomeGroups(): Flow<List<IncomeGroup>> = incomeGroupDao.getAllIncomeGroups()
 
     suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup? =
         incomeGroupDao.getIncomeGroupById(incomeGroupId)
+
+    suspend fun insertIncomeGroupsBatch(incomeGroups: List<IncomeGroup>) {
+        db.withTransaction {
+            incomeGroups.forEach { group ->
+                incomeGroupDao.insert(group)
+            }
+        }
+    }
 
     // ==================== CHECKPOINT OPERATIONS ====================
     suspend fun createCheckpoint(checkpoint: Checkpoint) = checkpointDao.insert(checkpoint)
