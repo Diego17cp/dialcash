@@ -60,13 +60,13 @@ class DeleteAccountActivity : AppCompatActivity() {
     }
     private fun deleteAccount() {
         if (!binding.confirmCheckbox.isChecked) return
-        lifecycleScope.launch(Dispatchers.IO) {
-            userDataStore.clearUserProfile()
-            viewModel.deleteData()
-            Toast.makeText(this@DeleteAccountActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
-            withContext(Dispatchers.Main) {
-                finish()
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                userDataStore.clearUserProfile()
+                viewModel.deleteData()
             }
+            Toast.makeText(this@DeleteAccountActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+            finish()
         }
     }
 }
