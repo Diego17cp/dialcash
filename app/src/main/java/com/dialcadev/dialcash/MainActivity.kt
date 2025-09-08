@@ -18,6 +18,7 @@ import androidx.core.view.size
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.dialcadev.dialcash.data.UserDataStore
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -81,33 +82,30 @@ class MainActivity : AppCompatActivity() {
                             startActivity(intent)
                             true
                         }
+
                         else -> false
                     }
                 }
             }, this@MainActivity, Lifecycle.State.RESUMED)
 
-            findViewById<android.view.View>(android.R.id.content).post {
-                setupNavigation()
-                handleBottomNavigationInsets()
-            }
+            setupNavigation()
+            handleBottomNavigationInsets()
+
         }
     }
 
     private fun setupNavigation() {
-        try {
-            val navController = findNavController(R.id.nav_host_fragment)
-            val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
-            bottomNav.setupWithNavController(navController)
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                supportActionBar?.title = destination.label
-            }
-        } catch (e: IllegalStateException) {
-            // Si el NavController no está listo, programar para el siguiente frame
-            findViewById<android.view.View>(android.R.id.content).postDelayed({
-                setupNavigation()
-            }, 100)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNav.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            supportActionBar?.title = destination.label
         }
     }
+
 
     private fun handleBottomNavigationInsets() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
