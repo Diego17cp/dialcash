@@ -99,7 +99,8 @@ class NewTransactionActivity : AppCompatActivity() {
                         IncomeGroup(
                             id = it.id,
                             name = it.name,
-                            amount = it.amount
+                            amount = it.amount,
+                            remaining = it.remaining
                         )
                     }
                     setupIncomeGroupDropdown(incomeGroupsList)
@@ -172,7 +173,7 @@ class NewTransactionActivity : AppCompatActivity() {
         }
         if (transactionType == "expense" || transactionType == "transfer") {
             if (selectedAccountFrom!!.balance < amount) {
-                Toast.makeText(this, "Insufficient funds. Available: ${selectedAccountFrom!!.balance}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Insufficient funds in selected account. Available: ${selectedAccountFrom!!.balance}", Toast.LENGTH_SHORT).show()
                 return
             }
         }
