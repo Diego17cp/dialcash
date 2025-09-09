@@ -21,8 +21,12 @@ class AppRepository(private val db: AppDB) {
     private val checkpointDao = db.checkpointDao()
 
     // ==================== ACCOUNT OPERATIONS ====================
-    suspend fun createAccount(account: Account) = accountDao.insert(account)
-    suspend fun updateAccount(account: Account) = accountDao.updateAccount(account)
+    suspend fun createAccount(account: Account) =
+        accountDao.insert(account.name, account.type, account.balance)
+
+    suspend fun updateAccount(account: Account) =
+        accountDao.updateAccount(account.id, account.name, account.type, account.balance)
+
     suspend fun deleteAccount(account: Account) = accountDao.delete(account)
     fun getAllAccounts(): Flow<List<Account>> = accountDao.getAllAccounts()
     fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> =
@@ -35,7 +39,7 @@ class AppRepository(private val db: AppDB) {
     suspend fun insertAccountsBatch(accounts: List<Account>) {
         db.withTransaction {
             accounts.forEach { account ->
-                accountDao.insert(account)
+                accountDao.insert(account.name, account.type, account.balance)
             }
         }
     }
@@ -45,25 +49,25 @@ class AppRepository(private val db: AppDB) {
     suspend fun addIncome(
         accountId: Int,
         amount: Double,
-        description: String?,
+        description: String,
         relatedIncomeId: Int? = null,
         date: Long? = null
     ) {
-        val transaction = Transaction(
+        transactionDao.insert(
             accountId = accountId,
             type = "income",
             amount = amount,
             date = date ?: System.currentTimeMillis(),
             description = description,
-            relatedIncomeId = relatedIncomeId
+            relatedIncomeId = relatedIncomeId,
+            transferAccountId = null
         )
-        transactionDao.insert(transaction)
     }
 
     suspend fun addExpense(
         accountId: Int,
         amount: Double,
-        description: String?,
+        description: String,
         relatedIncomeId: Int? = null,
         date: Long? = null
     ) {
@@ -79,17 +83,22 @@ class AppRepository(private val db: AppDB) {
                 }
 
                 val updatedIncomeGroup = incomeGroup.copy(remaining = updatedRemaining)
-                incomeGroupDao.update(updatedIncomeGroup)
+                incomeGroupDao.update(
+                    id = relatedIncomeId,
+                    name = updatedIncomeGroup.name,
+                    amount = updatedIncomeGroup.amount,
+                    remaining = updatedIncomeGroup.remaining
+                )
             }
-            val transaction = Transaction(
+            transactionDao.insert(
                 accountId = accountId,
                 type = "expense",
                 amount = amount,
                 date = date ?: System.currentTimeMillis(),
                 description = description,
-                relatedIncomeId = relatedIncomeId
+                relatedIncomeId = relatedIncomeId,
+                transferAccountId = null
             )
-            transactionDao.insert(transaction)
         }
     }
 
@@ -97,19 +106,19 @@ class AppRepository(private val db: AppDB) {
         fromAccountId: Int,
         toAccountId: Int,
         amount: Double,
-        description: String?,
+        description: String,
         date: Long? = null
     ) {
         db.withTransaction {
-            val transfer = Transaction(
+            transactionDao.insert(
                 amount = amount,
                 type = "transfer",
                 date = date ?: System.currentTimeMillis(),
                 description = description,
                 accountId = fromAccountId,
-                transferAccountId = toAccountId
+                transferAccountId = toAccountId,
+                relatedIncomeId = null
             )
-            transactionDao.insert(transfer)
         }
     }
 
@@ -151,14 +160,30 @@ class AppRepository(private val db: AppDB) {
     suspend fun insertTransactionsBatch(transactions: List<Transaction>) {
         db.withTransaction {
             transactions.forEach { transaction ->
-                transactionDao.insert(transaction)
+                transactionDao.insert(
+                    transaction.amount,
+                    transaction.type,
+                    transaction.description!!,
+                    transaction.date,
+                    transaction.accountId,
+                    transaction.transferAccountId,
+                    transaction.relatedIncomeId
+                )
             }
         }
     }
 
     // ==================== SPECIAL INCOMES OPERATIONS ====================
-    suspend fun createIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.insert(incomeGroup)
-    suspend fun updateIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.update(incomeGroup)
+    suspend fun createIncomeGroup(incomeGroup: IncomeGroup) =
+        incomeGroupDao.insert(incomeGroup.name, incomeGroup.amount, incomeGroup.remaining)
+
+    suspend fun updateIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.update(
+        incomeGroup.id,
+        incomeGroup.name,
+        incomeGroup.amount,
+        incomeGroup.remaining
+    )
+
     suspend fun deleteIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.delete(incomeGroup)
     fun getAllIncomeGroupsWithRemaining(): Flow<List<IncomeGroupRemaining>> =
         incomeGroupDao.getIncomeGroupsRemaining()
@@ -171,14 +196,21 @@ class AppRepository(private val db: AppDB) {
     suspend fun insertIncomeGroupsBatch(incomeGroups: List<IncomeGroup>) {
         db.withTransaction {
             incomeGroups.forEach { group ->
-                incomeGroupDao.insert(group)
+                incomeGroupDao.insert(group.name, group.amount, group.remaining)
             }
         }
     }
 
     // ==================== CHECKPOINT OPERATIONS ====================
-    suspend fun createCheckpoint(checkpoint: Checkpoint) = checkpointDao.insert(checkpoint)
-    suspend fun updateCheckpoint(checkpoint: Checkpoint) = checkpointDao.update(checkpoint)
+    suspend fun createCheckpoint(checkpoint: Checkpoint) =
+        checkpointDao.insert(checkpoint.date, checkpoint.balanceSnapshot)
+
+    suspend fun updateCheckpoint(checkpoint: Checkpoint) = checkpointDao.update(
+        checkpoint.id,
+        checkpoint.date,
+        checkpoint.balanceSnapshot
+    )
+
     suspend fun deleteCheckpoint(checkpoint: Checkpoint) = checkpointDao.delete(checkpoint)
     suspend fun getAllCheckpoints(): List<Checkpoint> = checkpointDao.getAllCheckpoints()
     suspend fun getCheckpointById(checkpointId: Long): Checkpoint? =
