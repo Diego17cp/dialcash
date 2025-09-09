@@ -10,5 +10,7 @@ data class Checkpoint (
     val id: Int = 0,
     val date: Long = System.currentTimeMillis(), // Timestamp in milliseconds
     @ColumnInfo(name = "balance_snapshot")
-    val balanceSnapshot: String
+    val balanceSnapshot: String,
+    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
+    val createdAt: String? = null
 )

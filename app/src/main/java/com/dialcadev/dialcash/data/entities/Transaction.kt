@@ -44,5 +44,7 @@ data class Transaction(
     @ColumnInfo(name = "related_income_id")
     val relatedIncomeId: Int? = null, // For expenses linked to an income group
     @ColumnInfo(name = "transfer_account_id")
-    val transferAccountId: Int? = null // For transfers, the other account involved
+    val transferAccountId: Int? = null, // For transfers, the other account involved
+    @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
+    val createdAt: String? = null
 )
