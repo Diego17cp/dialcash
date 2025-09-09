@@ -14,11 +14,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(transaction: Transaction): Long
 
-    @Update
-    suspend fun update(transaction: Transaction)
+    @Query("INSERT INTO transactions (amount, type, description, date, account_id, transfer_account_id, related_income_id) VALUES (:amount, :type, :description, :date, :accountId, :transferAccountId, :relatedIncomeId)")
+    suspend fun insert(amount: Double, type: String, description: String, date: Long, accountId: Int, transferAccountId: Int?, relatedIncomeId: Int?): Long
+
+    @Query("UPDATE transactions SET amount = :amount, type = :type, description = :description, date = :date, account_id = :accountId, transfer_account_id = :transferAccountId, related_income_id = :relatedIncomeId WHERE id = :id")
+    suspend fun update(id: Int, amount: Double, type: String, description: String, date: Long, accountId: Int, transferAccountId: Int?, relatedIncomeId: Int?)
 
     @Delete
     suspend fun delete(transaction: Transaction)

@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(account: Account): Long
+    @Query("INSERT INTO accounts (name, type, balance) VALUES (:name, :type, :balance)")
+    suspend fun insert(name: String, type: String, balance: Double): Long
 
-    @Update
-    suspend fun updateAccount(account: Account)
+    @Query("UPDATE accounts SET name = :name, type = :type, balance = :balance WHERE id = :id")
+    suspend fun updateAccount(id: Int, name: String, type: String, balance: Double)
 
     @Delete
     suspend fun delete(account: Account)

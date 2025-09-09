@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CheckpointDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(checkpoint: Checkpoint): Long
 
-    @Update
-    suspend fun update(checkpoint: Checkpoint)
+    @Query("INSERT INTO checkpoints (date, balance_snapshot) VALUES (:date, :balanceSnapshot)")
+    suspend fun insert(date: Long, balanceSnapshot: String): Long
+
+    @Query("UPDATE checkpoints SET date = :date, balance_snapshot = :balanceSnapshot WHERE id = :id")
+    suspend fun update(id: Int, date: Long, balanceSnapshot: String)
 
     @Delete
     suspend fun delete(checkpoint: Checkpoint)
