@@ -32,7 +32,7 @@ class AppRepository(private val db: AppDB) {
     fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> =
         accountDao.getAccountBalances()
 
-    fun getMainAccounts(): Flow<List<AccountBalance>> = accountDao.getMainAccountBalances()
+    fun getMainAccounts(): Flow<List<AccountBalanceWithOriginal>> = accountDao.getMainAccountBalances()
     suspend fun getAccountById(accountId: Long): Account? = accountDao.getAccountById(accountId)
     suspend fun getAccountByName(name: String): Account? = accountDao.getAccountByName(name)
     suspend fun getAccountCount(): Int = accountDao.getAccountCount()
