@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,8 +22,8 @@ class HomeViewModel @Inject constructor(
     val totalBalance: LiveData<Double> = _totalBalance
 
 //    Main Accounts
-    private val _mainAccounts = MutableLiveData<List<AccountBalance>>()
-    val mainAccounts: LiveData<List<AccountBalance>> = _mainAccounts
+    private val _mainAccounts = MutableLiveData<List<AccountBalanceWithOriginal>>()
+    val mainAccounts: LiveData<List<AccountBalanceWithOriginal>> = _mainAccounts
 
 //    Last transactions
     private val _recentTransactions = MutableLiveData<List<TransactionWithDetails>>()
