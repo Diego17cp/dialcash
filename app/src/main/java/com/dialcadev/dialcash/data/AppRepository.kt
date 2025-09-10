@@ -121,7 +121,16 @@ class AppRepository(private val db: AppDB) {
             )
         }
     }
-
+    suspend fun updateTransaction(transaction: Transaction) = transactionDao.update(
+        transaction.id,
+        transaction.amount,
+        transaction.type,
+        transaction.description!!,
+        transaction.date,
+        transaction.accountId,
+        transaction.transferAccountId,
+        transaction.relatedIncomeId
+    )
     suspend fun deleteTransaction(transaction: Transaction) = transactionDao.delete(transaction)
     fun getAllTransactions(): Flow<List<TransactionWithDetails>> =
         transactionDao.getTransactionWithDetails()
