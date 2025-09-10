@@ -167,6 +167,7 @@ class HomeFragment : Fragment() {
                         balance = newBalance
                     ))
                     resetView()
+                    bottomSheetDialog.dismiss()
                 }
                 etEditAccountName.addTextChangedListener { validateForm() }
                 actvAccountType.setOnItemClickListener { _, _, _, _ -> validateForm() }
