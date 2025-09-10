@@ -6,10 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.databinding.ItemMainAccountBinding
 
-class MainAccountsAdapter(private val onAccountClick: (AccountBalance) -> Unit) : ListAdapter<AccountBalance, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
+class MainAccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -> Unit) : ListAdapter<AccountBalanceWithOriginal, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
         val binding = ItemMainAccountBinding.inflate(
@@ -23,7 +24,7 @@ class MainAccountsAdapter(private val onAccountClick: (AccountBalance) -> Unit) 
     }
 
     inner class AccountViewHolder(private val binding: ItemMainAccountBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(account: AccountBalance) {
+        fun bind(account: AccountBalanceWithOriginal) {
             binding.apply {
                 textAccountName.text = account.name
                 textAccountBalance.text = root.context.getString(R.string.currency_format, account.balance)
@@ -41,12 +42,12 @@ class MainAccountsAdapter(private val onAccountClick: (AccountBalance) -> Unit) 
             }
         }
     }
-    private class AccountDiffCallback: DiffUtil.ItemCallback<AccountBalance>() {
-        override fun areItemsTheSame(oldItem: AccountBalance, newItem: AccountBalance): Boolean {
+    private class AccountDiffCallback: DiffUtil.ItemCallback<AccountBalanceWithOriginal>() {
+        override fun areItemsTheSame(oldItem: AccountBalanceWithOriginal, newItem: AccountBalanceWithOriginal): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: AccountBalance, newItem: AccountBalance): Boolean {
+        override fun areContentsTheSame(oldItem: AccountBalanceWithOriginal, newItem: AccountBalanceWithOriginal): Boolean {
             return oldItem == newItem
         }
     }
