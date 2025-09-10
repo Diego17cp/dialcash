@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
+import com.dialcadev.dialcash.data.entities.Account
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -34,6 +35,26 @@ class AccountsViewModel @Inject constructor(private val repository: AppRepositor
                 _errorMessage.value = "Error fetching accounts: ${e.message}"
             } finally {
                 _isLoading.value = false
+            }
+        }
+    }
+    fun deleteAccount(account: Account) {
+        viewModelScope.launch {
+            try {
+                repository.deleteAccount(account)
+                fetchAccounts()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error deleting account: ${e.message}"
+            }
+        }
+    }
+    fun updateAccount(account: Account) {
+        viewModelScope.launch {
+            try {
+                repository.updateAccount(account)
+                fetchAccounts()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error updating account: ${e.message}"
             }
         }
     }
