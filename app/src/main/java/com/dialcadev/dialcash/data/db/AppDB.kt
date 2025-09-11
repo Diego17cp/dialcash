@@ -12,7 +12,7 @@ import com.dialcadev.dialcash.data.dao.*
 
 @Database(
     entities = [Account::class, IncomeGroup::class, Transaction::class, Checkpoint::class],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 
