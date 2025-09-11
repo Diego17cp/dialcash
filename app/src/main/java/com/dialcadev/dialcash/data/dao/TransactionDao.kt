@@ -16,10 +16,27 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionDao {
 
     @Query("INSERT INTO transactions (amount, type, description, date, account_id, transfer_account_id, related_income_id) VALUES (:amount, :type, :description, :date, :accountId, :transferAccountId, :relatedIncomeId)")
-    suspend fun insert(amount: Double, type: String, description: String, date: Long, accountId: Int, transferAccountId: Int?, relatedIncomeId: Int?): Long
+    suspend fun insert(
+        amount: Double,
+        type: String,
+        description: String,
+        date: Long,
+        accountId: Int,
+        transferAccountId: Int?,
+        relatedIncomeId: Int?
+    ): Long
 
     @Query("UPDATE transactions SET amount = :amount, type = :type, description = :description, date = :date, account_id = :accountId, transfer_account_id = :transferAccountId, related_income_id = :relatedIncomeId WHERE id = :id")
-    suspend fun update(id: Int, amount: Double, type: String, description: String, date: Long, accountId: Int, transferAccountId: Int?, relatedIncomeId: Int?)
+    suspend fun update(
+        id: Int,
+        amount: Double,
+        type: String,
+        description: String,
+        date: Long,
+        accountId: Int,
+        transferAccountId: Int?,
+        relatedIncomeId: Int?
+    )
 
     @Delete
     suspend fun delete(transaction: Transaction)
@@ -51,30 +68,39 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE related_income_id = :incomeGroupId AND type = 'expense' ORDER BY date DESC")
     fun getExpensesByIncomeGroup(incomeGroupId: Int): Flow<List<Transaction>>
 
-    @Query("""
+    @Query(
+        """
         SELECT t.id, t.amount, t.type, t.date, t.description,
-        a.name AS accountName,
-        ig.name AS incomeGroupName
+               a1.name AS accountName,
+               a2.name AS accountToName,
+               ig.name AS incomeGroupName
         FROM transactions t
-        JOIN accounts a ON t.account_id = a.id
+        JOIN accounts a1 ON t.account_id = a1.id
+        LEFT JOIN accounts a2 ON t.transfer_account_id = a2.id
         LEFT JOIN income_groups ig ON t.related_income_id = ig.id
         ORDER BY t.date DESC
         LIMIT :limit
-    """)
+    """
+    )
     fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>>
 
-    @Query("""
+    @Query(
+        """
         SELECT t.id, t.amount, t.type, t.date, t.description,
-        a.name AS accountName,
-        ig.name AS incomeGroupName
+               a1.name AS accountName,
+               a2.name AS accountToName,
+               ig.name AS incomeGroupName
         FROM transactions t
-        JOIN accounts a ON t.account_id = a.id
+        JOIN accounts a1 ON t.account_id = a1.id
+        LEFT JOIN accounts a2 ON t.transfer_account_id = a2.id
         LEFT JOIN income_groups ig ON t.related_income_id = ig.id
         ORDER BY t.date DESC
-    """)
+    """
+    )
     fun getTransactionWithDetails(): Flow<List<TransactionWithDetails>>
 
-    @Query("""
+    @Query(
+        """
         SELECT  t.id, t.amount, t.date, t.description,
         a1.name AS fromAccount,
         a2.name AS toAccount
@@ -83,14 +109,21 @@ interface TransactionDao {
         JOIN accounts a2 ON t.transfer_account_id = a2.id
         WHERE t.type = 'transfer'
         ORDER BY t.date DESC
-    """)
+    """
+    )
     fun getTransferTransactions(): Flow<List<TransferHistory>>
 
-    @Query("""
+    @Query(
+        """
         SELECT * FROM transactions
         WHERE (account_id = :accountId OR transfer_account_id = :accountId)
         AND date BETWEEN :startDate AND :endDate
         ORDER BY date ASC
-    """)
-    fun getAccountTransactionsBetween(accountId: Int, startDate: Long, endDate: Long): Flow<List<Transaction>>
+    """
+    )
+    fun getAccountTransactionsBetween(
+        accountId: Int,
+        startDate: Long,
+        endDate: Long
+    ): Flow<List<Transaction>>
 }

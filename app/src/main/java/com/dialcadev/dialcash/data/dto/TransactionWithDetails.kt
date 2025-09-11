@@ -8,4 +8,5 @@ data class TransactionWithDetails (
     val description: String? = null,
     val accountName: String,
     val incomeGroupName: String? = null,
+    val accountToName: String? = null
 )
