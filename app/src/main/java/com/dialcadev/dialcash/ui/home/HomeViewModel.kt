@@ -1,5 +1,6 @@
 package com.dialcadev.dialcash.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,8 @@ import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.data.entities.Account
+import com.dialcadev.dialcash.data.entities.IncomeGroup
+import com.dialcadev.dialcash.data.entities.Transaction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -29,6 +32,12 @@ class HomeViewModel @Inject constructor(
 //    Last transactions
     private val _recentTransactions = MutableLiveData<List<TransactionWithDetails>>()
     val recentTransactions: LiveData<List<TransactionWithDetails>> = _recentTransactions
+
+//    Accounts, Income Groups for dropdowns
+    private val _accounts = MutableLiveData<List<Account>>()
+    val accounts: LiveData<List<Account>> = _accounts
+    private val _incomeGroups = MutableLiveData<List<IncomeGroup>>()
+    val incomeGroups: LiveData<List<IncomeGroup>> = _incomeGroups
 
 //    Loader state
     private val _isLoading = MutableLiveData<Boolean>()
@@ -80,6 +89,48 @@ class HomeViewModel @Inject constructor(
                 fetchHomeData()
             } catch (e: Exception) {
                 _errorMessage.value = "Error updating account: ${e.message}"
+            }
+        }
+    }
+    fun loadAccounts() {
+        viewModelScope.launch {
+            try {
+                val accounts = repository.getAllAccounts().first()
+                _accounts.value = accounts
+            } catch (e: Exception) {
+                _errorMessage.value = "Error loading accounts: ${e.message}"
+            }
+        }
+    }
+    fun loadIncomeGroups() {
+        viewModelScope.launch {
+            try {
+                val incomeGroups = repository.getAllIncomeGroups().first()
+                _incomeGroups.value = incomeGroups
+            } catch (e: Exception) {
+                _errorMessage.value = "Error loading income groups: ${e.message}"
+            }
+        }
+    }
+    fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            try {
+                repository.updateTransaction(transaction)
+                fetchHomeData()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error updating transaction: ${e.message}"
+                Log.d("HomeViewModel", "updateTransaction: ${e.message}")
+            }
+        }
+    }
+    fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            try {
+                repository.deleteTransaction(transaction)
+                fetchHomeData()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error deleting transaction: ${e.message}"
+                Log.d("HomeViewModel", "deleteTransaction: ${e.message}")
             }
         }
     }
