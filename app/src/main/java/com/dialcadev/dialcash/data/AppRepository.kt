@@ -1,5 +1,7 @@
 package com.dialcadev.dialcash.data
 
+import android.util.Log
+import androidx.room.RoomOpenDelegate
 import androidx.room.withTransaction
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.db.AppDB
@@ -12,6 +14,7 @@ import com.dialcadev.dialcash.data.entities.Checkpoint
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.data.entities.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlin.compareTo
 import kotlin.text.insert
 
 class AppRepository(private val db: AppDB) {
@@ -32,8 +35,10 @@ class AppRepository(private val db: AppDB) {
     fun getAllAccountBalances(): Flow<List<AccountBalanceWithOriginal>> =
         accountDao.getAccountBalances()
 
-    fun getMainAccounts(): Flow<List<AccountBalanceWithOriginal>> = accountDao.getMainAccountBalances()
-    suspend fun getAccountById(accountId: Long): Account? = accountDao.getAccountById(accountId)
+    fun getMainAccounts(): Flow<List<AccountBalanceWithOriginal>> =
+        accountDao.getMainAccountBalances()
+
+    suspend fun getAccountById(accountId: Int): Account? = accountDao.getAccountById(accountId)
     suspend fun getAccountByName(name: String): Account? = accountDao.getAccountByName(name)
     suspend fun getAccountCount(): Int = accountDao.getAccountCount()
     suspend fun insertAccountsBatch(accounts: List<Account>) {
@@ -42,6 +47,10 @@ class AppRepository(private val db: AppDB) {
                 accountDao.insert(account.name, account.type, account.balance)
             }
         }
+    }
+
+    suspend fun getAccountBalance(accountId: Int): Double? {
+        return accountDao.getAccountBalance(accountId)
     }
 
     // Transaction  operations
@@ -73,22 +82,10 @@ class AppRepository(private val db: AppDB) {
     ) {
         db.withTransaction {
             if (relatedIncomeId != null) {
-                val incomeGroup = incomeGroupDao.getIncomeGroupById(relatedIncomeId.toLong())
-                    ?: throw IllegalArgumentException("Income group with ID $relatedIncomeId not found")
-                val remaining = incomeGroupDao.getRemainingForGroup(incomeGroup.id.toInt())
-                val updatedRemaining = (remaining ?: 0.0) - amount
-
-                if (updatedRemaining < 0) {
-                    throw IllegalArgumentException("Insufficient funds in income group. Available: $remaining, Required: $amount")
+                val remaining = incomeGroupDao.getRemainingAmount(relatedIncomeId) ?: 0.0
+                if (remaining < amount) {
+                    throw IllegalArgumentException("Insufficient funds in the selected income group.")
                 }
-
-                val updatedIncomeGroup = incomeGroup.copy(remaining = updatedRemaining)
-                incomeGroupDao.update(
-                    id = relatedIncomeId,
-                    name = updatedIncomeGroup.name,
-                    amount = updatedIncomeGroup.amount,
-                    remaining = updatedIncomeGroup.remaining
-                )
             }
             transactionDao.insert(
                 accountId = accountId,
@@ -121,6 +118,7 @@ class AppRepository(private val db: AppDB) {
             )
         }
     }
+
     suspend fun updateTransaction(transaction: Transaction) = transactionDao.update(
         transaction.id,
         transaction.amount,
@@ -131,6 +129,7 @@ class AppRepository(private val db: AppDB) {
         transaction.transferAccountId,
         transaction.relatedIncomeId
     )
+
     suspend fun deleteTransaction(transaction: Transaction) = transactionDao.delete(transaction)
     fun getAllTransactions(): Flow<List<TransactionWithDetails>> =
         transactionDao.getTransactionWithDetails()
@@ -157,7 +156,7 @@ class AppRepository(private val db: AppDB) {
     fun getTransactionsForAccount(accountId: Int): Flow<List<Transaction>> =
         transactionDao.getTransactionsForAccount(accountId)
 
-    suspend fun getTransactionById(transactionId: Long): Transaction? =
+    suspend fun getTransactionById(transactionId: Int): Transaction? =
         transactionDao.getTransactionById(transactionId)
 
     suspend fun getTotalTransactions(): Int = transactionDao.getTransactionCount()
@@ -184,28 +183,32 @@ class AppRepository(private val db: AppDB) {
 
     // ==================== SPECIAL INCOMES OPERATIONS ====================
     suspend fun createIncomeGroup(incomeGroup: IncomeGroup) =
-        incomeGroupDao.insert(incomeGroup.name, incomeGroup.amount, incomeGroup.remaining)
+        incomeGroupDao.insert(incomeGroup.name, incomeGroup.amount)
 
     suspend fun updateIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.update(
         incomeGroup.id,
         incomeGroup.name,
-        incomeGroup.amount,
-        incomeGroup.remaining
+        incomeGroup.amount
     )
 
     suspend fun deleteIncomeGroup(incomeGroup: IncomeGroup) = incomeGroupDao.delete(incomeGroup)
+
     fun getAllIncomeGroupsWithRemaining(): Flow<List<IncomeGroupRemaining>> =
         incomeGroupDao.getIncomeGroupsRemaining()
 
     fun getAllIncomeGroups(): Flow<List<IncomeGroup>> = incomeGroupDao.getAllIncomeGroups()
 
-    suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup? =
+    suspend fun getRemainingForIncomeGroup(incomeGroupId: Int): Double {
+        return incomeGroupDao.getRemainingAmount(incomeGroupId) ?: 0.0
+    }
+
+    suspend fun getIncomeGroupById(incomeGroupId: Int): IncomeGroup? =
         incomeGroupDao.getIncomeGroupById(incomeGroupId)
 
     suspend fun insertIncomeGroupsBatch(incomeGroups: List<IncomeGroup>) {
         db.withTransaction {
             incomeGroups.forEach { group ->
-                incomeGroupDao.insert(group.name, group.amount, group.remaining)
+                incomeGroupDao.insert(group.name, group.amount)
             }
         }
     }
@@ -222,7 +225,7 @@ class AppRepository(private val db: AppDB) {
 
     suspend fun deleteCheckpoint(checkpoint: Checkpoint) = checkpointDao.delete(checkpoint)
     suspend fun getAllCheckpoints(): List<Checkpoint> = checkpointDao.getAllCheckpoints()
-    suspend fun getCheckpointById(checkpointId: Long): Checkpoint? =
+    suspend fun getCheckpointById(checkpointId: Int): Checkpoint? =
         checkpointDao.getCheckpointById(checkpointId)
 
     fun getCheckpointsBetween(startDate: Long, endDate: Long): Flow<List<Checkpoint>> =
@@ -235,4 +238,102 @@ class AppRepository(private val db: AppDB) {
     suspend fun wipeDatabase() {
         db.clearAllTables()
     }
+
+    suspend fun validateExpenseEdit(
+        transactionId: Int,
+        accountId: Int,
+        amount: Double,
+        incomeGroupId: Int?
+    ): ValidationResult {
+        val currentTransaction = transactionDao.getTransactionById(transactionId)
+        val currentAmount = currentTransaction?.amount ?: 0.0
+        val currentAccountId = currentTransaction?.accountId
+        if (currentAccountId != accountId) {
+            val accountBalance = getAccountBalance(accountId)
+            if ((accountBalance ?: 0.0) < amount) {
+                return ValidationResult(
+                    false,
+                    "Insufficient funds in the selected account."
+                )
+            }
+        } else {
+            val amountDiff = amount - currentAmount
+            if (amountDiff > 0) {
+                val accountBalance = getAccountBalance(accountId)
+                if ((accountBalance ?: 0.0) < amountDiff) {
+                    return ValidationResult(
+                        false,
+                        "Insufficient funds in the selected account."
+                    )
+                }
+            }
+        }
+
+        if (incomeGroupId != null) {
+            val currentIncomeId = currentTransaction?.relatedIncomeId
+            if (currentIncomeId != incomeGroupId) {
+                val remaining = getRemainingForIncomeGroup(incomeGroupId)
+                if (remaining < amount) {
+                    return ValidationResult(
+                        false,
+                        "Insufficient funds in the selected income group."
+                    )
+                }
+            } else {
+                val amountDiff = amount - currentAmount
+                if (amountDiff > 0) {
+                    val remaining = getRemainingForIncomeGroup(incomeGroupId)
+                    if (remaining < amountDiff) {
+                        return ValidationResult(
+                            false,
+                            "Insufficient funds in the selected income group."
+                        )
+                    }
+                }
+            }
+        }
+        return ValidationResult(true, "")
+    }
+
+    suspend fun validateTransferEdit(
+        transactionId: Int,
+        fromAccountId: Int,
+        toAccountId: Int,
+        amount: Double
+    ): ValidationResult {
+        val currentTransaction = transactionDao.getTransactionById(transactionId)
+        val currentAmount = currentTransaction?.amount ?: 0.0
+        val currentFromAccountId = currentTransaction?.accountId
+
+        if (fromAccountId == toAccountId) {
+            return ValidationResult(
+                false,
+                "Source and destination accounts must be different."
+            )
+        }
+
+        if (currentFromAccountId != fromAccountId) {
+            val fromAccountBalance = getAccountBalance(fromAccountId)
+            if ((fromAccountBalance ?: 0.0) < amount) {
+                return ValidationResult(
+                    false,
+                    "Insufficient funds in the source account."
+                )
+            }
+        } else {
+            val amountDiff = amount - currentAmount
+            if (amountDiff > 0) {
+                val fromAccountBalance = getAccountBalance(fromAccountId)
+                if ((fromAccountBalance ?: 0.0) < amountDiff) {
+                    return ValidationResult(
+                        false,
+                        "Insufficient funds in the source account."
+                    )
+                }
+            }
+        }
+        return ValidationResult(true, "")
+    }
 }
+
+data class ValidationResult(val isValid: Boolean, val message: String)
