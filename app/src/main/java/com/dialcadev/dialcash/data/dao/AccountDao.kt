@@ -26,7 +26,7 @@ interface AccountDao {
     fun getAllAccounts(): Flow<List<Account>>
 
     @Query("SELECT * FROM accounts WHERE id = :accountId LIMIT 1")
-    suspend fun getAccountById(accountId: Long): Account?
+    suspend fun getAccountById(accountId: Int): Account?
 
     @Query("SELECT * FROM accounts WHERE name LIKE :name LIMIT 1")
     suspend fun getAccountByName(name: String): Account?
@@ -68,6 +68,20 @@ interface AccountDao {
         GROUP BY a.id
     """)
     fun getAccountBalances(): Flow<List<AccountBalanceWithOriginal>>
+
+    @Query("""
+        SELECT a.balance + IFNULL(SUM(
+            CASE WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 END), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        WHERE a.id = :accountId
+        GROUP BY a.id
+    """)
+    suspend fun getAccountBalance(accountId: Int) : Double?
 }
 
 data class AccountBalanceWithOriginal(

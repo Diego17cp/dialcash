@@ -25,7 +25,7 @@ interface CheckpointDao {
     suspend fun getAllCheckpoints(): List<Checkpoint>
 
     @Query("SELECT * FROM checkpoints WHERE id = :checkpointId LIMIT 1")
-    suspend fun getCheckpointById(checkpointId: Long): Checkpoint?
+    suspend fun getCheckpointById(checkpointId: Int): Checkpoint?
 
     @Query("SELECT * FROM checkpoints WHERE date BETWEEN :startDate AND :endDate ORDER BY date ASC")
     fun getCheckpointsBetween(startDate: Long, endDate: Long): Flow<List<Checkpoint>>

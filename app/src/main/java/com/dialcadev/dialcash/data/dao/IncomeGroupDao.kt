@@ -26,7 +26,7 @@ interface IncomeGroupDao {
     fun getAllIncomeGroups(): Flow<List<IncomeGroup>>
 
     @Query("SELECT * FROM income_groups WHERE id = :incomeGroupId LIMIT 1")
-    suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup?
+    suspend fun getIncomeGroupById(incomeGroupId: Int): IncomeGroup?
 
     @Query(
         """
@@ -41,4 +41,12 @@ interface IncomeGroupDao {
     """
     )
     fun getIncomeGroupsRemaining(): Flow<List<IncomeGroupRemaining>>
+
+    @Query("""
+        SELECT ig.amount - COALESCE(SUM(t.amount), 0) AS remaining
+        FROM income_groups ig
+        LEFT JOIN transactions t ON t.related_income_id = ig.id AND t.type = 'expense'
+        WHERE ig.id = :incomeGroupId
+    """)
+    suspend fun getRemainingAmount(incomeGroupId: Int): Double?
 }
