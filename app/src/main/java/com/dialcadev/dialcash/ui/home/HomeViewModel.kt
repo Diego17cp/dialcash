@@ -6,8 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
+import com.dialcadev.dialcash.data.ValidationResult
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
-import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.data.entities.IncomeGroup
@@ -131,6 +131,44 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 _errorMessage.value = "Error deleting transaction: ${e.message}"
                 Log.d("HomeViewModel", "deleteTransaction: ${e.message}")
+            }
+        }
+    }
+    suspend fun getAccountBalance(accountId: Int): Double? {
+        return repository.getAccountBalance(accountId)
+    }
+    suspend fun getRemainingForIncomeGroup(incomeGroupId: Int): Double? {
+        return repository.getRemainingForIncomeGroup(incomeGroupId)
+    }
+    fun validateTransactionBalance(
+        transactionId: Int,
+        type: String,
+        accountId: Int,
+        amount: Double,
+        accountToId: Int? = null,
+        incomeGroupId: Int? = null,
+        onResult: (Boolean, String?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val result = when (type) {
+                    "expense" -> repository.validateExpenseEdit(
+                        transactionId,
+                        accountId,
+                        amount,
+                        incomeGroupId
+                    )
+                    "transfer" -> repository.validateTransferEdit(
+                        transactionId,
+                        accountId,
+                        accountToId!!,
+                        amount
+                    )
+                    else -> ValidationResult(true, "")
+                }
+                onResult(result.isValid, result.message)
+            } catch (e: Exception) {
+                onResult(false, "Error validating transaction: ${e.message}")
             }
         }
     }
