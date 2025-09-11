@@ -16,13 +16,12 @@ class NewIncomeViewModel @Inject constructor(private val repo: AppRepository) : 
     private val _uiState = MutableStateFlow(NewIncomeUiState())
     val uiState: StateFlow<NewIncomeUiState> = _uiState.asStateFlow()
 
-    fun createIncomeGroup(name: String, amount: Double, remaining: Double?) {
+    fun createIncomeGroup(name: String, amount: Double) {
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
-                val remainingToSend = remaining ?: amount
-                val incomeGroup = IncomeGroup(name = name, amount = amount, remaining = remainingToSend)
-                val incomeId = repo.createIncomeGroup(incomeGroup)
+                val incomeGroup = IncomeGroup(name = name, amount = amount)
+                repo.createIncomeGroup(incomeGroup)
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = true, errorMessage = null)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, isSuccess = false, errorMessage = e.message ?: "An error occurred")

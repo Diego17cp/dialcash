@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
+import com.dialcadev.dialcash.data.dto.IncomeGroupRemaining
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
@@ -13,8 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class IncomesViewModel @Inject constructor(private val repo: AppRepository): ViewModel() {
-    private val _incomes = MutableLiveData<List<IncomeGroup>>()
-    val incomes: LiveData<List<IncomeGroup>> = _incomes
+    private val _incomes = MutableLiveData<List<IncomeGroupRemaining>>()
+    val incomes: LiveData<List<IncomeGroupRemaining>> = _incomes
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
@@ -30,7 +31,7 @@ class IncomesViewModel @Inject constructor(private val repo: AppRepository): Vie
             _isLoading.value = true
             _errorMessage.value = null
             try {
-                val incomes = repo.getAllIncomeGroups().first()
+                val incomes = repo.getAllIncomeGroupsWithRemaining().first()
                 _incomes.value = incomes
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching incomes: ${e.message}"

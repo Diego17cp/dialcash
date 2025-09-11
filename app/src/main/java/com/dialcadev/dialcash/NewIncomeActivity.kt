@@ -105,7 +105,6 @@ class NewIncomeActivity : AppCompatActivity() {
         if (!validateForm()) return
         val name = binding.etIncomeName.text?.toString()?.trim() ?: ""
         val amount = binding.etAmount.text?.toString()?.trim()?.toDoubleOrNull() ?: 0.0
-        val remaining = binding.etRemaining.text?.toString()?.trim()?.toDoubleOrNull()
-        viewModel.createIncomeGroup(name, amount, remaining)
+        viewModel.createIncomeGroup(name, amount)
     }
 }
