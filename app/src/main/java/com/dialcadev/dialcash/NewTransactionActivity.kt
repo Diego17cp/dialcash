@@ -2,6 +2,7 @@ package com.dialcadev.dialcash
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -100,7 +101,6 @@ class NewTransactionActivity : AppCompatActivity() {
                             id = it.id,
                             name = it.name,
                             amount = it.amount,
-                            remaining = it.remaining
                         )
                     }
                     setupIncomeGroupDropdown(incomeGroupsList)
@@ -152,12 +152,15 @@ class NewTransactionActivity : AppCompatActivity() {
             return
         }
         if (transactionType == "expense" && selectedIncomeGroup != null) {
-            if (selectedIncomeGroup!!.remaining < amount) {
-                Toast.makeText(this, "Insufficient funds in income group. Available: ${selectedIncomeGroup!!.remaining}, Required: $amount", Toast.LENGTH_SHORT).show()
-                binding.dropdownIncomeGroup.text.clear()
-                binding.dropdownIncomeGroup.clearFocus()
-                selectedIncomeGroup = null
-                return
+            lifecycleScope.launch {
+                val remaining = repository.getRemainingForIncomeGroup(selectedIncomeGroup!!.id)
+                if (remaining < amount) {
+                    Toast.makeText(this@NewTransactionActivity, "Insufficient funds in income group. Available: $remaining, Required: $amount", Toast.LENGTH_SHORT).show()
+                    binding.dropdownIncomeGroup.text.clear()
+                    binding.dropdownIncomeGroup.clearFocus()
+                    selectedIncomeGroup = null
+                    return@launch
+                }
             }
         }
         if (transactionType == "transfer") {
@@ -212,7 +215,7 @@ class NewTransactionActivity : AppCompatActivity() {
                 Toast.makeText(this@NewTransactionActivity, "Transaction saved successfully", Toast.LENGTH_SHORT).show()
                 finish()
             } catch (e: Exception) {
-                Toast.makeText(this@NewTransactionActivity, "Error saving transaction: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.d("NewTransactionActivity", "saveTransaction: ${e.message}")
             }
         }
     }
