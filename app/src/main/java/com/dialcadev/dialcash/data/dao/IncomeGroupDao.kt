@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface IncomeGroupDao {
 
-    @Query("INSERT INTO income_groups (name, amount, remaining) VALUES (:name, :amount, :remaining)")
-    suspend fun insert(name: String, amount: Double, remaining: Double): Long
+    @Query("INSERT INTO income_groups (name, amount) VALUES (:name, :amount)")
+    suspend fun insert(name: String, amount: Double): Long
 
-    @Query("UPDATE income_groups SET name = :name, amount = :amount, remaining = :remaining WHERE id = :id")
-    suspend fun update(id: Int, name: String, amount: Double, remaining: Double)
+    @Query("UPDATE income_groups SET name = :name, amount = :amount WHERE id = :id")
+    suspend fun update(id: Int, name: String, amount: Double)
 
     @Delete
     suspend fun delete(incomeGroup: IncomeGroup)
@@ -28,13 +28,10 @@ interface IncomeGroupDao {
     @Query("SELECT * FROM income_groups WHERE id = :incomeGroupId LIMIT 1")
     suspend fun getIncomeGroupById(incomeGroupId: Long): IncomeGroup?
 
-    @Query("SELECT remaining FROM income_groups WHERE id = :incomeGroupId LIMIT 1")
-    suspend fun getRemainingForGroup(incomeGroupId: Int): Double?
-
     @Query(
         """
         SELECT ig.id, ig.name, ig.amount,
-        IFNULL(SUM(
+        ig.amount + IFNULL(SUM(
             CASE WHEN t.type = 'income' THEN t.amount
                  WHEN t.type = 'expense' THEN -t.amount
                  ELSE 0 END), 0) AS remaining

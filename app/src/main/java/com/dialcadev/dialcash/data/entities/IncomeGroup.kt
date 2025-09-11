@@ -10,7 +10,6 @@ data class IncomeGroup (
     val id: Int = 0,
     val name: String,
     val amount: Double = 0.0,
-    val remaining: Double = 0.0,
     @ColumnInfo(name = "created_at", defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: String? = null
 )
