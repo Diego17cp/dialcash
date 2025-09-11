@@ -4,6 +4,7 @@ import android.content.Intent
 import android.icu.text.DateFormat
 import android.media.Image
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,13 +56,7 @@ class HomeFragment : Fragment() {
     private val dateFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
 
     private val accountTypeLabels = arrayOf(
-        "Bank",
-        "Card",
-        "Cash",
-        "Wallet",
-        "Debt",
-        "Savings",
-        "Other"
+        "Bank", "Card", "Cash", "Wallet", "Debt", "Savings", "Other"
     )
     private val accountTypeMapped = mapOf(
         "Bank" to "bank",
@@ -74,9 +69,7 @@ class HomeFragment : Fragment() {
     )
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
@@ -119,8 +112,7 @@ class HomeFragment : Fragment() {
                 imageAccountIcon.setImageResource(iconRes)
 
                 val accountTypeAdapter = ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_dropdown_item_1line, accountTypeLabels
+                    requireContext(), android.R.layout.simple_dropdown_item_1line, accountTypeLabels
                 )
                 actvAccountType.setAdapter(accountTypeAdapter)
                 actvAccountType.setText(account.type.replaceFirstChar { it.uppercase() }, false)
@@ -181,10 +173,7 @@ class HomeFragment : Fragment() {
                         ?: account.originalBalance
                     viewModel.updateAccount(
                         Account(
-                            id = account.id,
-                            name = newName,
-                            type = newType,
-                            balance = newBalance
+                            id = account.id, name = newName, type = newType, balance = newBalance
                         )
                     )
                     resetView()
@@ -262,8 +251,7 @@ class HomeFragment : Fragment() {
                 }
                 val amount = if (transaction.type == "income") "+${
                     root.context.getString(
-                        R.string.currency_format,
-                        transaction.amount
+                        R.string.currency_format, transaction.amount
                     )
                 }" else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
                 ivTransactionType.setImageResource(iconRes)
@@ -288,9 +276,7 @@ class HomeFragment : Fragment() {
                 fun setupAccountAdapters(accounts: List<Account>) {
                     val accountNames = accounts.map { it.name }
                     val accountAdapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        accountNames
+                        requireContext(), android.R.layout.simple_dropdown_item_1line, accountNames
                     )
                     actvAccountName.setAdapter(accountAdapter)
                     actvAccountToName.setAdapter(accountAdapter)
@@ -301,9 +287,7 @@ class HomeFragment : Fragment() {
                 fun setupIncomeGroupAdapter(groups: List<IncomeGroup>) {
                     val groupNames = groups.map { it.name }
                     val groupAdapter = ArrayAdapter(
-                        requireContext(),
-                        android.R.layout.simple_dropdown_item_1line,
-                        groupNames
+                        requireContext(), android.R.layout.simple_dropdown_item_1line, groupNames
                     )
                     actvIncomeGroupName.setAdapter(groupAdapter)
                     actvIncomeGroupName.setText(transaction.incomeGroupName ?: "", false)
@@ -338,6 +322,27 @@ class HomeFragment : Fragment() {
                     editFooter.visibility = View.GONE
                     deleteConfirmFooter.visibility = View.GONE
                 }
+                fun handleValidationResult(balanceValid: Boolean?, message: String?) {
+                    if (balanceValid == true) {
+                        tilAccountName.error = null
+                        tilIncomeGroupName.error = null
+                        btnSave.isEnabled = true
+                    } else {
+                        when (transaction.type) {
+                            "expense" -> {
+                                if (message?.contains("account") == true) {
+                                    tilAccountName.error = message
+                                } else {
+                                    tilIncomeGroupName.error = message
+                                }
+                            }
+                            "transfer" -> {
+                                tilAccountName.error = message
+                            }
+                        }
+                        btnSave.isEnabled = false
+                    }
+                }
 
                 fun validateForm(): Boolean {
                     val amountText = etTransactionAmount.text.toString().trim()
@@ -354,28 +359,21 @@ class HomeFragment : Fragment() {
                     } else {
                         tilTransactionAmount.error = null
                     }
-
                     if (descriptionText.isEmpty()) {
                         tilTransactionDescription.error = "Description cannot be empty"
                         isValid = false
                     } else {
                         tilTransactionDescription.error = null
                     }
-
-                    if (accountText.isEmpty() || !viewModel.accounts.value.orEmpty()
-                            .any { it.name == accountText }
-                    ) {
+                    if (accountText.isEmpty() || !viewModel.accounts.value.orEmpty().any { it.name == accountText }) {
                         tilAccountName.error = "Select a valid account"
                         isValid = false
                     } else {
                         tilAccountName.error = null
                     }
-
                     if (transaction.type == "transfer") {
                         val toAccountText = actvAccountToName.text.toString().trim()
-                        if (toAccountText.isEmpty() || !viewModel.accounts.value.orEmpty()
-                                .any { it.name == toAccountText }
-                        ) {
+                        if (toAccountText.isEmpty() || !viewModel.accounts.value.orEmpty().any { it.name == toAccountText }) {
                             tilAccountToName.error = "Select a valid account"
                             isValid = false
                         } else if ((selectedAccount != null && selectedAccountTo != null) && (selectedAccount!!.id == selectedAccountTo!!.id)) {
@@ -385,10 +383,9 @@ class HomeFragment : Fragment() {
                             tilAccountToName.error = null
                         }
                     }
-
                     if (transaction.type == "expense") {
                         val groupText = actvIncomeGroupName.text.toString().trim()
-                        if (groupText.isEmpty() || !viewModel.incomeGroups.value.orEmpty()
+                        if (groupText.isNotEmpty() && !viewModel.incomeGroups.value.orEmpty()
                                 .any { it.name == groupText }
                         ) {
                             tilIncomeGroupName.error = "Select a valid income group"
@@ -398,7 +395,34 @@ class HomeFragment : Fragment() {
                         }
                     }
 
-                    btnSave.isEnabled = isValid
+                    if (isValid && (transaction.type == "expense" || transaction.type == "transfer")) {
+                        val amount = amountText.toDouble()
+                        val accountId = viewModel.accounts.value?.find { it.name == accountText }?.id ?: return false
+                        val accountToId = if (transaction.type == "transfer") {
+                            val toAccountText = actvAccountToName.text.toString().trim()
+                            viewModel.accounts.value?.find { it.name == toAccountText }?.id
+                        } else null
+                        val incomeGroupId = if (transaction.type == "expense") {
+                            val groupText = actvIncomeGroupName.text.toString().trim()
+                            if (groupText.isNotEmpty()) {
+                                viewModel.incomeGroups.value?.find { it.name == groupText }?.id
+                            } else null
+                        } else null
+                        lifecycleScope.launch {
+                            viewModel.validateTransactionBalance(
+                                transactionId = transaction.id,
+                                type = transaction.type,
+                                accountId = accountId,
+                                amount = amount,
+                                accountToId = accountToId,
+                                incomeGroupId = incomeGroupId
+                            ) { balanceValid, message ->
+                                handleValidationResult(balanceValid, message)
+                            }
+                        }
+                    } else {
+                        btnSave.isEnabled = isValid
+                    }
                     return isValid
                 }
                 etTransactionAmount.addTextChangedListener { validateForm() }
@@ -407,11 +431,13 @@ class HomeFragment : Fragment() {
                     val selectedName = actvAccountName.adapter.getItem(position) as String
                     selectedAccount =
                         viewModel.accounts.value.orEmpty().find { it.name == selectedName }
+                    validateForm()
                 }
                 actvAccountToName.setOnItemClickListener { _, _, position, _ ->
                     val selectedName = actvAccountToName.adapter.getItem(position) as String
                     selectedAccountTo =
                         viewModel.accounts.value.orEmpty().find { it.name == selectedName }
+                    validateForm()
                 }
                 actvIncomeGroupName.setOnItemClickListener { _, _, position, _ ->
                     val selectedName = actvIncomeGroupName.adapter.getItem(position) as String
@@ -426,35 +452,60 @@ class HomeFragment : Fragment() {
                     val newAmount = etTransactionAmount.text.toString().trim().toDouble()
                     val newDescription = etTransactionDescription.text.toString().trim()
                     val selectedAccountName = actvAccountName.text.toString().trim()
-                    val newAccountId = viewModel.accounts.value?.find { it.name == selectedAccountName }?.id
-                        ?: return
+                    val newAccountId = viewModel.accounts.value?.find { it.name == selectedAccountName }?.id ?: return
                     val newAccountToId = if (transaction.type == "transfer") {
                         val selectedToAccountName = actvAccountToName.text.toString().trim()
                         viewModel.accounts.value?.find { it.name == selectedToAccountName }?.id
                     } else null
-
                     val newIncomeGroupId = if (transaction.type == "expense") {
                         val selectedGroupName = actvIncomeGroupName.text.toString().trim()
                         viewModel.incomeGroups.value?.find { it.name == selectedGroupName }?.id
                     } else null
-
-                    viewModel.updateTransaction(
-                        Transaction(
-                            id = transaction.id,
-                            amount = newAmount,
-                            type = transaction.type,
-                            date = transaction.date,
-                            description = newDescription,
-                            accountId = newAccountId,
-                            transferAccountId = newAccountToId,
-                            relatedIncomeId = newIncomeGroupId
+                    if (transaction.type == "income") {
+                        viewModel.updateTransaction(
+                            Transaction(
+                                id = transaction.id,
+                                amount = newAmount,
+                                type = transaction.type,
+                                date = transaction.date,
+                                description = newDescription,
+                                accountId = newAccountId,
+                                transferAccountId = newAccountToId,
+                                relatedIncomeId = newIncomeGroupId
+                            )
                         )
-                    )
-                    resetView()
-                    bottomSheetDialog.dismiss()
+                        resetView()
+                        bottomSheetDialog.dismiss()
+                        return
+                    }
+                    lifecycleScope.launch {
+                        viewModel.validateTransactionBalance(
+                            transactionId = transaction.id,
+                            type = transaction.type,
+                            accountId = newAccountId,
+                            amount = newAmount,
+                            accountToId = newAccountToId,
+                            incomeGroupId = newIncomeGroupId
+                        ) { balanceValid, message ->
+                            if (balanceValid == true) {
+                                viewModel.updateTransaction(
+                                    Transaction(
+                                        id = transaction.id,
+                                        amount = newAmount,
+                                        type = transaction.type,
+                                        date = transaction.date,
+                                        description = newDescription,
+                                        accountId = newAccountId,
+                                        transferAccountId = newAccountToId,
+                                        relatedIncomeId = newIncomeGroupId
+                                    )
+                                )
+                                resetView()
+                                bottomSheetDialog.dismiss()
+                            }
+                        }
+                    }
                 }
-
-
                 fun deleteTransaction() {
                     viewModel.deleteTransaction(
                         Transaction(
@@ -596,8 +647,7 @@ class HomeFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction("Retry") { viewModel.refreshData() }
-                    .show()
+                    .setAction("Retry") { viewModel.refreshData() }.show()
                 viewModel.clearError()
             }
         }
