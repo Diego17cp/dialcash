@@ -11,6 +11,7 @@ import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.data.entities.Transaction
+import com.dialcadev.dialcash.ui.shared.contracts.TransactionsOperations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(private val repository: AppRepository) :
-    ViewModel() {
+    ViewModel(), TransactionsOperations {
     private val _transactions = MutableLiveData<List<TransactionWithDetails>>()
     val transactions: LiveData<List<TransactionWithDetails>> = _transactions
     private val _accounts = MutableLiveData<List<Account>>()
@@ -88,13 +89,13 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
             }
         }
     }
-    fun validateTransactionBalance(
+    override fun validateTransactionBalance(
         transactionId: Int,
         type: String,
         accountId: Int,
         amount: Double,
-        accountToId: Int? = null,
-        incomeGroupId: Int? = null,
+        accountToId: Int?,
+        incomeGroupId: Int?,
         onResult: (Boolean, String?) -> Unit
     ) {
         viewModelScope.launch {
@@ -120,7 +121,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
             }
         }
     }
-    fun updateTransaction(transaction: Transaction) {
+    override fun updateTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
                 repository.updateTransaction(transaction)
@@ -131,7 +132,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
             }
         }
     }
-    fun deleteTransaction(transaction: Transaction) {
+    override fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
                 repository.deleteTransaction(transaction)

@@ -12,6 +12,8 @@ import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.data.entities.Transaction
+import com.dialcadev.dialcash.ui.shared.contracts.AccountOperations
+import com.dialcadev.dialcash.ui.shared.contracts.TransactionsOperations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -20,26 +22,27 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: AppRepository
-) : ViewModel() {
-//    Total Balance of accounts
+) : ViewModel(), TransactionsOperations, AccountOperations {
+
+    //    Total Balance of accounts
     private val _totalBalance = MutableLiveData<Double>()
     val totalBalance: LiveData<Double> = _totalBalance
 
-//    Main Accounts
+    //    Main Accounts
     private val _mainAccounts = MutableLiveData<List<AccountBalanceWithOriginal>>()
     val mainAccounts: LiveData<List<AccountBalanceWithOriginal>> = _mainAccounts
 
-//    Last transactions
+    //    Last transactions
     private val _recentTransactions = MutableLiveData<List<TransactionWithDetails>>()
     val recentTransactions: LiveData<List<TransactionWithDetails>> = _recentTransactions
 
-//    Accounts, Income Groups for dropdowns
+    //    Accounts, Income Groups for dropdowns
     private val _accounts = MutableLiveData<List<Account>>()
     val accounts: LiveData<List<Account>> = _accounts
     private val _incomeGroups = MutableLiveData<List<IncomeGroup>>()
     val incomeGroups: LiveData<List<IncomeGroup>> = _incomeGroups
 
-//    Loader state
+    //    Loader state
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -72,7 +75,7 @@ class HomeViewModel @Inject constructor(
     fun refreshData() {
         fetchHomeData()
     }
-    fun deleteAccount(account: Account) {
+    override fun deleteAccount(account: Account) {
         viewModelScope.launch {
             try {
                 repository.deleteAccount(account)
@@ -82,7 +85,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    fun updateAccount(account: Account) {
+    override fun updateAccount(account: Account) {
         viewModelScope.launch {
             try {
                 repository.updateAccount(account)
@@ -112,7 +115,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    fun updateTransaction(transaction: Transaction) {
+    override fun updateTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
                 repository.updateTransaction(transaction)
@@ -123,7 +126,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-    fun deleteTransaction(transaction: Transaction) {
+    override fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
                 repository.deleteTransaction(transaction)
@@ -140,13 +143,13 @@ class HomeViewModel @Inject constructor(
     suspend fun getRemainingForIncomeGroup(incomeGroupId: Int): Double? {
         return repository.getRemainingForIncomeGroup(incomeGroupId)
     }
-    fun validateTransactionBalance(
+    override fun validateTransactionBalance(
         transactionId: Int,
         type: String,
         accountId: Int,
         amount: Double,
-        accountToId: Int? = null,
-        incomeGroupId: Int? = null,
+        accountToId: Int?,
+        incomeGroupId: Int?,
         onResult: (Boolean, String?) -> Unit
     ) {
         viewModelScope.launch {

@@ -7,13 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.entities.Account
+import com.dialcadev.dialcash.ui.shared.contracts.AccountOperations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AccountsViewModel @Inject constructor(private val repository: AppRepository): ViewModel() {
+class AccountsViewModel @Inject constructor(private val repository: AppRepository): ViewModel(), AccountOperations {
     private val _accounts = MutableLiveData<List<AccountBalanceWithOriginal>>()
     val accounts: MutableLiveData<List<AccountBalanceWithOriginal>> = _accounts
 
@@ -38,7 +39,7 @@ class AccountsViewModel @Inject constructor(private val repository: AppRepositor
             }
         }
     }
-    fun deleteAccount(account: Account) {
+    override fun deleteAccount(account: Account) {
         viewModelScope.launch {
             try {
                 repository.deleteAccount(account)
@@ -48,7 +49,7 @@ class AccountsViewModel @Inject constructor(private val repository: AppRepositor
             }
         }
     }
-    fun updateAccount(account: Account) {
+    override fun updateAccount(account: Account) {
         viewModelScope.launch {
             try {
                 repository.updateAccount(account)
