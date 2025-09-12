@@ -11,9 +11,11 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.MenuProvider
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -36,6 +38,18 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.dialcadev.dialcash.data.entities.IncomeGroup
+import com.dialcadev.dialcash.data.entities.Transaction
+import com.dialcadev.dialcash.databinding.RecycleTransactionItemBinding
+import kotlinx.coroutines.launch
+import kotlin.collections.any
+import kotlin.collections.find
+import kotlin.collections.orEmpty
 
 @AndroidEntryPoint
 class TransactionsFragment : Fragment() {
@@ -44,6 +58,8 @@ class TransactionsFragment : Fragment() {
     private val viewModel: TransactionsViewModel by viewModels()
     private lateinit var transactionsAdapter: TransactionsAdapter
     private var selectedAccountsChips: List<String> = emptyList()
+
+    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -261,7 +277,344 @@ class TransactionsFragment : Fragment() {
     }
     private fun setupRecyclerView() {
         transactionsAdapter = TransactionsAdapter { transaction ->
-            // Aquí puedes manejar el clic en la transacción si es necesario
+            val bottomSheetDialog = BottomSheetDialog(requireContext())
+            val binding = RecycleTransactionItemBinding.inflate(layoutInflater)
+            binding.apply {
+                val iconRes = when (transaction.type) {
+                    "income" -> R.drawable.ic_income
+                    "expense" -> R.drawable.ic_expense
+                    else -> R.drawable.ic_transactions_outline
+                }
+                val color = when (transaction.type) {
+                    "income" -> R.color.positive_amount
+                    "transfer" -> R.color.colorPrimary
+                    else -> R.color.negative_amount
+                }
+                val amount = if (transaction.type == "income") "+${
+                    root.context.getString(
+                        R.string.currency_format, transaction.amount
+                    )
+                }" else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
+                ivTransactionType.setImageResource(iconRes)
+                ivTransactionType.setColorFilter(root.context.getColor(color))
+                tvTransactionAmount.text = amount
+                tvTransactionAmount.setTextColor(root.context.getColor(color))
+                etTransactionAmount.setText(transaction.amount.toString())
+                tvTransactionDescription.text = transaction.description
+                etTransactionDescription.setText(transaction.description)
+                tvAccountName.text = transaction.accountName
+                fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, onChange: (T) -> Unit) {
+                    val observer = object : Observer<T> {
+                        override fun onChanged(value: T) {
+                            onChange(value)
+                            removeObserver(this)
+                        }
+                    }
+                    observe(owner, observer)
+                }
+                viewModel.fetchAccounts()
+                viewModel.loadIncomeGroups()
+                fun setupAccountAdapters(accounts: List<Account>) {
+                    val accountNames = accounts.map { it.name }
+                    val accountAdapter = ArrayAdapter(
+                        requireContext(), android.R.layout.simple_dropdown_item_1line, accountNames
+                    )
+                    actvAccountName.setAdapter(accountAdapter)
+                    actvAccountToName.setAdapter(accountAdapter)
+                    actvAccountName.setText(transaction.accountName, false)
+                    actvAccountToName.setText(transaction.accountToName ?: "", false)
+                }
+
+                fun setupIncomeGroupAdapter(groups: List<IncomeGroup>) {
+                    val groupNames = groups.map { it.name }
+                    val groupAdapter = ArrayAdapter(
+                        requireContext(), android.R.layout.simple_dropdown_item_1line, groupNames
+                    )
+                    actvIncomeGroupName.setAdapter(groupAdapter)
+                    actvIncomeGroupName.setText(transaction.incomeGroupName ?: "", false)
+                }
+                viewModel.accounts.observeOnce(viewLifecycleOwner) { accounts ->
+                    setupAccountAdapters(accounts)
+                }
+                viewModel.incomeGroups.observeOnce(viewLifecycleOwner) { groups ->
+                    setupIncomeGroupAdapter(groups)
+                }
+
+                var selectedAccount: Account? = null
+                var selectedAccountTo: Account? = null
+                var selectedIncomeGroup: IncomeGroup? = null
+
+                fun resetView() {
+                    tvTransactionAmount.visibility = View.VISIBLE
+                    tilTransactionAmount.visibility = View.GONE
+                    tvTransactionDescription.visibility = View.VISIBLE
+                    tilTransactionDescription.visibility = View.GONE
+                    tvAccountName.visibility = View.VISIBLE
+                    tilAccountName.visibility = View.GONE
+                    if (transaction.type == "transfer" && transaction.accountToName != null) {
+                        tvAccountToName.visibility = View.VISIBLE
+                        tilAccountToName.visibility = View.GONE
+                    }
+                    if (transaction.type == "expense" && transaction.incomeGroupName != null) {
+                        tvIncomeGroupName.visibility = View.VISIBLE
+                        tilIncomeGroupName.visibility = View.GONE
+                    }
+                    actionsRow.visibility = View.VISIBLE
+                    editFooter.visibility = View.GONE
+                    deleteConfirmFooter.visibility = View.GONE
+                }
+                fun handleValidationResult(balanceValid: Boolean?, message: String?) {
+                    if (balanceValid == true) {
+                        tilAccountName.error = null
+                        tilIncomeGroupName.error = null
+                        btnSave.isEnabled = true
+                    } else {
+                        when (transaction.type) {
+                            "expense" -> {
+                                if (message?.contains("account") == true) {
+                                    tilAccountName.error = message
+                                } else {
+                                    tilIncomeGroupName.error = message
+                                }
+                            }
+                            "transfer" -> {
+                                tilAccountName.error = message
+                            }
+                        }
+                        btnSave.isEnabled = false
+                    }
+                }
+
+                fun validateForm(): Boolean {
+                    val amountText = etTransactionAmount.text.toString().trim()
+                    val descriptionText = etTransactionDescription.text.toString().trim()
+                    val accountText = actvAccountName.text.toString().trim()
+                    var isValid = true
+
+                    if (amountText.isEmpty()) {
+                        tilTransactionAmount.error = "Amount cannot be empty"
+                        isValid = false
+                    } else if (amountText.toDoubleOrNull() == null || amountText.toDouble() <= 0) {
+                        tilTransactionAmount.error = "Enter a valid number"
+                        isValid = false
+                    } else {
+                        tilTransactionAmount.error = null
+                    }
+                    if (descriptionText.isEmpty()) {
+                        tilTransactionDescription.error = "Description cannot be empty"
+                        isValid = false
+                    } else {
+                        tilTransactionDescription.error = null
+                    }
+                    if (accountText.isEmpty() || !viewModel.accounts.value.orEmpty().any { it.name == accountText }) {
+                        tilAccountName.error = "Select a valid account"
+                        isValid = false
+                    } else {
+                        tilAccountName.error = null
+                    }
+                    if (transaction.type == "transfer") {
+                        val toAccountText = actvAccountToName.text.toString().trim()
+                        if (toAccountText.isEmpty() || !viewModel.accounts.value.orEmpty().any { it.name == toAccountText }) {
+                            tilAccountToName.error = "Select a valid account"
+                            isValid = false
+                        } else if ((selectedAccount != null && selectedAccountTo != null) && (selectedAccount!!.id == selectedAccountTo!!.id)) {
+                            tilAccountToName.error = "Cannot transfer to the same account"
+                            isValid = false
+                        } else {
+                            tilAccountToName.error = null
+                        }
+                    }
+                    if (transaction.type == "expense") {
+                        val groupText = actvIncomeGroupName.text.toString().trim()
+                        if (groupText.isNotEmpty() && !viewModel.incomeGroups.value.orEmpty()
+                                .any { it.name == groupText }
+                        ) {
+                            tilIncomeGroupName.error = "Select a valid income group"
+                            isValid = false
+                        } else {
+                            tilIncomeGroupName.error = null
+                        }
+                    }
+
+                    if (isValid && (transaction.type == "expense" || transaction.type == "transfer")) {
+                        val amount = amountText.toDouble()
+                        val accountId = viewModel.accounts.value?.find { it.name == accountText }?.id ?: return false
+                        val accountToId = if (transaction.type == "transfer") {
+                            val toAccountText = actvAccountToName.text.toString().trim()
+                            viewModel.accounts.value?.find { it.name == toAccountText }?.id
+                        } else null
+                        val incomeGroupId = if (transaction.type == "expense") {
+                            val groupText = actvIncomeGroupName.text.toString().trim()
+                            if (groupText.isNotEmpty()) {
+                                viewModel.incomeGroups.value?.find { it.name == groupText }?.id
+                            } else null
+                        } else null
+                        lifecycleScope.launch {
+                            viewModel.validateTransactionBalance(
+                                transactionId = transaction.id,
+                                type = transaction.type,
+                                accountId = accountId,
+                                amount = amount,
+                                accountToId = accountToId,
+                                incomeGroupId = incomeGroupId
+                            ) { balanceValid, message ->
+                                handleValidationResult(balanceValid, message)
+                            }
+                        }
+                    } else {
+                        btnSave.isEnabled = isValid
+                    }
+                    return isValid
+                }
+                etTransactionAmount.addTextChangedListener { validateForm() }
+                etTransactionDescription.addTextChangedListener { validateForm() }
+                actvAccountName.setOnItemClickListener { _, _, position, _ ->
+                    val selectedName = actvAccountName.adapter.getItem(position) as String
+                    selectedAccount =
+                        viewModel.accounts.value.orEmpty().find { it.name == selectedName }
+                    validateForm()
+                }
+                actvAccountToName.setOnItemClickListener { _, _, position, _ ->
+                    val selectedName = actvAccountToName.adapter.getItem(position) as String
+                    selectedAccountTo =
+                        viewModel.accounts.value.orEmpty().find { it.name == selectedName }
+                    validateForm()
+                }
+                actvIncomeGroupName.setOnItemClickListener { _, _, position, _ ->
+                    val selectedName = actvIncomeGroupName.adapter.getItem(position) as String
+                    selectedIncomeGroup =
+                        viewModel.incomeGroups.value.orEmpty().find { it.name == selectedName }
+                    validateForm()
+                }
+
+                fun editTransaction() {
+                    if (!validateForm()) return
+
+                    val newAmount = etTransactionAmount.text.toString().trim().toDouble()
+                    val newDescription = etTransactionDescription.text.toString().trim()
+                    val selectedAccountName = actvAccountName.text.toString().trim()
+                    val newAccountId = viewModel.accounts.value?.find { it.name == selectedAccountName }?.id ?: return
+                    val newAccountToId = if (transaction.type == "transfer") {
+                        val selectedToAccountName = actvAccountToName.text.toString().trim()
+                        viewModel.accounts.value?.find { it.name == selectedToAccountName }?.id
+                    } else null
+                    val newIncomeGroupId = if (transaction.type == "expense") {
+                        val selectedGroupName = actvIncomeGroupName.text.toString().trim()
+                        viewModel.incomeGroups.value?.find { it.name == selectedGroupName }?.id
+                    } else null
+                    if (transaction.type == "income") {
+                        viewModel.updateTransaction(
+                            Transaction(
+                                id = transaction.id,
+                                amount = newAmount,
+                                type = transaction.type,
+                                date = transaction.date,
+                                description = newDescription,
+                                accountId = newAccountId,
+                                transferAccountId = newAccountToId,
+                                relatedIncomeId = newIncomeGroupId
+                            )
+                        )
+                        resetView()
+                        bottomSheetDialog.dismiss()
+                        return
+                    }
+                    lifecycleScope.launch {
+                        viewModel.validateTransactionBalance(
+                            transactionId = transaction.id,
+                            type = transaction.type,
+                            accountId = newAccountId,
+                            amount = newAmount,
+                            accountToId = newAccountToId,
+                            incomeGroupId = newIncomeGroupId
+                        ) { balanceValid, message ->
+                            if (balanceValid == true) {
+                                viewModel.updateTransaction(
+                                    Transaction(
+                                        id = transaction.id,
+                                        amount = newAmount,
+                                        type = transaction.type,
+                                        date = transaction.date,
+                                        description = newDescription,
+                                        accountId = newAccountId,
+                                        transferAccountId = newAccountToId,
+                                        relatedIncomeId = newIncomeGroupId
+                                    )
+                                )
+                                resetView()
+                                bottomSheetDialog.dismiss()
+                            }
+                        }
+                    }
+                }
+                fun deleteTransaction() {
+                    viewModel.deleteTransaction(
+                        Transaction(
+                            id = transaction.id,
+                            amount = transaction.amount,
+                            type = transaction.type,
+                            date = transaction.date,
+                            description = transaction.description,
+                            accountId = transaction.id,
+                            transferAccountId = transaction.id,
+                            relatedIncomeId = transaction.id
+                        )
+                    )
+                    bottomSheetDialog.dismiss()
+                }
+                if (transaction.type == "transfer" && transaction.accountToName != null) layoutTransferTo.visibility =
+                    View.VISIBLE
+                tvAccountToName.text = transaction.accountToName ?: "N/A"
+                if (transaction.type == "expense" && transaction.incomeGroupName != null) layoutIncomeGroup.visibility =
+                    View.VISIBLE
+                tvIncomeGroupName.text = transaction.incomeGroupName ?: "N/A"
+                tvTransactionDate.text = dateFormat.format(transaction.date)
+
+                btnEdit.setOnClickListener {
+                    tvTransactionAmount.visibility = View.GONE
+                    tilTransactionAmount.visibility = View.VISIBLE
+                    tvTransactionDescription.visibility = View.GONE
+                    tilTransactionDescription.visibility = View.VISIBLE
+                    tvAccountName.visibility = View.GONE
+                    tilAccountName.visibility = View.VISIBLE
+                    if (transaction.type == "transfer" && transaction.accountToName != null) {
+                        tvAccountToName.visibility = View.GONE
+                        tilAccountToName.visibility = View.VISIBLE
+                    }
+                    if (transaction.type == "expense" && transaction.incomeGroupName != null) {
+                        tvIncomeGroupName.visibility = View.GONE
+                        tilIncomeGroupName.visibility = View.VISIBLE
+                    }
+                    actionsRow.visibility = View.GONE
+                    editFooter.visibility = View.VISIBLE
+                }
+                btnCancel.setOnClickListener {
+                    if (actionsRow.isGone && editFooter.isVisible) {
+                        resetView()
+                    } else {
+                        bottomSheetDialog.dismiss()
+                    }
+                }
+                btnDelete.setOnClickListener {
+                    actionsRow.visibility = View.GONE
+                    deleteConfirmFooter.visibility = View.VISIBLE
+                }
+                btnCancelDelete.setOnClickListener {
+                    if (deleteConfirmFooter.isVisible && actionsRow.isGone) {
+                        resetView()
+                    } else {
+                        bottomSheetDialog.dismiss()
+                    }
+                }
+                btnConfirmDelete.setOnClickListener {
+                    deleteTransaction()
+                }
+                btnSave.setOnClickListener {
+                    editTransaction()
+                }
+            }
+            bottomSheetDialog.setContentView(binding.root)
+            bottomSheetDialog.show()
         }
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(context)
