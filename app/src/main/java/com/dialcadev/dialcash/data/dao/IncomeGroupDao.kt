@@ -30,7 +30,7 @@ interface IncomeGroupDao {
 
     @Query(
         """
-        SELECT ig.id, ig.name, ig.amount,
+        SELECT ig.id, ig.name, ig.amount, ig.created_at as createdAt,
         ig.amount + IFNULL(SUM(
             CASE WHEN t.type = 'income' THEN t.amount
                  WHEN t.type = 'expense' THEN -t.amount

@@ -5,4 +5,5 @@ data class IncomeGroupRemaining (
     val name: String,
     val amount: Double, // Total amount allocated to the income group
     val remaining: Double, // Remaining amount in the income group
+    val createdAt: String // Creation timestamp
 )
