@@ -40,6 +40,38 @@ class IncomesViewModel @Inject constructor(private val repo: AppRepository): Vie
             }
         }
     }
+    fun editIncome(income: IncomeGroupRemaining) {
+        viewModelScope.launch {
+            try {
+                val updatedIncome = IncomeGroup(
+                    id = income.id,
+                    name = income.name,
+                    amount = income.amount,
+                    createdAt = income.createdAt
+                )
+                repo.updateIncomeGroup(updatedIncome)
+                fetchIncomes()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error updating income: ${e.message}"
+            }
+        }
+    }
+    fun deleteIncome(income: IncomeGroupRemaining) {
+        viewModelScope.launch {
+            try {
+                val incomeToDelete = IncomeGroup(
+                    id = income.id,
+                    name = income.name,
+                    amount = income.amount,
+                    createdAt = income.createdAt
+                )
+                repo.deleteIncomeGroup(incomeToDelete)
+                fetchIncomes()
+            } catch (e: Exception) {
+                _errorMessage.value = "Error deleting income: ${e.message}"
+            }
+        }
+    }
     fun refreshIncomes() {
         fetchIncomes()
     }
