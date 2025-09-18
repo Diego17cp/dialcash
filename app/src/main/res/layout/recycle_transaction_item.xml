@@ -154,7 +154,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             app:boxBackgroundColor="@color/background"
-            android:hint="Account"
+            android:hint="@string/hint_account"
             android:visibility="gone">
 
             <AutoCompleteTextView
@@ -202,7 +202,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 app:boxBackgroundColor="@color/background"
-                android:hint="To Account"
+                android:hint="@string/hint_to_account"
                 android:visibility="gone">
 
                 <AutoCompleteTextView
@@ -355,13 +355,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save"
+                android:text="@string/save"
                 app:icon="@drawable/ic_check" />
         </LinearLayout>
 
@@ -380,7 +380,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnConfirmDelete"
