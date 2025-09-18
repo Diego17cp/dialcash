@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="0dp"
-        app:title="Settings"
+        app:title="@string/settings"
         app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         app:titleTextColor="?attr/colorOnSurface" />
 
@@ -70,7 +70,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
-                            android:text="username"
+                            android:text="@string/username"
                             android:textAppearance="@style/TextAppearance.Material3.HeadlineSmall"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
@@ -86,7 +86,7 @@
                         android:gravity="center"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="6dp"
-                        android:text="Edit profile"
+                        android:text="@string/edit_profile"
                         android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                         android:textColor="?attr/colorPrimary" />
 
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Appearance"
+                android:text="@string/appearance"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="?attr/colorPrimary" />
 
@@ -144,7 +144,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Theme"
+                                android:text="@string/theme"
                                 android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                                 android:textColor="?attr/colorOnSurface" />
 
@@ -152,7 +152,7 @@
                                 android:id="@+id/text_current_theme"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="System"
+                                android:text="@string/system"
                                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                                 android:textColor="?attr/colorOnSurfaceVariant" />
                         </LinearLayout>
@@ -176,7 +176,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Data"
+                android:text="@string/data"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="?attr/colorPrimary" />
 
@@ -216,7 +216,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
-                            android:text="Export data"
+                            android:text="@string/export_data"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -256,7 +256,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
-                            android:text="Import data"
+                            android:text="@string/import_data"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                             android:textColor="?attr/colorOnSurface" />
 
@@ -277,7 +277,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Account"
+                android:text="@string/hint_account"
                 android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="?attr/colorPrimary" />
 
@@ -323,7 +323,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_weight="1"
-                            android:text="Delete account"
+                            android:text="@string/delete_account"
                             android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
                             android:textColor="?attr/colorError" />
 
