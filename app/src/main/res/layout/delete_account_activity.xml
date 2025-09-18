@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:elevation="0dp"
-        app:title="Delete account"
+        app:title="@string/delete_account"
         app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         app:titleTextColor="?attr/colorOnSurface" />
 
@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Are you sure you want to delete your account?"
+                android:text="@string/delete_account_title"
                 android:textAlignment="center" />
 
             <TextView
@@ -50,8 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="This action is irreversible. Deleting the account will permanently delete all data related to your profile and banking services." />
-            />
+                android:text="@string/delete_account_subtitle" />
 
             <TextView
                 android:id="@+id/delete_list"
@@ -59,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:lineSpacingExtra="4dp"
-                android:text="\u2022 Profile data (name, photo, preferences)\n\u2022 Bank accounts and payment methods\n\u2022 Transaction and activity history\n\u2022 Custom settings" />
+                android:text="@string/warning_bullets" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -87,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:paddingStart="8dp"
-                        android:text="I have read and understand that deleting my account will permanently erase all my data."
+                        android:text="@string/confirm_delete_txt"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -98,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="If you want to keep important information, download a copy before continuing."
+                android:text="@string/caption_delete"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <LinearLayout
@@ -111,7 +110,7 @@
                     android:id="@+id/btn_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cancel"
+                    android:text="@string/cancel"
                     android:background="@drawable/ripple_item_bg"
                     android:textColor="?attr/colorPrimary"
                     app:iconGravity="textStart" />
@@ -122,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:enabled="false"
-                    android:text="Delete Account"
+                    android:text="@string/delete_account"
                     android:textColor="?attr/colorOnError"
                     app:backgroundTint="?attr/colorError" />
             </LinearLayout>
