@@ -12,7 +12,6 @@ import com.dialcadev.dialcash.databinding.NewAccountActivityBinding
 import com.dialcadev.dialcash.domain.AccountType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.toString
 
 @AndroidEntryPoint
 class NewAccountActivity : AppCompatActivity() {
