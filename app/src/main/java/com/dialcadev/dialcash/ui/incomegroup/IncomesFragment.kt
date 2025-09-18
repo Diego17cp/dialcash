@@ -58,7 +58,7 @@ class IncomesFragment : Fragment() {
                 tvIncomeGroupBalance.text = getString(R.string.currency_format, income.amount)
                 etInitialBalance.setText(income.amount.toString())
                 tvIncomeGroupRemaining.text = getString(R.string.currency_format, income.remaining)
-                tvCreatedAt.text = "Created at: ${income.createdAt}"
+                tvCreatedAt.text = getString(R.string.created_at, income.createdAt)
 
                 fun validateForm() {
                     val name = etEditAccountName.text.toString().trim()
@@ -67,21 +67,20 @@ class IncomesFragment : Fragment() {
                     val isAmountValid = amountText.isNotEmpty() && amountText.toDoubleOrNull() != null && amountText.toDouble() >= 0.0
                     btnSave.isEnabled = isNameValid && isAmountValid
                     if (!isNameValid) {
-                        etEditAccountName.error = "Name cannot be empty"
+                        tilIncomeGroupName.error = "Name cannot be empty"
                     }
                     if (!isAmountValid) {
-                        etInitialBalance.error = "Enter a valid non-negative amount"
+                        tilInitialBalance.error = "Enter a valid non-negative amount"
                     }
                 }
                 fun resetForm() {
                     tvIncomeGroupName.visibility = View.VISIBLE
-                    etEditAccountName.visibility = View.GONE
+                    tilIncomeGroupName.visibility = View.GONE
                     tvIncomeGroupBalance.visibility = View.VISIBLE
-                    etInitialBalance.visibility = View.GONE
-                    btnEdit.visibility = View.VISIBLE
-                    btnDelete.visibility = View.VISIBLE
-                    btnSave.visibility = View.GONE
-                    btnCancel.visibility = View.GONE
+                    tilInitialBalance.visibility = View.GONE
+                    actionsRow.visibility = View.VISIBLE
+                    editFooter.visibility = View.GONE
+                    deleteConfirmFooter.visibility = View.GONE
                     etEditAccountName.error = null
                     etInitialBalance.error = null
                 }
@@ -90,9 +89,9 @@ class IncomesFragment : Fragment() {
 
                 btnEdit.setOnClickListener {
                     tvIncomeGroupName.visibility = View.GONE
-                    etEditAccountName.visibility = View.VISIBLE
+                    tilIncomeGroupName.visibility = View.VISIBLE
                     tvIncomeGroupBalance.visibility = View.GONE
-                    etInitialBalance.visibility = View.VISIBLE
+                    tilInitialBalance.visibility = View.VISIBLE
                     actionsRow.visibility = View.GONE
                     editFooter.visibility = View.VISIBLE
                     validateForm()
