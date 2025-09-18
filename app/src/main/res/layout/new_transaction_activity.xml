@@ -43,7 +43,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="New Transaction"
+                    android:text="@string/new_transaction"
                     android:textAlignment="center"
                     android:textColor="?attr/colorOnPrimary"
                     android:textSize="30sp"
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="52dp"
-            android:hint="Amount"
+            android:hint="@string/til_amount"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/card_header"
             tools:layout_editor_absoluteX="24dp">
@@ -79,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:hint="Description"
+            android:hint="@string/hint_description"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/til_amount"
             tools:layout_editor_absoluteX="24dp">
@@ -99,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:hint="Account"
+            android:hint="@string/hint_account"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/til_description"
             tools:layout_editor_absoluteX="24dp">
@@ -119,7 +119,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="To Account"
+            android:hint="@string/hint_to_account"
             android:visibility="gone"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/til_account_from">
@@ -140,7 +140,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Income Group (optional)"
+            android:hint="@string/hint_ic_g_optional"
             android:visibility="gone"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/til_account_to">
@@ -160,7 +160,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:hint="Date (optional)"
+            android:hint="@string/hint_date_optional"
             app:hintTextColor="?attr/colorPrimary"
             app:layout_constraintTop_toBottomOf="@id/til_income_group"
             tools:layout_editor_absoluteX="24dp">
@@ -170,7 +170,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:focusable="false"
+                android:focusable="true"
                 android:inputType="none"
                 android:textColor="?attr/colorOnSurface" />
 
@@ -191,7 +191,7 @@
                 android:layout_height="56dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:textColor="?attr/colorOnSurface"
                 app:strokeColor="?attr/colorOnSurface" />
 
@@ -202,7 +202,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 android:backgroundTint="?attr/colorPrimary"
-                android:text="Save"
+                android:text="@string/save"
                 android:textColor="?attr/colorOnPrimary" />
 
         </LinearLayout>
