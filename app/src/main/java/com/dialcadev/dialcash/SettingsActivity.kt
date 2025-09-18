@@ -17,6 +17,7 @@ import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.SettingsActivityBinding
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.UserData
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -119,9 +120,9 @@ class SettingsActivity : AppCompatActivity() {
             else -> radioGroup.check(R.id.rb_system)
         }
         val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle("Select Theme")
+            .setTitle(getString(R.string.select_theme))
             .setView(view)
-            .setNegativeButton("Cancel") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Ok") { dialog, _ ->
                 when (radioGroup.checkedRadioButtonId) {
                     R.id.rb_system -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
