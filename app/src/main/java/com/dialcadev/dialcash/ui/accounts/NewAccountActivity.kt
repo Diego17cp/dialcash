@@ -1,5 +1,6 @@
 package com.dialcadev.dialcash.ui.accounts
 
+import com.dialcadev.dialcash.R
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -8,32 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.databinding.NewAccountActivityBinding
+import com.dialcadev.dialcash.domain.AccountType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.toString
 
 @AndroidEntryPoint
 class NewAccountActivity : AppCompatActivity() {
     private lateinit var binding: NewAccountActivityBinding
     private val viewModel: NewAccountViewModel by viewModels()
 
-    private val accountTypeLabels = arrayOf(
-        "Bank Account",
-        "Credit Card",
-        "Cash",
-        "Wallet",
-        "Debt",
-        "Savings Account",
-        "Other"
-    )
-    private val accountTypeMapped = mapOf(
-        "Bank Account" to "bank",
-        "Credit Card" to "card",
-        "Cash" to "cash",
-        "Wallet" to "wallet",
-        "Debt" to "debt",
-        "Savings Account" to "savings",
-        "Other" to "other"
-    )
+    private val accountTypes = AccountType.entries.toList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,13 +33,14 @@ class NewAccountActivity : AppCompatActivity() {
     private fun setupViews() {
         setupDropdownMenu()
         setupValidation()
-        binding.actvAccountType.setText(accountTypeLabels[0], false)
+        binding.actvAccountType.setText(getString(accountTypes.first().labelRes), false)
     }
     private fun setupDropdownMenu() {
+        val labels = accountTypes.map { getString(it.labelRes) }
         val accountTypeAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_dropdown_item_1line,
-            accountTypeLabels
+            labels
         )
         binding.actvAccountType.setAdapter(accountTypeAdapter)
         binding.actvAccountType.setOnItemClickListener { _, _, _, _ ->
@@ -77,19 +64,19 @@ class NewAccountActivity : AppCompatActivity() {
                 when {
                     state.isLoading -> {
                         binding.btnCreateAccount.isEnabled = false
-                        binding.btnCreateAccount.text = "Creating..."
+                        binding.btnCreateAccount.text = getString(R.string.creating)
                     }
                     state.isSuccess -> {
                         Toast.makeText(
                             this@NewAccountActivity,
-                            "Account created successfully",
+                            getString(R.string.account_created_successfully),
                             Toast.LENGTH_SHORT
                         ).show()
                         finish()
                     }
                     state.errorMessage != null -> {
                         binding.btnCreateAccount.isEnabled = true
-                        binding.btnCreateAccount.text = "Create Account"
+                        binding.btnCreateAccount.text = getString(R.string.create_account)
                         Toast.makeText(
                             this@NewAccountActivity,
                             "Error ${state.errorMessage}",
@@ -102,39 +89,41 @@ class NewAccountActivity : AppCompatActivity() {
     }
     private fun validateForm() : Boolean {
         val accountName = binding.etAccountName.text?.toString()?.trim()
-        val accountType = binding.actvAccountType.text?.toString()?.trim()
+        val labelSelected = binding.actvAccountType.text?.toString()?.trim()
         val initialBalance = binding.etInitialBalance.text?.toString()?.trim()
 
         var isValid = true
 
         if (accountName.isNullOrEmpty()) {
-            binding.tilAccountName.error = "Account name is required"
+            binding.tilAccountName.error = getString(R.string.account_name_required)
             isValid = false
         } else {
             binding.tilAccountName.error = null
         }
 
-        if (accountType.isNullOrEmpty() || !accountTypeMapped.containsKey(accountType)) {
-            binding.tilAccountType.error = "Account type is required"
+        val accountType = accountTypes.firstOrNull() { getString(it.labelRes) == labelSelected }
+
+        if (accountType == null) {
+            binding.tilAccountType.error = getString(R.string.account_type_required)
             isValid = false
         } else {
             binding.tilAccountType.error = null
         }
 
         if (initialBalance.isNullOrEmpty()) {
-            binding.tilInitialBalance.error = "Initial balance is required"
+            binding.tilInitialBalance.error = getString(R.string.initial_balance_required)
             isValid = false
         } else {
             try {
                 val balance = initialBalance.toDoubleOrNull()
                 if (balance == null) {
-                    binding.tilInitialBalance.error = "Enter a valid amount"
+                    binding.tilInitialBalance.error = getString(R.string.enter_valid_amount)
                     isValid = false
                 } else {
                     binding.tilInitialBalance.error = null
                 }
             } catch (e: NumberFormatException) {
-                binding.tilInitialBalance.error = "Enter a valid amount"
+                binding.tilInitialBalance.error = getString(R.string.enter_valid_amount)
                 isValid = false
             }
         }
@@ -145,12 +134,11 @@ class NewAccountActivity : AppCompatActivity() {
     private fun createAccount() {
         if (!validateForm()) return
 
-        val accountName = binding.etAccountName.text?.toString()?.trim() ?: ""
-        val accountTypeLabel = binding.actvAccountType.text?.toString()?.trim() ?: ""
-        val initialBalanceText = binding.etInitialBalance.text?.toString()?.trim() ?: "0"
-        val initialBalance = initialBalanceText.toDoubleOrNull() ?: 0.0
-        val accountTypeValue = accountTypeMapped[accountTypeLabel] ?: "bank"
+        val accountName = binding.etAccountName.text?.toString()?.trim().orEmpty()
+        val labelSelected = binding.actvAccountType.text?.toString()
+        val accountType = accountTypes.first { getString(it.labelRes) == labelSelected }
+        val initialBalance = binding.etInitialBalance.text?.toString()?.toDoubleOrNull() ?: 0.0
 
-        viewModel.createAccount(accountName, accountTypeValue, initialBalance)
+        viewModel.createAccount(accountName, accountType.code, initialBalance)
     }
 }
