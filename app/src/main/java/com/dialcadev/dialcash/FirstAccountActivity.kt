@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.databinding.FirstAccountActivityBinding
+import com.dialcadev.dialcash.domain.FirstAccountType
 import com.dialcadev.dialcash.ui.viewmodel.FirstAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -18,22 +19,6 @@ import kotlinx.coroutines.launch
 class FirstAccountActivity : AppCompatActivity() {
     private lateinit var binding: FirstAccountActivityBinding
     private val viewModel: FirstAccountViewModel by viewModels()
-
-    private val accountTypeLabels = arrayOf(
-        "Checking Account",
-        "Savings Account",
-        "Credit Card",
-        "Cash",
-        "Investment Account"
-    )
-
-    private val accountTypeMapped = mapOf(
-        "Checking Account" to "bank",
-        "Savings Account" to "bank",
-        "Credit Card" to "card",
-        "Cash" to "cash",
-        "Investment Account" to "wallet"
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,14 +34,16 @@ class FirstAccountActivity : AppCompatActivity() {
     private fun setupViews() {
         setupDropdownMenu()
         setupValidation()
-        binding.actvAccountType.setText(accountTypeLabels[0], false)
+        val labels = FirstAccountType.labels(this)
+        if (labels.isNotEmpty()) binding.actvAccountType.setText(labels[0], false)
     }
 
     private fun setupDropdownMenu() {
+        val labels = FirstAccountType.labels(this)
         val accountTypeAdapter = ArrayAdapter(
             this,
             android.R.layout.simple_dropdown_item_1line,
-            accountTypeLabels
+            labels
         )
         binding.actvAccountType.setAdapter(accountTypeAdapter)
         binding.actvAccountType.setOnItemClickListener { _, _, _, _ ->
@@ -85,13 +72,13 @@ class FirstAccountActivity : AppCompatActivity() {
                 when {
                     state.isLoading -> {
                         binding.btnCreateAccount.isEnabled = false
-                        binding.btnCreateAccount.text = "Creating..."
+                        binding.btnCreateAccount.text = getString(R.string.creating)
                     }
 
                     state.isSuccess -> {
                         Toast.makeText(
                             this@FirstAccountActivity,
-                            "Account created successfully!",
+                            getString(R.string.account_created_successfully),
                             Toast.LENGTH_SHORT
                         ).show()
                         navigateToMainActivity()
@@ -99,7 +86,7 @@ class FirstAccountActivity : AppCompatActivity() {
 
                     state.errorMessage != null -> {
                         binding.btnCreateAccount.isEnabled = true
-                        binding.btnCreateAccount.text = "Create Account"
+                        binding.btnCreateAccount.text = getString(R.string.create_account)
                         Toast.makeText(
                             this@FirstAccountActivity,
                             "Error: ${state.errorMessage}",
@@ -116,7 +103,7 @@ class FirstAccountActivity : AppCompatActivity() {
             override fun handleOnBackPressed() {
                 Toast.makeText(
                     this@FirstAccountActivity,
-                    "You must create an account to proceed",
+                    getString(R.string.must_create_acc_to_proceed),
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -131,33 +118,33 @@ class FirstAccountActivity : AppCompatActivity() {
         var isValid = true
 
         if (accountName.isNullOrEmpty()) {
-            binding.tilAccountName.error = "Account name is required"
+            binding.tilAccountName.error = getString(R.string.account_name_required)
             isValid = false
         } else {
             binding.tilAccountName.error = null
         }
 
-        if (accountType.isNullOrEmpty() || !accountTypeMapped.containsKey(accountType)) {
-            binding.tilAccountType.error = "Account type is required"
+        if (FirstAccountType.fromLabel(this, accountType) == null) {
+            binding.tilAccountType.error = getString(R.string.account_type_required)
             isValid = false
         } else {
             binding.tilAccountType.error = null
         }
 
         if (initialBalance.isNullOrEmpty()) {
-            binding.tilInitialBalance.error = "Initial balance is required"
+            binding.tilInitialBalance.error = getString(R.string.initial_balance_required)
             isValid = false
         } else {
             try {
                 val balance = initialBalance.toDoubleOrNull()
                 if (balance == null) {
-                    binding.tilInitialBalance.error = "Enter a valid amount"
+                    binding.tilInitialBalance.error = getString(R.string.enter_valid_amount)
                     isValid = false
                 } else {
                     binding.tilInitialBalance.error = null
                 }
             } catch (e: NumberFormatException) {
-                binding.tilInitialBalance.error = "Enter a valid amount"
+                binding.tilInitialBalance.error = getString(R.string.enter_valid_amount)
                 isValid = false
             }
         }
@@ -173,8 +160,9 @@ class FirstAccountActivity : AppCompatActivity() {
         val accountTypeLabel = binding.actvAccountType.text?.toString()?.trim() ?: ""
         val initialBalanceText = binding.etInitialBalance.text?.toString()?.trim() ?: "0"
         val initialBalance = initialBalanceText.toDoubleOrNull() ?: 0.0
-        val accountTypeValue = accountTypeMapped[accountTypeLabel] ?: "bank"
 
+        val firstAccType = FirstAccountType.fromLabel(this, accountTypeLabel) ?: FirstAccountType.CHECKING
+        val accountTypeValue = firstAccType.code
         viewModel.createAccount(accountName, accountTypeValue, initialBalance)
     }
 
