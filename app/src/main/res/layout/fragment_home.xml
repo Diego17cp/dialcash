@@ -20,14 +20,38 @@
                 android:padding="16dp">
 
                 <!-- Total Balance -->
-                <TextView
-                    android:id="@+id/textTotalBalance"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="$0.00"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
+                    android:gravity="start"
+                    android:orientation="vertical"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tvTotalLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:text="@string/total_balance"
+                        android:textAlignment="viewStart"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        android:textStyle="normal" />
+
+                    <TextView
+                        android:id="@+id/textTotalBalance"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="$0.00"
+                        android:textAlignment="viewStart"
+                        android:textColor="?attr/colorSecondary"
+                        android:textSize="42sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
 
                 <!-- Quick Actions -->
                 <LinearLayout
@@ -36,42 +60,100 @@
                     android:layout_marginTop="24dp"
                     android:orientation="horizontal">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnQuickIncome"
+                    <!-- Income -->
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:minHeight="48dp"
-                        android:text="Income"
-                        android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        android:gravity="center"
+                        android:orientation="vertical">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnQuickExpense"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:layout_weight="1"
-                        android:minHeight="48dp"
-                        android:text="Expense"
-                        android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        <ImageButton
+                            android:id="@+id/btnQuickIncome"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginBottom="6dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/bg_income_btn"
+                            android:contentDescription="@string/income"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_income"
+                            app:tint="@color/positive_balance" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnQuickTransfer"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/income"
+                            android:textAllCaps="false"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Expense -->
+                    <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:minHeight="48dp"
-                        android:text="Transfer"
-                        android:textAllCaps="false"
-                        android:textSize="12sp" />
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnQuickExpense"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginBottom="6dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/bg_expense_btn"
+                            android:contentDescription="@string/expense"
+                            android:padding="2dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_expense"
+                            app:tint="@color/negative_balance" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/expense"
+                            android:textAllCaps="false"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Transfer -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:id="@+id/btnQuickTransfer"
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:layout_marginBottom="6dp"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/bg_transfer_btn"
+                            android:contentDescription="@string/transfer"
+                            android:padding="12dp"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_transactions_outline"
+                            app:tint="@color/colorPrimary" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/transfer"
+                            android:textAllCaps="false"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="12sp" />
+                    </LinearLayout>
 
                 </LinearLayout>
-
                 <!-- Main Accounts Section -->
                 <LinearLayout
                     android:id="@+id/layoutMainAccounts"
@@ -89,7 +171,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Main Accounts"
+                            android:text="@string/main_accounts"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -98,7 +180,7 @@
                             style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="View All" />
+                            android:text="@string/view_all" />
 
                     </LinearLayout>
 
@@ -127,7 +209,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Recent Transactions"
+                            android:text="@string/recent_transactions"
                             android:textSize="18sp"
                             android:textStyle="bold" />
 
@@ -136,7 +218,7 @@
                             style="@style/Widget.Material3.Button.TextButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="View All" />
+                            android:text="@string/view_all" />
 
                     </LinearLayout>
 
@@ -152,18 +234,18 @@
                     android:id="@+id/layoutNoInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="64dp"
                     android:gravity="center"
                     android:orientation="vertical"
                     android:padding="24dp"
-                    android:visibility="gone"
-                    android:layout_marginTop="64dp">
+                    android:visibility="gone">
 
                     <ImageView
                         android:id="@+id/ivEmptyState"
                         android:layout_width="120dp"
                         android:layout_height="120dp"
                         android:layout_marginBottom="16dp"
-                        android:contentDescription="No Info"
+                        android:contentDescription="@string/no_info"
                         android:src="@drawable/ic_error"
                         app:tint="?attr/colorOnSurfaceVariant" />
 
@@ -172,8 +254,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
+                        android:text="@string/empty_home_title"
                         android:textAlignment="center"
-                        android:text="There are no accounts or transactions to display."
                         android:textAppearance="?attr/textAppearanceHeadline6"
                         android:textColor="?attr/colorOnSurface" />
 
@@ -181,7 +263,7 @@
                         android:id="@+id/tvEmptySubtitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Pull down to refresh or add a new transaction or account."
+                        android:text="@string/empty_home_subtitle"
                         android:textAlignment="center"
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textColor="?attr/colorOnSurfaceVariant" />
