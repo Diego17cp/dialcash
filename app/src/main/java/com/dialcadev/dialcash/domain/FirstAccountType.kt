@@ -13,7 +13,7 @@ enum class FirstAccountType(val code: String, val labelRes: Int) {
     companion object {
         fun fromCode(code: String) = values().firstOrNull { it.code == code } ?: CHECKING
 
-        fun fromLabel(context: Context, label: String?): UiAccountType? {
+        fun fromLabel(context: Context, label: String?): FirstAccountType? {
             if (label == null) return null
             return values().firstOrNull { context.getString(it.labelRes) == label }
         }
