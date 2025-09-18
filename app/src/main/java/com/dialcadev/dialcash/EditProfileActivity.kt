@@ -96,7 +96,7 @@ class EditProfileActivity : AppCompatActivity() {
     private fun validateName(): Boolean {
         val name = binding.etName.text.toString().trim()
         return if (name.isEmpty()) {
-            binding.tilName.error = "Name cannot be empty"
+            binding.tilName.error = getString(R.string.name_cannot_be_empty)
             binding.btnSaveChanges.isEnabled = false
             false
         } else {
@@ -116,12 +116,12 @@ class EditProfileActivity : AppCompatActivity() {
                     name = updatedName,
                     photoUri = updatedPhotoUri.takeIf { it.isNotBlank() }
                 )
-                Toast.makeText(this@EditProfileActivity, "Profile updated", Toast.LENGTH_SHORT)
+                Toast.makeText(this@EditProfileActivity, getString(R.string.profile_updated), Toast.LENGTH_SHORT)
                     .show()
             } catch (e: Exception) {
                 Toast.makeText(
                     this@EditProfileActivity,
-                    "Failed to update profile",
+                    getString(R.string.failed_to_update_profile),
                     Toast.LENGTH_SHORT
                 ).show()
             }

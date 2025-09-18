@@ -45,13 +45,13 @@ class NewIncomeActivity : AppCompatActivity() {
                 when {
                     state.isLoading -> {
                         binding.btnCreateIncome.isEnabled = false
-                        binding.btnCreateIncome.text = "Creating..."
+                        binding.btnCreateIncome.text = getString(R.string.creating)
                     }
 
                     state.isSuccess -> {
                         Toast.makeText(
                             this@NewIncomeActivity,
-                            "Income group created successfully",
+                            getString(R.string.income_group_created_successfully),
                             Toast.LENGTH_SHORT
                         ).show()
                         finish()
@@ -59,7 +59,7 @@ class NewIncomeActivity : AppCompatActivity() {
 
                     state.errorMessage != null -> {
                         binding.btnCreateIncome.isEnabled = true
-                        binding.btnCreateIncome.text = "Create Income"
+                        binding.btnCreateIncome.text = getString(R.string.create)
                         Toast.makeText(
                             this@NewIncomeActivity,
                             state.errorMessage,
@@ -76,22 +76,22 @@ class NewIncomeActivity : AppCompatActivity() {
         val amountText = binding.etAmount.text?.toString()?.trim()
         var isValid = true
         if (name.isNullOrEmpty()) {
-            binding.tilIncomeName.error = "Name is required"
+            binding.tilIncomeName.error = getString(R.string.account_name_required)
             isValid = false
         } else binding.tilIncomeName.error = null
 
         if (amountText.isNullOrEmpty()) {
-            binding.tilAmount.error = "Amount is required"
+            binding.tilAmount.error = getString(R.string.amount_required)
             isValid = false
         } else binding.tilAmount.error = null
 
         if (amountText.isNullOrEmpty()) {
-            binding.tilAmount.error = "Amount is required"
+            binding.tilAmount.error = getString(R.string.amount_required)
             isValid = false
         } else {
             val amount = amountText.toDoubleOrNull()
             if (amount == null || amount <= 0) {
-                binding.tilAmount.error = "Enter a valid amount"
+                binding.tilAmount.error = getString(R.string.enter_valid_amount)
                 isValid = false
             } else {
                 binding.tilAmount.error = null

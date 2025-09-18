@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.DeleteAccountActivityBinding
@@ -65,7 +64,7 @@ class DeleteAccountActivity : AppCompatActivity() {
                 userDataStore.clearUserProfile()
                 viewModel.deleteData()
             }
-            Toast.makeText(this@DeleteAccountActivity, "Account deleted successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@DeleteAccountActivity, getString(R.string.account_deleted_successfully), Toast.LENGTH_SHORT).show()
             finish()
         }
     }

@@ -75,7 +75,7 @@ class RegisterActivity : AppCompatActivity() {
         var isValid = true
 
         if (name.isNullOrEmpty()) {
-            binding.tilName.error = "The name is required"
+            binding.tilName.error = getString(R.string.name_cannot_be_empty)
             isValid = false
         } else {
             binding.tilName.error = null
@@ -98,7 +98,7 @@ class RegisterActivity : AppCompatActivity() {
                     photoUri = photoUriString
                 )
 
-                Toast.makeText(this@RegisterActivity, "Registered successful", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@RegisterActivity, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
 
                 val intent = Intent(this@RegisterActivity, FirstAccountActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

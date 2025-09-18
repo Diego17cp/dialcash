@@ -82,18 +82,18 @@ class ImportDataActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 binding.btnImport.isEnabled = false
-                binding.btnImport.text = "Importing..."
+                binding.btnImport.text = getString(R.string.importing)
                 val mime = contentResolver.getType(uri)
                 val name = queryDisplayName(uri)
                 val lowerName = name?.lowercase() ?: ""
                 if (!lowerName.endsWith(".json") && !lowerName.endsWith(".backup")) {
                     Toast.makeText(
                         this@ImportDataActivity,
-                        "Please select a valid .json or .backup file",
+                        getString(R.string.please_select_valid_file),
                         Toast.LENGTH_LONG
                     ).show()
                     binding.btnImport.isEnabled = true
-                    binding.btnImport.text = "Import Data"
+                    binding.btnImport.text = getString(R.string.import_data)
                     return@launch
                 }
                 contentResolver.openInputStream(uri)?.use { rawStream ->
@@ -115,11 +115,11 @@ class ImportDataActivity : AppCompatActivity() {
                     if (!header.startsWith("{") && !header.startsWith("[")) {
                         Toast.makeText(
                             this@ImportDataActivity,
-                            "Selected file is not a valid JSON backup.",
+                            getString(R.string.selected_file_error),
                             Toast.LENGTH_LONG
                         ).show()
                         binding.btnImport.isEnabled = true
-                        binding.btnImport.text = "Import Data"
+                        binding.btnImport.text = getString(R.string.import_data)
                         return@use
                     }
 
@@ -134,25 +134,25 @@ class ImportDataActivity : AppCompatActivity() {
                 } ?: run {
                     Toast.makeText(
                         this@ImportDataActivity,
-                        "Failed to open selected file.",
+                        getString(R.string.failed_open_file),
                         Toast.LENGTH_LONG
                     ).show()
                     binding.btnImport.isEnabled = true
-                    binding.btnImport.text = "Import Data"
+                    binding.btnImport.text = getString(R.string.import_data)
                     return@launch
                 }
 
                 setResult(Activity.RESULT_OK)
                 Toast.makeText(
                     this@ImportDataActivity,
-                    "Data imported successfully",
+                    getString(R.string.data_imported_successfully),
                     Toast.LENGTH_LONG
                 ).show()
                 finish()
             } catch (e: Exception) {
                 e.printStackTrace()
                 binding.btnImport.isEnabled = true
-                binding.btnImport.text = "Import Data"
+                binding.btnImport.text = getString(R.string.import_data)
             }
         }
     }

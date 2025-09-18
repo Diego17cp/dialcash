@@ -49,17 +49,17 @@ class NewTransactionActivity : AppCompatActivity() {
     private fun setupUI() {
         when (transactionType) {
             "income" -> {
-                binding.tvTransactionTitle.text = "New Income"
-                binding.tilAccountFrom.hint = "Account"
+                binding.tvTransactionTitle.text = getString(R.string.new_income)
+                binding.tilAccountFrom.hint = getString(R.string.hint_account)
             }
             "expense" -> {
-                binding.tvTransactionTitle.text = "New Expense"
-                binding.tilAccountFrom.hint = "Account"
+                binding.tvTransactionTitle.text = getString(R.string.new_expense)
+                binding.tilAccountFrom.hint = getString(R.string.hint_account)
                 binding.tilIncomeGroup.visibility = View.VISIBLE
             }
             "transfer" -> {
-                binding.tvTransactionTitle.text = "New Transfer"
-                binding.tilAccountFrom.hint = "From Account"
+                binding.tvTransactionTitle.text = getString(R.string.new_transfer)
+                binding.tilAccountFrom.hint = getString(R.string.from_account)
                 binding.tilAccountTo.visibility = View.VISIBLE
             }
         }
@@ -135,27 +135,27 @@ class NewTransactionActivity : AppCompatActivity() {
         val amountText = binding.etAmount.text?.toString()?.trim()
         val description = binding.etDescription.text?.toString()?.trim()
         if (description.isNullOrEmpty()) {
-            binding.tilDescription.error = "Description is required"
+            binding.tilDescription.error = getString(R.string.description_required)
             return
         }
         if (amountText.isNullOrEmpty()) {
-            binding.tilAmount.error = "Amount is required"
+            binding.tilAmount.error = getString(R.string.amount_required)
             return
         }
         val amount = amountText.toDoubleOrNull()
         if (amount == null || amount <= 0) {
-            binding.tilAmount.error = "Enter a valid amount"
+            binding.tilAmount.error = getString(R.string.enter_valid_amount)
             return
         }
         if (selectedAccountFrom == null) {
-            Toast.makeText(this, "Please select an account", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.please_select_acc), Toast.LENGTH_SHORT).show()
             return
         }
         if (transactionType == "expense" && selectedIncomeGroup != null) {
             lifecycleScope.launch {
                 val remaining = repository.getRemainingForIncomeGroup(selectedIncomeGroup!!.id)
                 if (remaining < amount) {
-                    Toast.makeText(this@NewTransactionActivity, "Insufficient funds in income group. Available: $remaining, Required: $amount", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@NewTransactionActivity, "${getString(R.string.insuficient_funds_income_group_available)}: $remaining, Required: $amount", Toast.LENGTH_SHORT).show()
                     binding.dropdownIncomeGroup.text.clear()
                     binding.dropdownIncomeGroup.clearFocus()
                     selectedIncomeGroup = null
@@ -165,18 +165,18 @@ class NewTransactionActivity : AppCompatActivity() {
         }
         if (transactionType == "transfer") {
             if (selectedAccountTo == null) {
-                Toast.makeText(this, "Please select destination account", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.please_select_to_acc), Toast.LENGTH_SHORT).show()
                 return
             }
 
             if (selectedAccountFrom?.id == selectedAccountTo?.id) {
-                Toast.makeText(this, "Source and destination accounts must be different", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.source_and_dest_acc_must_be_different), Toast.LENGTH_SHORT).show()
                 return
             }
         }
         if (transactionType == "expense" || transactionType == "transfer") {
             if (selectedAccountFrom!!.balance < amount) {
-                Toast.makeText(this, "Insufficient funds in selected account. Available: ${selectedAccountFrom!!.balance}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "${getString(R.string.insuficient_funds_account_available)}: ${selectedAccountFrom!!.balance}", Toast.LENGTH_SHORT).show()
                 return
             }
         }
@@ -212,7 +212,7 @@ class NewTransactionActivity : AppCompatActivity() {
                         )
                     }
                 }
-                Toast.makeText(this@NewTransactionActivity, "Transaction saved successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@NewTransactionActivity, getString(R.string.transaction_created_successfully), Toast.LENGTH_SHORT).show()
                 finish()
             } catch (e: Exception) {
                 Log.d("NewTransactionActivity", "saveTransaction: ${e.message}")

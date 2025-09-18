@@ -64,7 +64,7 @@ class DownloadDataActivity : AppCompatActivity() {
 
     private fun downloadBackup() {
         if (!binding.confirmCheckbox.isChecked) {
-            Toast.makeText(this, "Please confirm to proceed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.please_confirm_to_proceed), Toast.LENGTH_SHORT).show()
             return
         }
         val fileName = "dialcash_data_${System.currentTimeMillis()}.backup"
@@ -88,7 +88,7 @@ class DownloadDataActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 binding.btnDownload.isEnabled = false
-                binding.btnDownload.text = "Generating backup..."
+                binding.btnDownload.text = getString(R.string.generating_backup)
 
                 contentResolver.openOutputStream(uri)?.use { outputStream ->
                     backupManager.exportToOutputStream(outputStream)
@@ -96,19 +96,19 @@ class DownloadDataActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this@DownloadDataActivity,
-                    "Backup saved successfully",
+                    getString(R.string.backup_saved_successfully),
                     Toast.LENGTH_LONG
                 ).show()
                 onBackPressedDispatcher.onBackPressed()
             } catch (e: Exception) {
                 Toast.makeText(
                     this@DownloadDataActivity,
-                    "Failed to save backup: ${e.message}",
+                    "${getString(R.string.failed_to_generate_backup)}: ${e.message}",
                     Toast.LENGTH_LONG
                 ).show()
             } finally {
                 binding.btnDownload.isEnabled = true
-                binding.btnDownload.text = "Download Data"
+                binding.btnDownload.text = getString(R.string.download_data)
             }
         }
     }
