@@ -43,7 +43,7 @@
             android:id="@+id/etSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Search..."
+            android:hint="@string/search_hint"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:maxLines="1"
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Transaction types"
+            android:text="@string/transaction_types"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -103,7 +103,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Incomes"
+                    android:text="@string/incomes"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -151,7 +151,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Expenses"
+                    android:text="@string/expenses"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -199,7 +199,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Transfers"
+                    android:text="@string/transfers"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 
@@ -218,7 +218,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:text="Date range"
+            android:text="@string/date_range"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -226,6 +226,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:weightSum="2">
             <!-- Start Date -->
@@ -250,8 +251,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:focusable="false"
-                    android:hint="Start date"
+                    android:focusable="true"
+                    android:hint="@string/hint_start_date"
                     android:paddingVertical="14dp"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/colorPrimary" />
@@ -279,7 +280,7 @@
                     android:layout_height="wrap_content"
                     android:clickable="true"
                     android:focusable="false"
-                    android:hint="End date"
+                    android:hint="@string/hint_end_date"
                     android:paddingVertical="14dp"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/colorPrimary" />
@@ -293,7 +294,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:layout_marginBottom="12dp"
-            android:text="Accounts Selector"
+            android:text="@string/accounts_selector"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold" />
