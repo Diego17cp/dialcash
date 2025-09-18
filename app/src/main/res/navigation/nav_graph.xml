@@ -8,22 +8,22 @@
         android:id="@+id/homeFragment"
         android:name="com.dialcadev.dialcash.ui.home.HomeFragment"
         tools:layout="@layout/fragment_home"
-        android:label="Home" />
+        android:label="DialCash" />
     <fragment
         android:id="@+id/transactionsFragment"
         android:name="com.dialcadev.dialcash.ui.transactions.TransactionsFragment"
         tools:layout="@layout/fragment_transactions"
-        android:label="Transactions" />
+        android:label="@string/transactions_toolbar_t" />
     <fragment
         android:id="@+id/accountsFragment"
         android:name="com.dialcadev.dialcash.ui.accounts.AccountsFragment"
         tools:layout="@layout/fragment_accounts"
-        android:label="Accounts" />
+        android:label="@string/accounts_toolbar_t" />
     <fragment
         android:id="@+id/incomesFragment"
         android:name="com.dialcadev.dialcash.ui.incomegroup.IncomesFragment"
         tools:layout="@layout/fragment_incomes"
-        android:label="Special Incomes" />
+        android:label="@string/incomes_toolbar_t" />
     <fragment
         android:id="@+id/checkpointFragment"
         android:name="com.dialcadev.dialcash.ui.CheckpointFragment"
