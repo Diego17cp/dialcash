@@ -227,7 +227,7 @@ class TransactionsFragment : Fragment() {
     ) {
         chipGroup.removeAllViews()
         val allChip = Chip(requireContext()).apply {
-            text = "All"
+            text = requireContext().getString(R.string.all)
             isCheckable = true
             isChecked = selectedAccounts.isEmpty()
             id = View.generateViewId()
@@ -340,10 +340,10 @@ class TransactionsFragment : Fragment() {
         binding.layoutTransactions.visibility = if (transactionsEmpty) View.GONE else View.VISIBLE
         binding.layoutNoTransactions.visibility = if (transactionsEmpty) View.VISIBLE else View.GONE
         if (transactionsEmpty) {
-            binding.tvEmptyTitle.text = if (filtered) "No results found" else "No transactions yet"
+            binding.tvEmptyTitle.text = if (filtered) getString(R.string.no_results) else getString(R.string.no_transactions_yet)
             binding.tvEmptySubtitle.text =
-                if (filtered) "Try adjusting your filters or clear them to see all transactions."
-                else "Add your first transaction to get started."
+                if (filtered) getString(R.string.try_adjusting_filters)
+                else getString(R.string.add_your_first_transaction)
         }
     }
 
@@ -361,7 +361,7 @@ class TransactionsFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction("Retry") { viewModel.refreshTransactions() }
+                    .setAction(getString(R.string.retry)) { viewModel.refreshTransactions() }
                     .show()
                 viewModel.clearError()
             }
@@ -370,10 +370,10 @@ class TransactionsFragment : Fragment() {
             binding.btnClearFilters.visibility = if (filtered) View.VISIBLE else View.GONE
             if (binding.layoutNoTransactions.isVisible) {
                 binding.tvEmptyTitle.text =
-                    if (filtered) "No results found" else "No transactions yet"
+                    if (filtered) getString(R.string.no_results) else getString(R.string.no_transactions_yet)
                 binding.tvEmptySubtitle.text =
-                    if (filtered) "Try adjusting your filters or clear them to see all transactions."
-                    else "Add your first transaction to get started."
+                    if (filtered) getString(R.string.try_adjusting_filters)
+                    else getString(R.string.add_your_first_transaction)
             }
         }
         try {
