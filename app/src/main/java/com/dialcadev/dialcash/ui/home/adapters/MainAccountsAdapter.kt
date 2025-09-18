@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
-import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.databinding.ItemMainAccountBinding
 
 class MainAccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -> Unit) : ListAdapter<AccountBalanceWithOriginal, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
