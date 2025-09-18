@@ -15,7 +15,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.collections.find
-import kotlin.collections.orEmpty
 
 class TransactionBottomSheetHandler(
     private val binding: RecycleTransactionItemBinding,
@@ -130,22 +129,22 @@ class TransactionBottomSheetHandler(
             val accountText = actvAccountName.text.toString().trim()
             var isValid = true
             if (amountText.isEmpty()) {
-                tilTransactionAmount.error = "Amount cannot be empty"
+                tilTransactionAmount.error = root.context.getString(R.string.amount_required)
                 isValid = false
             } else if (amountText.toDoubleOrNull() == null || amountText.toDouble() <= 0) {
-                tilTransactionAmount.error = "Enter a valid number"
+                tilTransactionAmount.error = root.context.getString(R.string.enter_valid_amount)
                 isValid = false
             } else {
                 tilTransactionAmount.error = null
             }
             if (descriptionText.isEmpty()) {
-                tilTransactionDescription.error = "Description cannot be empty"
+                tilTransactionDescription.error = root.context.getString(R.string.description_cannot_be_empty)
                 isValid = false
             } else {
                 tilTransactionDescription.error = null
             }
             if (accountText.isEmpty() || accounts.none { it.name == accountText }) {
-                tilAccountName.error = "Select a valid account"
+                tilAccountName.error = root.context.getString(R.string.select_valid_acc)
                 isValid = false
             } else {
                 tilAccountName.error = null
@@ -153,10 +152,10 @@ class TransactionBottomSheetHandler(
             if (transaction.type == "transfer") {
                 val toAccountText = actvAccountToName.text.toString().trim()
                 if (toAccountText.isEmpty() || accounts.none { it.name == toAccountText }) {
-                    tilAccountToName.error = "Select a valid account"
+                    tilAccountToName.error = root.context.getString(R.string.select_valid_acc)
                     isValid = false
                 } else if ((selectedAccount != null && selectedAccountTo != null) && (selectedAccount!!.id == selectedAccountTo!!.id)) {
-                    tilAccountToName.error = "Cannot transfer to the same account"
+                    tilAccountToName.error = root.context.getString(R.string.cannot_transfer_same_acc)
                     isValid = false
                 } else {
                     tilAccountToName.error = null
@@ -165,7 +164,7 @@ class TransactionBottomSheetHandler(
             if (transaction.type == "expense") {
                 val groupText = actvIncomeGroupName.text.toString().trim()
                 if (groupText.isNotEmpty() && incomeGroups.none { it.name == groupText }) {
-                    tilIncomeGroupName.error = "Select a valid income group"
+                    tilIncomeGroupName.error = root.context.getString(R.string.select_valid_income_group)
                     isValid = false
                 } else {
                     tilIncomeGroupName.error = null

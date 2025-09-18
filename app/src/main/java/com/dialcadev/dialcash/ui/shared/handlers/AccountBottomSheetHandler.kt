@@ -9,6 +9,7 @@ import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.databinding.RecycleAccountItemBinding
+import com.dialcadev.dialcash.domain.AccountType
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class AccountBottomSheetHandler(
@@ -18,17 +19,7 @@ class AccountBottomSheetHandler(
     private val onDelete: (Account) -> Unit,
     private val dialog: BottomSheetDialog
 ) {
-    private val accountTypeLabels =
-        arrayOf("Bank", "Cash", "Card", "Wallet", "Debt", "Savings", "Other")
-    private val accountTypeMapped = mapOf(
-        "Bank" to "bank",
-        "Cash" to "cash",
-        "Card" to "card",
-        "Wallet" to "wallet",
-        "Debt" to "debt",
-        "Savings" to "savings",
-        "Other" to "other"
-    )
+    private val accountTypes = AccountType.entries.toList()
 
     fun setup() {
         initializeViews()
@@ -40,30 +31,31 @@ class AccountBottomSheetHandler(
         binding.apply {
             tvAccountName.text = account.name
             etEditAccountName.setText(account.name)
-            tvAccountType.text = account.type.replaceFirstChar { it.uppercase() }
-            tvAccountBalance.text =
-                root.context.getString(R.string.currency_format, account.originalBalance)
+            val enumType = AccountType.byCode(account.type)
+            tvAccountType.text = root.context.getString(enumType.labelRes)
+            tvAccountBalance.text = root.context.getString(R.string.currency_format, account.originalBalance)
             etInitialBalance.setText(account.originalBalance.toString())
-            tvAccountCurrentBalance.text =
-                root.context.getString(R.string.currency_format, account.balance)
-            tvCreatedAt.text = "Created at: ${account.createdAt}"
-            val iconRes = when (account.type) {
-                "bank" -> R.drawable.ic_bank
-                "cash" -> R.drawable.ic_cash
-                "card" -> R.drawable.ic_card
-                "wallet" -> R.drawable.ic_accounts_outline
+            tvAccountCurrentBalance.text = root.context.getString(R.string.currency_format, account.balance)
+            tvCreatedAt.text = root.context.getString(
+                R.string.created_at,
+                account.createdAt
+            )
+            val iconRes = when (enumType) {
+                AccountType.BANK -> R.drawable.ic_bank
+                AccountType.CASH -> R.drawable.ic_cash
+                AccountType.CARD -> R.drawable.ic_card
+                AccountType.WALLET -> R.drawable.ic_accounts_outline
                 else -> R.drawable.ic_account_default
             }
             imageAccountIcon.setImageResource(iconRes)
+            val labels = accountTypes.map { root.context.getString(it.labelRes) }
             val accountTypeAdapter = ArrayAdapter(
                 root.context,
                 android.R.layout.simple_dropdown_item_1line,
-                accountTypeLabels
+                labels
             )
             actvAccountType.setAdapter(accountTypeAdapter)
-            val currentLabel = accountTypeMapped.entries.find { it.value == account.type }?.key
-                ?: account.type.replaceFirstChar { it.uppercase() }
-            actvAccountType.setText(currentLabel, false)
+            actvAccountType.setText(root.context.getString(enumType.labelRes), false)
         }
     }
 
@@ -84,23 +76,24 @@ class AccountBottomSheetHandler(
             var isValid = true
 
             if (name.isEmpty()) {
-                tilAccountName.error = "Name cannot be empty"
+                tilAccountName.error = root.context.getString(R.string.name_cannot_be_empty)
                 isValid = false
             } else {
                 tilAccountName.error = null
             }
-            if (typeText.isEmpty() || !accountTypeMapped.containsKey(typeText)) {
-                tilAccountType.error = "Select a valid account type"
+            val selectedType = accountTypes.firstOrNull { root.context.getString(it.labelRes) == typeText }
+            if (selectedType == null) {
+                tilAccountType.error = root.context.getString(R.string.select_valid_acc_type)
                 isValid = false
             } else {
                 tilAccountType.error = null
             }
             val balance = balanceText.toDoubleOrNull()
             if (balanceText.isEmpty()) {
-                tilInitialBalance.error = "Balance cannot be empty"
+                tilInitialBalance.error = root.context.getString(R.string.balance_cannot_be_empty)
                 isValid = false
             } else if (balance == null) {
-                tilInitialBalance.error = "Enter a valid number"
+                tilInitialBalance.error = root.context.getString(R.string.enter_valid_amount)
                 isValid = false
             } else {
                 tilInitialBalance.error = null
@@ -127,7 +120,7 @@ class AccountBottomSheetHandler(
                 if (!validateForm()) return
                 val newName = etEditAccountName.text.toString().trim()
                 val newTypeLabel = actvAccountType.text.toString().trim()
-                val newType = accountTypeMapped[newTypeLabel] ?: account.type
+                val newType = accountTypes.first { root.context.getString(it.labelRes) == newTypeLabel }.code
                 val newBalance = etInitialBalance.text.toString().trim().toDoubleOrNull()
                     ?: account.originalBalance
                 onUpdate(
