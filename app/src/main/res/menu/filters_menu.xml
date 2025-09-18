@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_filters"
-        android:title="Filters"
+        android:title="@string/filters"
         android:icon="@drawable/ic_filter_list"
         android:orderInCategory="90"
         app:showAsAction="ifRoom" />
