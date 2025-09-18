@@ -186,7 +186,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Current Balance"
+                android:text="@string/current_balance"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -261,7 +261,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 app:icon="@drawable/ic_delete"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textColor="?attr/colorError"
                 app:iconTint="?attr/colorError"
                 app:strokeColor="?attr/colorError" />
@@ -271,7 +271,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_edit"
-                android:text="Edit" />
+                android:text="@string/edit" />
         </LinearLayout>
 
         <!-- Edit Mode Footer -->
@@ -321,7 +321,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_x"
-                android:text="Confirm Delete"
+                android:text="@string/confirm_delete"
                 android:backgroundTint="?attr/colorError"
                 android:textColor="?attr/colorOnError"
                 app:iconTint="?attr/colorOnError" />

@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 app:boxBackgroundColor="@color/background"
-                android:hint="Description"
+                android:hint="@string/description"
                 android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -131,7 +131,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Account"
+            android:text="@string/hint_account"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -179,7 +179,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Transfered to"
+                android:text="@string/transferred_to"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -229,7 +229,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="Income Group"
+                android:text="@string/income_group"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -252,7 +252,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 app:boxBackgroundColor="@color/background"
-                android:hint="Income Group"
+                android:hint="@string/income_group"
                 android:visibility="gone">
 
                 <AutoCompleteTextView
@@ -326,7 +326,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:textColor="?attr/colorError"
                 app:icon="@drawable/ic_delete"
                 app:iconTint="?attr/colorError"
@@ -336,7 +336,7 @@
                 android:id="@+id/btnEdit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Edit"
+                android:text="@string/edit"
                 app:icon="@drawable/ic_edit" />
         </LinearLayout>
 
@@ -387,7 +387,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="?attr/colorError"
-                android:text="Confirm Delete"
+                android:text="@string/confirm_delete"
                 android:textColor="?attr/colorOnError"
                 app:icon="@drawable/ic_x"
                 app:iconTint="?attr/colorOnError" />
