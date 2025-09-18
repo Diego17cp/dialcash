@@ -1,19 +1,12 @@
 package com.dialcadev.dialcash.ui.home
 
 import android.content.Intent
-import android.icu.text.DateFormat
-import android.media.Image
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.databinding.FragmentHomeBinding
@@ -21,27 +14,12 @@ import com.dialcadev.dialcash.ui.home.adapters.MainAccountsAdapter
 import com.dialcadev.dialcash.ui.home.adapters.RecentTransactionsAdapter
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.dialcadev.dialcash.NewTransactionActivity
-import com.dialcadev.dialcash.databinding.RecycleAccountItemBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.textfield.TextInputEditText
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.map
-import com.dialcadev.dialcash.data.entities.Account
-import com.dialcadev.dialcash.data.entities.IncomeGroup
-import com.dialcadev.dialcash.data.entities.Transaction
-import com.dialcadev.dialcash.databinding.RecycleTransactionItemBinding
 import com.dialcadev.dialcash.ui.shared.BottomSheetManager
-import kotlinx.coroutines.launch
-import kotlin.toString
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -53,21 +31,6 @@ class HomeFragment : Fragment() {
 
     private lateinit var accountsAdapter: MainAccountsAdapter
     private lateinit var transactionsAdapter: RecentTransactionsAdapter
-
-    private val dateFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
-
-    private val accountTypeLabels = arrayOf(
-        "Bank", "Card", "Cash", "Wallet", "Debt", "Savings", "Other"
-    )
-    private val accountTypeMapped = mapOf(
-        "Bank" to "bank",
-        "Card" to "card",
-        "Cash" to "cash",
-        "Wallet" to "wallet",
-        "Debt" to "debt",
-        "Savings" to "savings",
-        "Other" to "other"
-    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -206,7 +169,7 @@ class HomeFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction("Retry") { viewModel.refreshData() }.show()
+                    .setAction(getString(R.string.retry)) { viewModel.refreshData() }.show()
                 viewModel.clearError()
             }
         }
