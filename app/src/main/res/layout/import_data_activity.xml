@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:elevation="0dp"
-        app:title="Import data"
+        app:title="@string/import_data"
         app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
         app:titleTextColor="?attr/colorOnSurface" />
 
@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Import your data"
+                android:text="@string/import_your_data"
                 android:textAlignment="center" />
 
             <TextView
@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Select a backup file to import. Imported data may replace the information you currently have in the app."
+                android:text="@string/import_your_data_subtitle"
                 android:textAlignment="center" />
 
             <TextView
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:lineSpacingExtra="4dp"
-                android:text="\u2022 Profile data (name, photo, preferences)\n\u2022 Bank accounts and payment methods\n\u2022 Transaction and activity history\n\u2022 Custom settings" />
+                android:text="@string/warning_bullets" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:paddingStart="8dp"
-                        android:text="I understand that the current data may be replaced by the imported information."
+                        android:text="@string/confirm_import_txt"
                         android:textAppearance="@style/TextAppearance.Material3.BodySmall" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -98,7 +98,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="It is recommended to make a backup before importing. The import will overwrite relevant account data."
+                android:text="@string/caption_import"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
             <LinearLayout
@@ -112,7 +112,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ripple_item_bg"
-                    android:text="Cancel"
+                    android:text="@string/cancel"
                     android:textColor="?attr/colorPrimary"
                     app:iconGravity="textStart" />
 
@@ -122,7 +122,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:enabled="false"
-                    android:text="Import Data"
+                    android:text="@string/import_data"
                     android:textColor="?attr/colorOnPrimary"
                     app:backgroundTint="?attr/colorPrimary" />
             </LinearLayout>
