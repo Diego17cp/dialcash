@@ -15,19 +15,19 @@
             android:id="@+id/rb_system"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="System Default" />
+            android:text="@string/system_default" />
 
         <RadioButton
             android:id="@+id/rb_light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Light" />
+            android:text="@string/light" />
 
         <RadioButton
             android:id="@+id/rb_dark"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dark" />
+            android:text="@string/dark" />
 
     </RadioGroup>
 </LinearLayout>
