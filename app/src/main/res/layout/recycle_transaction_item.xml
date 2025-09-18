@@ -58,7 +58,7 @@
                 style="?attr/textInputFilledStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 app:hintEnabled="false"
                 app:prefixText="S/. "
                 android:visibility="gone">
@@ -94,7 +94,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 android:hint="Description"
                 android:visibility="gone">
 
@@ -153,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+            app:boxBackgroundColor="@color/background"
             android:hint="Account"
             android:visibility="gone">
 
@@ -201,7 +201,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 android:hint="To Account"
                 android:visibility="gone">
 
@@ -251,7 +251,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 android:hint="Income Group"
                 android:visibility="gone">
 

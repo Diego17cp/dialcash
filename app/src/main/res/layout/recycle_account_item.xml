@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -89,7 +89,7 @@
                 style="@style/Widget.Material3.TextInputLayout.FilledBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 android:hint="Account Type"
                 android:visibility="gone">
 
@@ -154,7 +154,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 app:prefixText="S/. "
                 app:hintEnabled="false">
 

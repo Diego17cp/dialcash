@@ -32,7 +32,7 @@
             android:layout_height="48dp"
             android:layout_marginEnd="16dp"
             android:contentDescription="Account Icon"
-            tools:src="@drawable/ic_income_item"
+            android:src="@drawable/ic_income_item"
             app:tint="?attr/colorSecondary" />
 
         <LinearLayout
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 app:hintEnabled="false">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_edit_account_name"
@@ -124,7 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:boxBackgroundColor="?attr/colorSurfaceContainerHighest"
+                app:boxBackgroundColor="@color/background"
                 app:prefixText="S/. "
                 app:hintEnabled="false">
 
