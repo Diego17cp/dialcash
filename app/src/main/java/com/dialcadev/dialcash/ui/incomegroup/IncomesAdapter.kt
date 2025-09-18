@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dto.IncomeGroupRemaining
-import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.databinding.ItemIncomeGroupBinding
 
 class IncomesAdapter(private val onIncomeClick: (IncomeGroupRemaining) -> Unit) :
@@ -28,7 +27,10 @@ class IncomesAdapter(private val onIncomeClick: (IncomeGroupRemaining) -> Unit) 
             binding.apply {
                 val currencyFormat = root.context.getString(R.string.currency_format)
                 textIncomeName.text = income.name
-                textIncomeBalance.text = "Original balance: ${String.format(currencyFormat, income.amount)}"
+                textIncomeBalance.text = root.context.getString(
+                    R.string.original_balance_with_value,
+                    root.context.getString(R.string.currency_format, income.amount)
+                )
                 textIncomeRemaining.text = String.format(currencyFormat, income.remaining)
                 root.setOnClickListener { onIncomeClick(income) }
             }

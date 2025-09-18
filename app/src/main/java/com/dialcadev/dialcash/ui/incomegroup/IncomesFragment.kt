@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.NewIncomeActivity
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.databinding.FragmentIncomesBinding
-import com.dialcadev.dialcash.databinding.ItemIncomeGroupBinding
 import com.dialcadev.dialcash.databinding.RecycleIncomeGroupItemBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -67,10 +65,10 @@ class IncomesFragment : Fragment() {
                     val isAmountValid = amountText.isNotEmpty() && amountText.toDoubleOrNull() != null && amountText.toDouble() >= 0.0
                     btnSave.isEnabled = isNameValid && isAmountValid
                     if (!isNameValid) {
-                        tilIncomeGroupName.error = "Name cannot be empty"
+                        tilIncomeGroupName.error = getString(R.string.name_cannot_be_empty)
                     }
                     if (!isAmountValid) {
-                        tilInitialBalance.error = "Enter a valid non-negative amount"
+                        tilInitialBalance.error = getString(R.string.amount_required)
                     }
                 }
                 fun resetForm() {
@@ -148,7 +146,7 @@ class IncomesFragment : Fragment() {
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             errorMessage?.let {
                 Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG)
-                    .setAction("Retry") { viewModel.refreshIncomes() }
+                    .setAction(getString(R.string.retry)) { viewModel.refreshIncomes() }
                     .show()
                 viewModel.clearError()
             }
