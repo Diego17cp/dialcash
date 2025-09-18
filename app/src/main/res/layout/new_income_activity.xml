@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:text="New Income Group"
+            android:text="@string/new_income_title"
             android:textColor="?attr/colorOnSurface"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -30,7 +30,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Create a special income group to track your money sources"
+            android:text="@string/new_income_subtitle"
             android:textAlignment="center"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="16sp"
@@ -45,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:hint="Income Name"
+            android:hint="@string/income_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
@@ -67,7 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Amount"
+            android:hint="@string/til_amount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tilIncomeName"
@@ -144,7 +144,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💰 Income Group Tips"
+                    android:text="@string/income_tip_title"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -154,7 +154,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:lineSpacingExtra="4dp"
-                    android:text="• Use descriptive names (e.g., 'Birthday Money', 'Bonus')\n• Amount is the total income received\n• Remaining tracks how much is left to spend\n• Link expenses to income groups for better tracking"
+                    android:text="@string/income_tip_bullets"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp" />
 
@@ -179,7 +179,7 @@
                 android:layout_height="56dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                android:text="Cancel"
+                android:text="@string/cancel"
                 android:textSize="16sp" />
 
             <com.google.android.material.button.MaterialButton
@@ -189,7 +189,7 @@
                 android:layout_height="56dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="Create"
+                android:text="@string/create"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
