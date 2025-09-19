@@ -18,6 +18,7 @@ class UserDataStore @Inject constructor(private val context: Context) {
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_PHOTO_URI = stringPreferencesKey("user_photo_uri")
         private val IS_REGISTERED = booleanPreferencesKey("is_registered")
+        private val SEEN_ONBOARDING = booleanPreferencesKey("seen_onboarding")
     }
 
     suspend fun saveUserData(
@@ -66,6 +67,16 @@ class UserDataStore @Inject constructor(private val context: Context) {
     suspend fun clearUserData() {
         context.dataStore.edit { prefs ->
             prefs.clear()
+        }
+    }
+    fun isOnboardingSeen(): Flow<Boolean> {
+        return context.dataStore.data.map { prefs ->
+            prefs[SEEN_ONBOARDING] ?: false
+        }
+    }
+    suspend fun setOnboardingSeen(seen: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[SEEN_ONBOARDING] = seen
         }
     }
 }
