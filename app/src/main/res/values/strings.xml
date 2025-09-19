@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dialcash</string>
+    <string name="app_name" translatable="false">Dialcash</string>
     <string name="currency_format">S/. %.2f</string>
     <string name="create_account">Create account</string>
     <string name="subtitle_first_acc">Complete your profile to get started</string>
@@ -139,7 +139,7 @@
     <string name="add_your_first_transaction">Add your first transaction to get started.</string>
     <string name="account_deleted_successfully">Account deleted successfully</string>
     <string name="please_confirm_to_proceed">Please confirm to proceed.</string>
-    <string name="generating_backup">Generating backup...</string>
+    <string name="generating_backup">Generating backup…</string>
     <string name="backup_saved_successfully">Backup saved successfully</string>
     <string name="failed_to_generate_backup">Failed to generate backup</string>
     <string name="profile_updated">Profile updated successfully</string>
@@ -147,7 +147,7 @@
     <string name="data_imported_successfully">Data imported successfully</string>
     <string name="failed_to_import_data">Failed to import data</string>
     <string name="must_create_acc_to_proceed">You must create an account to proceed</string>
-    <string name="importing">Importing...</string>
+    <string name="importing">Importing…</string>
     <string name="please_select_valid_file">Please select a valid .json or .backup file</string>
     <string name="selected_file_error">Selected file is not a valid JSON backup.</string>
     <string name="failed_open_file">Failed to open selected file.</string>
