@@ -3,7 +3,6 @@ package com.dialcadev.dialcash.data.backup
 import android.util.Log
 import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.UserDataStore
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.stream.JsonWriter
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +12,9 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.OutputStreamWriter
-import java.nio.charset.Charset
 import javax.inject.Inject
 import javax.inject.Singleton
+import androidx.room.withTransaction
 
 @Singleton
 class BackupManager @Inject constructor(
@@ -89,23 +88,77 @@ class BackupManager @Inject constructor(
         }
     }
     suspend fun restoreFromBundle(bundle: BackupBundleDto) {
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             try {
                 Log.d("BackupManager", "Starting db restore")
 
-                // Clear existing data
-                repo.wipeDatabase()
-                bundle.db.accounts?.let { accounts ->
-                    repo.insertAccountsBatch(accounts)
-                    Log.d("BackupManager", "Inserted ${accounts.size} accounts")
-                }
-                bundle.db.incomeGroups?.let { groups ->
-                    repo.insertIncomeGroupsBatch(groups)
-                    Log.d("BackupManager", "Inserted ${groups.size} income groups")
-                }
-                bundle.db.transactions?.let { transactions ->
-                    repo.insertTransactionsBatch(transactions)
-                    Log.d("BackupManager", "Inserted ${transactions.size} transactions")
+                repo.database.withTransaction {
+                    repo.wipeDatabase()
+                    val accountIdMap = mutableMapOf<Int, Int>()
+                    val incomeGroupIdMap = mutableMapOf<Int, Int>()
+                    bundle.db.accounts?.forEach { originalAccount ->
+                        val accountCopy = originalAccount.copy(id = 0)
+                        val newId = repo.createAccount(accountCopy)
+                        accountIdMap[originalAccount.id] = newId.toInt()
+                        Log.d("BackupManager", "Account remapped: ${originalAccount.id} -> $newId")
+                    }
+                    bundle.db.incomeGroups?.forEach { originalGroup ->
+                        val groupCopy = originalGroup.copy(id = 0)
+                        val newId = repo.createIncomeGroup(groupCopy)
+                        incomeGroupIdMap[originalGroup.id] = newId.toInt()
+                        Log.d(
+                            "BackupManager",
+                            "IncomeGroup remapped: ${originalGroup.id} -> $newId"
+                        )
+                    }
+                    bundle.db.transactions?.forEach { originalTransaction ->
+                        val newAccountId = accountIdMap[originalTransaction.accountId]
+                        val newTransferAccountId = originalTransaction.transferAccountId?.let { accountIdMap[it] }
+                        val newRelatedIncomeId = originalTransaction.relatedIncomeId?.let { incomeGroupIdMap[it] }
+                        if (newAccountId != null) {
+                            when (originalTransaction.type) {
+                                "income" -> repo.addIncome(
+                                    accountId = newAccountId,
+                                    amount = originalTransaction.amount,
+                                    description = originalTransaction.description ?: "",
+                                    relatedIncomeId = newRelatedIncomeId,
+                                    date = originalTransaction.date
+                                )
+                                "expense" -> repo.addExpense(
+                                    accountId = newAccountId,
+                                    amount = originalTransaction.amount,
+                                    description = originalTransaction.description ?: "",
+                                    relatedIncomeId = newRelatedIncomeId,
+                                    date = originalTransaction.date
+                                )
+                                "transfer" -> {
+                                    if (newTransferAccountId != null) {
+                                        repo.makeTransfer(
+                                            fromAccountId = newAccountId,
+                                            toAccountId = newTransferAccountId,
+                                            amount = originalTransaction.amount,
+                                            description = originalTransaction.description ?: "",
+                                            date = originalTransaction.date
+                                        )
+                                    }
+                                }
+                            }
+                            Log.d(
+                                "BackupManager",
+                                "Transaction remapped: account ${originalTransaction.accountId} -> $newAccountId"
+                            )
+                        } else {
+                            Log.w(
+                                "BackupManager",
+                                "Could not find mapped account for transaction ${originalTransaction.id}"
+                            )
+                        }
+                    }
+
+                    Log.d(
+                        "BackupManager",
+                        "Inserted ${bundle.db.accounts?.size ?: 0} accounts, ${bundle.db.incomeGroups?.size ?: 0} income groups, ${bundle.db.transactions?.size ?: 0} transactions"
+                    )
                 }
                 bundle.datastore?.let { dataStore ->
                     userDataStore.updateUserData(

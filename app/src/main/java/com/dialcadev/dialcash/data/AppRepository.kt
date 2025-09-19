@@ -22,6 +22,7 @@ class AppRepository(private val db: AppDB) {
     private val transactionDao = db.transactionDao()
     private val incomeGroupDao = db.incomeGroupDao()
     private val checkpointDao = db.checkpointDao()
+    val database: AppDB = db
 
     // ==================== ACCOUNT OPERATIONS ====================
     suspend fun createAccount(account: Account) =
