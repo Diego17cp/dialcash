@@ -165,4 +165,18 @@
     <string name="transaction_created_successfully">交易创建成功</string>
     <string name="registered_successfully">注册成功</string>
     <string name="created_at">创建于：%1$s</string>
+    <string name="skip">跳过</string>
+    <string name="next">下一步</string>
+    <string name="onb_title_1">欢迎使用DialCash</string>
+    <string name="onb_subtitle_1">您的个人财务伙伴，帮助您轻松管理账户、跟踪支出并实现财务目标。</string>
+    <string name="onb_title_2">多账户管理</string>
+    <string name="onb_subtitle_2">在一个地方管理您的所有银行账户、信用卡和现金。跟踪所有金融账户的余额和交易。</string>
+    <string name="onb_title_3">智能分类</string>
+    <string name="onb_subtitle_3">通过智能分类整理您的支出。通过详细的收入和支出类别跟踪您的资金流向。</string>
+    <string name="onb_title_4">深度报告</string>
+    <string name="onb_subtitle_4">获取关于您消费习惯的详细分析和报告。通过全面的数据可视化做出明智的财务决策。</string>
+    <string name="onb_title_5">安全私密</string>
+    <string name="onb_subtitle_5">您的财务数据受到银行级安全保护。所有信息都保存在您的设备上 - 保证完全隐私。</string>
+    <string name="onb_title_6">准备开始了吗？</string>
+    <string name="onb_subtitle_6">创建您的账户，开始更好的财务管理之旅。让我们设置您的第一个账户并开始跟踪！</string>
 </resources>

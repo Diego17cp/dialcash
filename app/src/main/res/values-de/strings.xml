@@ -165,4 +165,18 @@
     <string name="transaction_created_successfully">Transaktion erfolgreich erstellt</string>
     <string name="registered_successfully">Erfolgreich registriert</string>
     <string name="created_at">Erstellt am: %1$s</string>
+    <string name="skip">Überspringen</string>
+    <string name="next">Weiter</string>
+    <string name="onb_title_1">Willkommen bei DialCash</string>
+    <string name="onb_subtitle_1">Ihr persönlicher Finanzbegleiter, der Ihnen hilft, Konten zu verwalten, Ausgaben zu verfolgen und Ihre finanziellen Ziele mühelos zu erreichen.</string>
+    <string name="onb_title_2">Mehrere Konten</string>
+    <string name="onb_subtitle_2">Verwalten Sie alle Ihre Bankkonten, Kreditkarten und Bargeld an einem Ort. Verfolgen Sie Salden und Transaktionen über alle Ihre Finanzkonten hinweg.</string>
+    <string name="onb_title_3">Intelligente Kategorien</string>
+    <string name="onb_subtitle_3">Organisieren Sie Ihre Ausgaben mit intelligenter Kategorisierung. Verfolgen Sie, wohin Ihr Geld geht, mit detaillierten Einkommens- und Ausgabenkategorien.</string>
+    <string name="onb_title_4">Aufschlussreiche Berichte</string>
+    <string name="onb_subtitle_4">Erhalten Sie detaillierte Analysen und Berichte über Ihre Ausgabengewohnheiten. Treffen Sie fundierte finanzielle Entscheidungen mit umfassender Datenvisualisierung.</string>
+    <string name="onb_title_5">Sicher und Privat</string>
+    <string name="onb_subtitle_5">Ihre Finanzdaten sind mit bankähnlicher Sicherheit geschützt. Alle Informationen bleiben auf Ihrem Gerät - vollständige Privatsphäre garantiert.</string>
+    <string name="onb_title_6">Bereit zu beginnen?</string>
+    <string name="onb_subtitle_6">Erstellen Sie Ihr Konto und beginnen Sie Ihre Reise zu besserer Finanzverwaltung. Lassen Sie uns Ihr erstes Konto einrichten und mit der Verfolgung beginnen!</string>
 </resources>

@@ -165,4 +165,18 @@
     <string name="transaction_created_successfully">Transaction created successfully</string>
     <string name="registered_successfully">Registered successfully</string>
     <string name="created_at">Created at: %1$s</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="onb_title_1">Welcome to DialCash</string>
+    <string name="onb_subtitle_1">Your personal finance companion that helps you manage accounts, track expenses, and achieve your financial goals effortlessly.</string>
+    <string name="onb_title_2">Multiple Accounts</string>
+    <string name="onb_subtitle_2">Manage all your bank accounts, credit cards, and cash in one place. Keep track of balances and transactions across all your financial accounts.</string>
+    <string name="onb_title_3">Smart Categories</string>
+    <string name="onb_subtitle_3">Organize your expenses with intelligent categorization. Track where your money goes with detailed income and expense categories.</string>
+    <string name="onb_title_4">Insightful Reports</string>
+    <string name="onb_subtitle_4">Get detailed analytics and reports about your spending habits. Make informed financial decisions with comprehensive data visualization.</string>
+    <string name="onb_title_5">Secure and Private</string>
+    <string name="onb_subtitle_5">Your financial data is protected with bank-level security. All information stays on your device - complete privacy guaranteed.</string>
+    <string name="onb_title_6">Ready to Start?</string>
+    <string name="onb_subtitle_6">Create your account and begin your journey towards better financial management. Let\'s set up your first account and start tracking!</string>
 </resources>

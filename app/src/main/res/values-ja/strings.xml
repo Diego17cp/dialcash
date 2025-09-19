@@ -165,4 +165,18 @@
     <string name="transaction_created_successfully">取引が正常に作成されました</string>
     <string name="registered_successfully">正常に登録されました</string>
     <string name="created_at">作成日：%1$s</string>
+    <string name="skip">スキップ</string>
+    <string name="next">次へ</string>
+    <string name="onb_title_1">DialCashへようこそ</string>
+    <string name="onb_subtitle_1">口座管理、支出追跡、財務目標の達成を簡単にサポートするあなたの個人財務パートナーです。</string>
+    <string name="onb_title_2">複数アカウント</string>
+    <string name="onb_subtitle_2">すべての銀行口座、クレジットカード、現金を一箇所で管理。すべての金融アカウントの残高と取引を追跡しましょう。</string>
+    <string name="onb_title_3">スマートカテゴリー</string>
+    <string name="onb_subtitle_3">インテリジェントな分類で支出を整理。詳細な収入・支出カテゴリーでお金の流れを追跡します。</string>
+    <string name="onb_title_4">洞察に富むレポート</string>
+    <string name="onb_subtitle_4">支出習慣の詳細な分析とレポートを取得。包括的なデータ可視化で情報に基づいた財務決定を行いましょう。</string>
+    <string name="onb_title_5">安全でプライベート</string>
+    <string name="onb_subtitle_5">あなたの財務データは銀行レベルのセキュリティで保護されています。すべての情報はあなたのデバイスに保存 - 完全なプライバシーを保証します。</string>
+    <string name="onb_title_6">始める準備はできましたか？</string>
+    <string name="onb_subtitle_6">アカウントを作成し、より良い財務管理への旅を始めましょう。最初のアカウントを設定して追跡を開始しましょう！</string>
 </resources>
