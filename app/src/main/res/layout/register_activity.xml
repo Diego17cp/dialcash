@@ -93,6 +93,29 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Currency Symbol Field -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilCurrency"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/hint_currency_symbol"
+            app:helperText="@string/helper_currency"
+            app:helperTextEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tilName">
+
+            <AutoCompleteTextView
+                android:id="@+id/etCurrency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapCharacters"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <!-- Info Card -->
         <com.google.android.material.card.MaterialCardView
@@ -105,7 +128,7 @@
             app:cardElevation="0dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilName"
+            app:layout_constraintTop_toBottomOf="@id/tilCurrency"
             app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="1dp">
 
@@ -136,7 +159,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Registe Button -->
+        <!-- Register Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
             style="@style/Widget.Material3.Button"
