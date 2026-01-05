@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.databinding.ItemAccountBinding
-
 class AccountsAdapter(
     private val onAccountClick: (AccountBalanceWithOriginal) -> Unit,
     currencySymbol: String
@@ -36,7 +35,11 @@ class AccountsAdapter(
             binding.apply {
                 textAccountName.text = account.name
                 "$currentCurrencySymbol ${"%.2f".format(account.balance)}".also { textCurrentBalance.text = it }
-                "$currentCurrencySymbol ${"%.2f".format(account.originalBalance)}".also { textOriginalBalance.text = it }
+                val formattedBalance = "$currentCurrencySymbol ${"%.2f".format(account.originalBalance)}"
+                textOriginalBalance.text = root.context.getString(
+                    R.string.original_balance_with_value,
+                    formattedBalance
+                )
                 val iconRes = when(account.type){
                     "cash" -> R.drawable.ic_cash
                     "bank" -> R.drawable.ic_bank

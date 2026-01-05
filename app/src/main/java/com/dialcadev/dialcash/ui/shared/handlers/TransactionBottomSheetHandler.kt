@@ -31,7 +31,6 @@ class TransactionBottomSheetHandler(
     private var selectedAccount: Account? = null
     private var selectedAccountTo: Account? = null
     private var selectedIncomeGroup: IncomeGroup? = null
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
     fun setup() {
         initializeViews()
         setupAdapters()
@@ -51,8 +50,8 @@ class TransactionBottomSheetHandler(
                 "transfer" -> R.color.colorPrimary
                 else -> R.color.negative_amount
             }
-            val amountText = if (transaction.type == "income") "+ $currencySymbol${transaction.amount}"
-            else "- $currencySymbol${transaction.amount}"
+            val amountText = if (transaction.type == "income") "+$currencySymbol ${transaction.amount}"
+            else "-$currencySymbol ${transaction.amount}"
             ivTransactionType.setImageResource(iconRes)
             ivTransactionType.setColorFilter(root.context.getColor(color))
             tvTransactionAmount.text = amountText

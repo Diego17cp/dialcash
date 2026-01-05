@@ -41,8 +41,8 @@ class TransactionsAdapter(
                 textTransactionDescription.text = transaction.description ?: "No Description"
                 textTransactionAccount.text = "${transaction.accountName} -"
 
-                val amount = if (transaction.type == "income") "+ $currentCurrencySymbol${transaction.amount}"
-                else "- $currentCurrencySymbol${transaction.amount}"
+                val amount = if (transaction.type == "income") "+$currentCurrencySymbol ${transaction.amount}"
+                else "-$currentCurrencySymbol ${transaction.amount}"
                 textTransactionAmount.text = amount
 
                 textTransactionAmount.text = amount
