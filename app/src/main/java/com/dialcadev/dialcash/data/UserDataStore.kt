@@ -19,27 +19,32 @@ class UserDataStore @Inject constructor(private val context: Context) {
         private val USER_PHOTO_URI = stringPreferencesKey("user_photo_uri")
         private val IS_REGISTERED = booleanPreferencesKey("is_registered")
         private val SEEN_ONBOARDING = booleanPreferencesKey("seen_onboarding")
+        private val CURRENCY_SYMBOL = stringPreferencesKey("currency_symbol")
     }
 
     suspend fun saveUserData(
         name: String,
-        photoUri: String? = null
+        photoUri: String? = null,
+        currencySymbol: String? = "$"
     ) {
         context.dataStore.edit { prefs ->
             prefs[USER_NAME] = name
             prefs[USER_PHOTO_URI] = photoUri ?: ""
             prefs[IS_REGISTERED] = true
+            prefs[CURRENCY_SYMBOL] = currencySymbol ?: "$"
         }
     }
     suspend fun updateUserData(
         name: String,
-        photoUri: String? = null
+        photoUri: String? = null,
+        currencySymbol: String? = "$"
     ) {
         context.dataStore.edit { prefs ->
             prefs[USER_NAME] = name
             if (photoUri != null) {
                 prefs[USER_PHOTO_URI] = photoUri
             }
+            prefs[CURRENCY_SYMBOL] = currencySymbol ?: "$"
         }
     }
 
@@ -48,7 +53,8 @@ class UserDataStore @Inject constructor(private val context: Context) {
             UserData(
                 name = prefs[USER_NAME] ?: "",
                 photoUri = prefs[USER_PHOTO_URI] ?: "",
-                isRegistered = prefs[IS_REGISTERED] ?: false
+                isRegistered = prefs[IS_REGISTERED] ?: false,
+                currencySymbol = prefs[CURRENCY_SYMBOL] ?: "$"
             )
         }
     }
@@ -62,6 +68,7 @@ class UserDataStore @Inject constructor(private val context: Context) {
         context.dataStore.edit { prefs ->
             prefs[USER_NAME] = ""
             prefs[USER_PHOTO_URI] = ""
+            prefs[CURRENCY_SYMBOL] = "$"
         }
     }
     suspend fun clearUserData() {
@@ -84,5 +91,6 @@ class UserDataStore @Inject constructor(private val context: Context) {
 data class UserData(
     val name: String,
     val photoUri: String,
-    val isRegistered: Boolean
+    val isRegistered: Boolean,
+    val currencySymbol: String
 )
