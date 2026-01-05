@@ -94,6 +94,7 @@ class SettingsActivity : AppCompatActivity() {
         val intent = Intent(this, EditProfileActivity::class.java)
         intent.putExtra("userName", userData?.name)
         intent.putExtra("userPhotoUri", userData?.photoUri)
+        intent.putExtra("userCurrency", userData?.currencySymbol)
         startActivity(intent)
     }
 
