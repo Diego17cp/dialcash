@@ -1,6 +1,7 @@
 package com.dialcadev.dialcash.utils
 
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 fun String.toReadableDate(): String {
@@ -11,5 +12,13 @@ fun String.toReadableDate(): String {
         date?.let { outputFormat.format(it) } ?: this
     } catch (e: Exception) {
         this
+    }
+}
+fun Long.toReadableDate(): String {
+    return try {
+        val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        outputFormat.format(Date(this))
+    } catch (e: Exception) {
+        this.toString()
     }
 }
