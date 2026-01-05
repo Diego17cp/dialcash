@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +27,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var userName: String
     private lateinit var userPhotoUri: String
     private var newPhotoUri: Uri? = null
+    private lateinit var userCurrency: String
     private val launcher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
             if (uri != null) {
@@ -50,6 +52,7 @@ class EditProfileActivity : AppCompatActivity() {
         binding = EditProfileActivityBinding.inflate(layoutInflater)
         userName = intent.getStringExtra("userName") ?: ""
         userPhotoUri = intent.getStringExtra("userPhotoUri") ?: ""
+        userCurrency = intent.getStringExtra("userCurrency") ?: ""
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -72,6 +75,10 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
+        val currencyOptions = resources.getStringArray(R.array.currency_options)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, currencyOptions)
+        binding.etCurrency.setAdapter(adapter)
+        binding.etCurrency.setText(userCurrency, false)
         binding.etName.setText(userName)
         val uri = userPhotoUri.takeIf { it.isNotBlank() }?.toUri()
         if (uri != null) {
@@ -90,6 +97,7 @@ class EditProfileActivity : AppCompatActivity() {
             launcher.launch(arrayOf("image/*"))
         }
         binding.etName.addTextChangedListener { validateName() }
+        binding.etCurrency.addTextChangedListener { validateCurrency() }
         binding.btnSaveChanges.setOnClickListener { updateInfo() }
     }
 
@@ -106,15 +114,31 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    private fun validateCurrency(): Boolean {
+        val currency = binding.etCurrency.text.toString().trim()
+        return if (currency.isEmpty()) {
+            binding.tilCurrency.error = getString(R.string.currency_cannot_be_empty)
+            binding.btnSaveChanges.isEnabled = false
+            false
+        } else {
+            binding.tilCurrency.error = null
+            binding.btnSaveChanges.isEnabled = true
+            true
+        }
+    }
+
     private fun updateInfo() {
         if (!validateName()) return
         val updatedName = binding.etName.text.toString().trim()
         val updatedPhotoUri = newPhotoUri?.toString() ?: userPhotoUri
+        val updatedCurrency = binding.etCurrency.text.toString().trim()
+            .substringBefore(" -")
         lifecycleScope.launch {
             try {
                 userDataStore.updateUserData(
                     name = updatedName,
-                    photoUri = updatedPhotoUri.takeIf { it.isNotBlank() }
+                    photoUri = updatedPhotoUri.takeIf { it.isNotBlank() },
+                    currencySymbol = updatedCurrency
                 )
                 Toast.makeText(this@EditProfileActivity, getString(R.string.profile_updated), Toast.LENGTH_SHORT)
                     .show()
