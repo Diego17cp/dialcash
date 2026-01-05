@@ -47,7 +47,8 @@ class BackupManager @Inject constructor(
                     ),
                     datastore = DataStoreBackup(
                         username = userData.name,
-                        profilePicture = userData.photoUri.takeIf { it.isNotEmpty() }
+                        profilePicture = userData.photoUri.takeIf { it.isNotEmpty() },
+                        currencySymbol = userData.currencySymbol
                     ),
                     db = DatabaseBackup(
                         accounts = accounts,
@@ -163,7 +164,8 @@ class BackupManager @Inject constructor(
                 bundle.datastore?.let { dataStore ->
                     userDataStore.updateUserData(
                         name = dataStore.username ?: "",
-                        photoUri = dataStore.profilePicture ?: ""
+                        photoUri = dataStore.profilePicture ?: "",
+                        currencySymbol = dataStore.currencySymbol ?: "$"
                     )
                     Log.d("BackupManager", "User data restored")
                 }

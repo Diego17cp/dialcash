@@ -14,6 +14,7 @@ data class BackupBundleDto(
 data class DataStoreBackup(
     val username: String,
     val profilePicture: String?, // Uri as String
+    val currencySymbol: String, // e.g. "$", "€"
 )
 
 data class DatabaseBackup(
