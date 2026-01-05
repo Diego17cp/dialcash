@@ -51,7 +51,7 @@
                 android:textStyle="bold"
                 android:gravity="end"
                 android:textAlignment="viewEnd"
-                tools:text="- S/. 50.00"
+                tools:text="- $ 50.00"
                 tools:textColor="@color/negative_balance" />
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilTransactionAmount"
@@ -60,7 +60,6 @@
                 android:layout_height="wrap_content"
                 app:boxBackgroundColor="@color/background"
                 app:hintEnabled="false"
-                app:prefixText="S/. "
                 android:visibility="gone">
 
                 <com.google.android.material.textfield.TextInputEditText
