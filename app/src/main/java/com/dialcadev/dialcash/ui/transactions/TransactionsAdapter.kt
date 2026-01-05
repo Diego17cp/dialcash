@@ -9,11 +9,14 @@ import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.databinding.ItemRecentTransactionBinding
 
-class TransactionsAdapter(private val onTransactionClick: (TransactionWithDetails) -> Unit) :
+class TransactionsAdapter(
+    private val onTransactionClick: (TransactionWithDetails) -> Unit,
+    currencySymbol: String
+) :
     ListAdapter<TransactionWithDetails, TransactionsAdapter.TransactionViewHolder>(
         TransactionDiffCallback()
     ) {
-
+    private var currentCurrencySymbol = currencySymbol
     private val dateFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
@@ -25,6 +28,10 @@ class TransactionsAdapter(private val onTransactionClick: (TransactionWithDetail
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
 
     inner class TransactionViewHolder(private val binding: ItemRecentTransactionBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -34,12 +41,9 @@ class TransactionsAdapter(private val onTransactionClick: (TransactionWithDetail
                 textTransactionDescription.text = transaction.description ?: "No Description"
                 textTransactionAccount.text = "${transaction.accountName} -"
 
-                val amount = if (transaction.type == "income") "+${
-                    root.context.getString(
-                        R.string.currency_format,
-                        transaction.amount
-                    )
-                }" else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
+                val amount = if (transaction.type == "income") "+ $currentCurrencySymbol${transaction.amount}"
+                else "- $currentCurrencySymbol${transaction.amount}"
+                textTransactionAmount.text = amount
 
                 textTransactionAmount.text = amount
 

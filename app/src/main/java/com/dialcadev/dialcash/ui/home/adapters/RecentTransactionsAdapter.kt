@@ -11,10 +11,14 @@ import com.dialcadev.dialcash.databinding.ItemRecentTransactionBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class RecentTransactionsAdapter(private val onTransactionClick: (TransactionWithDetails) -> Unit) :
+class RecentTransactionsAdapter(
+    private val onTransactionClick: (TransactionWithDetails) -> Unit,
+    currencySymbol: String
+) :
     ListAdapter<TransactionWithDetails, RecentTransactionsAdapter.TransactionViewHolder>(
         TransactionDiffCallback()
     ) {
+    private var currentCurrencySymbol = currencySymbol
     private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
     override fun onCreateViewHolder(
@@ -33,6 +37,10 @@ class RecentTransactionsAdapter(private val onTransactionClick: (TransactionWith
     ) {
         holder.bind(getItem(position))
     }
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
 
     inner class TransactionViewHolder(
         private val binding: ItemRecentTransactionBinding
@@ -42,13 +50,8 @@ class RecentTransactionsAdapter(private val onTransactionClick: (TransactionWith
                 textTransactionDate.text = dateFormat.format(transaction.date)
                 textTransactionDescription.text = transaction.description ?: "No Description"
                 textTransactionAccount.text = "${transaction.accountName} -"
-                val amount = if (transaction.type == "income") "+${
-                    root.context.getString(
-                        R.string.currency_format,
-                        transaction.amount
-                    )
-                }"
-                else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
+                val amount = if (transaction.type == "income") "+ $currentCurrencySymbol${transaction.amount}"
+                else "- $currentCurrencySymbol${transaction.amount}"
                 textTransactionAmount.text = amount
                 val colorRes =
                     when (transaction.type) {
