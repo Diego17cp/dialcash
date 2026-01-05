@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">Ihre Finanzdaten sind mit bankähnlicher Sicherheit geschützt. Alle Informationen bleiben auf Ihrem Gerät - vollständige Privatsphäre garantiert.</string>
     <string name="onb_title_6">Bereit zu beginnen?</string>
     <string name="onb_subtitle_6">Erstellen Sie Ihr Konto und beginnen Sie Ihre Reise zu besserer Finanzverwaltung. Lassen Sie uns Ihr erstes Konto einrichten und mit der Verfolgung beginnen!</string>
+    <string name="hint_currency_symbol">Währung</string>
+    <string name="helper_currency">Wählen Sie eine beliebte Währung oder geben Sie Ihre eigene ein</string>
+    <string name="currency_cannot_be_empty">Die Währung darf nicht leer sein</string>
 </resources>

@@ -179,4 +179,18 @@
     <string name="onb_subtitle_5">Your financial data is protected with bank-level security. All information stays on your device - complete privacy guaranteed.</string>
     <string name="onb_title_6">Ready to Start?</string>
     <string name="onb_subtitle_6">Create your account and begin your journey towards better financial management. Let\'s set up your first account and start tracking!</string>
+    <string name="hint_currency_symbol">Currency</string>
+    <string name="helper_currency">Select a popular currency or type your own</string>
+    <string-array name="currency_options">
+        <item>$ - USD</item>
+        <item>€ - EUR</item>
+        <item>£ - GBP</item>
+        <item>¥ - JPY</item>
+        <item>₹ - INR</item>
+        <item>₽ - RUB</item>
+        <item>₩ - KRW</item>
+        <item>元 - CNY</item>
+        <item>S/. - PEN</item>
+    </string-array>
+    <string name="currency_cannot_be_empty">Currency cannot be empty</string>
 </resources>

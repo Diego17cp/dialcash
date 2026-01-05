@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">Os seus dados financeiros estão protegidos com segurança de nível bancário. Toda a informação fica no seu dispositivo - privacidade completa garantida.</string>
     <string name="onb_title_6">Pronto para Começar?</string>
     <string name="onb_subtitle_6">Crie a sua conta e comece a sua jornada para uma melhor gestão financeira. Vamos configurar a sua primeira conta e começar a rastrear!</string>
+    <string name="hint_currency_symbol">Moeda</string>
+    <string name="helper_currency">Selecione uma moeda popular ou digite a sua</string>
+    <string name="currency_cannot_be_empty">A moeda não pode estar vazia</string>
 </resources>

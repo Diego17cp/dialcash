@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">Tus datos financieros están protegidos con seguridad de nivel bancario. Toda la información permanece en tu dispositivo: privacidad completa garantizada.</string>
     <string name="onb_title_6">¿Listo para Empezar?</string>
     <string name="onb_subtitle_6">Crea tu cuenta y comienza tu viaje hacia una mejor gestión financiera. ¡Configuremos tu primera cuenta y comencemos a rastrear!</string>
+    <string name="hint_currency_symbol">Divisa</string>
+    <string name="helper_currency">Selecciona una divisa popular o escribe la tuya</string>
+    <string name="currency_cannot_be_empty">La divisa no puede estar vacía</string>
 </resources>

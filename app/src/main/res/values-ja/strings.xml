@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">あなたの財務データは銀行レベルのセキュリティで保護されています。すべての情報はあなたのデバイスに保存 - 完全なプライバシーを保証します。</string>
     <string name="onb_title_6">始める準備はできましたか？</string>
     <string name="onb_subtitle_6">アカウントを作成し、より良い財務管理への旅を始めましょう。最初のアカウントを設定して追跡を開始しましょう！</string>
+    <string name="hint_currency_symbol">通貨</string>
+    <string name="helper_currency">人気の通貨を選択するか、独自の通貨を入力してください</string>
+    <string name="currency_cannot_be_empty">通貨は空にできません</string>
 </resources>

@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">您的财务数据受到银行级安全保护。所有信息都保存在您的设备上 - 保证完全隐私。</string>
     <string name="onb_title_6">准备开始了吗？</string>
     <string name="onb_subtitle_6">创建您的账户，开始更好的财务管理之旅。让我们设置您的第一个账户并开始跟踪！</string>
+    <string name="hint_currency_symbol">货币</string>
+    <string name="helper_currency">选择热门货币或输入您自己的</string>
+    <string name="currency_cannot_be_empty">货币不能为空</string>
 </resources>

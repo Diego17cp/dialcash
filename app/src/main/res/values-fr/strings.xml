@@ -179,4 +179,7 @@
     <string name="onb_subtitle_5">Vos données financières sont protégées avec une sécurité de niveau bancaire. Toutes les informations restent sur votre appareil - confidentialité complète garantie.</string>
     <string name="onb_title_6">Prêt à Commencer ?</string>
     <string name="onb_subtitle_6">Créez votre compte et commencez votre voyage vers une meilleure gestion financière. Configurons votre premier compte et commençons le suivi !</string>
+    <string name="hint_currency_symbol">Devise</string>
+    <string name="helper_currency">Sélectionnez une devise populaire ou saisissez la vôtre</string>
+    <string name="currency_cannot_be_empty">La devise ne peut pas être vide</string>
 </resources>
