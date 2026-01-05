@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -49,7 +50,14 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun setupViews() {
+        val currencyOptions = resources.getStringArray(R.array.currency_options)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, currencyOptions)
+        binding.etCurrency.setAdapter(adapter)
+        binding.etCurrency.setText("$", false)
         binding.etName.addTextChangedListener {
+            validateForm()
+        }
+        binding.etCurrency.addTextChangedListener {
             validateForm()
         }
     }
@@ -72,6 +80,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun validateForm(): Boolean {
         val name = binding.etName.text?.toString()?.trim()
+        val currency = binding.etCurrency.text?.toString()?.trim()
         var isValid = true
 
         if (name.isNullOrEmpty()) {
@@ -79,6 +88,13 @@ class RegisterActivity : AppCompatActivity() {
             isValid = false
         } else {
             binding.tilName.error = null
+        }
+
+        if (currency.isNullOrEmpty()) {
+            binding.tilCurrency.error = getString(R.string.currency_cannot_be_empty)
+            isValid = false
+        } else {
+            binding.tilCurrency.error = null
         }
 
         binding.btnRegister.isEnabled = isValid
@@ -90,12 +106,15 @@ class RegisterActivity : AppCompatActivity() {
 
         val name = binding.etName.text.toString().trim()
         val photoUriString = selectedImageUri?.toString()
+        val currencySymbol = binding.etCurrency.text.toString().trim()
+            .substringBefore(" -")
 
         lifecycleScope.launch {
             try {
                 userDataStore.saveUserData(
                     name = name,
-                    photoUri = photoUriString
+                    photoUri = photoUriString,
+                    currencySymbol = currencySymbol
                 )
 
                 Toast.makeText(this@RegisterActivity, getString(R.string.registered_successfully), Toast.LENGTH_SHORT).show()
