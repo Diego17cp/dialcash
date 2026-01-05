@@ -9,8 +9,12 @@ import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dto.IncomeGroupRemaining
 import com.dialcadev.dialcash.databinding.ItemIncomeGroupBinding
 
-class IncomesAdapter(private val onIncomeClick: (IncomeGroupRemaining) -> Unit) :
+class IncomesAdapter(
+    private val onIncomeClick: (IncomeGroupRemaining) -> Unit,
+    currencySymbol: String
+) :
     ListAdapter<IncomeGroupRemaining, IncomesAdapter.IncomesViewHolder>(IncomeDiffCallback()) {
+    private var currentCurrencySymbol = currencySymbol
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncomesViewHolder {
         val binding =
             ItemIncomeGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -21,17 +25,23 @@ class IncomesAdapter(private val onIncomeClick: (IncomeGroupRemaining) -> Unit) 
         holder.bind(getItem(position))
     }
 
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
+
     inner class IncomesViewHolder(private val binding: ItemIncomeGroupBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(income: IncomeGroupRemaining) {
             binding.apply {
-                val currencyFormat = root.context.getString(R.string.currency_format)
                 textIncomeName.text = income.name
+                "$currentCurrencySymbol ${"%.2f".format(income.remaining)}"
+                    .also { textIncomeRemaining.text = it }
+                val formattedBalance = "$currentCurrencySymbol ${"%.2f".format(income.amount)}"
                 textIncomeBalance.text = root.context.getString(
                     R.string.original_balance_with_value,
-                    root.context.getString(R.string.currency_format, income.amount)
+                    formattedBalance
                 )
-                textIncomeRemaining.text = String.format(currencyFormat, income.remaining)
                 root.setOnClickListener { onIncomeClick(income) }
             }
         }
