@@ -33,7 +33,12 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.dialcadev.dialcash.data.UserData
+import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.ui.shared.BottomSheetManager
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionsFragment : Fragment() {
@@ -43,7 +48,9 @@ class TransactionsFragment : Fragment() {
     private lateinit var transactionsAdapter: TransactionsAdapter
     private var selectedAccountsChips: List<String> = emptyList()
 
-    private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    @Inject
+    lateinit var userDataStore: UserDataStore
+    var userData: UserData? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -274,35 +281,46 @@ class TransactionsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val manager = BottomSheetManager(requireContext(), layoutInflater)
-        transactionsAdapter = TransactionsAdapter { transaction ->
-            fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, onChange: (T) -> Unit) {
-                val observer = object : Observer<T> {
-                    override fun onChanged(value: T) {
-                        onChange(value)
-                        removeObserver(this)
+        transactionsAdapter = TransactionsAdapter(
+            onTransactionClick = { transaction ->
+                fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, onChange: (T) -> Unit) {
+                    val observer = object : Observer<T> {
+                        override fun onChanged(value: T) {
+                            onChange(value)
+                            removeObserver(this)
+                        }
+                    }
+                    observe(owner, observer)
+                }
+                viewModel.fetchAccounts()
+                viewModel.loadIncomeGroups()
+                viewModel.accounts.observeOnce(viewLifecycleOwner) { accounts ->
+                    viewModel.incomeGroups.observeOnce(viewLifecycleOwner) { groups ->
+                        manager.showTransactionBottomSheet(
+                            transaction,
+                            accounts,
+                            groups,
+                            userData?.currencySymbol ?: "$",
+                            { updated -> viewModel.updateTransaction(updated) },
+                            { toDelete -> viewModel.deleteTransaction(toDelete) },
+                            { id, type, accountId, amount, accountToId, incomeGroupId, onResult: (Boolean, String?) -> Unit ->
+                                viewModel.validateTransactionBalance(
+                                    id,
+                                    type,
+                                    accountId,
+                                    amount,
+                                    accountToId,
+                                    incomeGroupId,
+                                    onResult
+                                )
+                            }
+                        )
                     }
                 }
-                observe(owner, observer)
-            }
-            viewModel.fetchAccounts()
-            viewModel.loadIncomeGroups()
-            viewModel.accounts.observeOnce(viewLifecycleOwner) { accounts ->
-                viewModel.incomeGroups.observeOnce(viewLifecycleOwner) { groups ->
-                    manager.showTransactionBottomSheet(
-                        transaction,
-                        accounts,
-                        groups,
-                        { updated -> viewModel.updateTransaction(updated) },
-                        { toDelete -> viewModel.deleteTransaction(toDelete) },
-                        { id, type, accountId, amount, accountToId, incomeGroupId, onResult: (Boolean, String?) -> Unit ->
-                            viewModel.validateTransactionBalance(
-                                id, type, accountId, amount, accountToId, incomeGroupId, onResult
-                            )
-                        }
-                    )
-                }
-            }
-        }
+            },
+            currencySymbol = userData?.currencySymbol ?: "$"
+        )
+
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = transactionsAdapter
@@ -323,7 +341,8 @@ class TransactionsFragment : Fragment() {
         binding.layoutTransactions.visibility = if (transactionsEmpty) View.GONE else View.VISIBLE
         binding.layoutNoTransactions.visibility = if (transactionsEmpty) View.VISIBLE else View.GONE
         if (transactionsEmpty) {
-            binding.tvEmptyTitle.text = if (filtered) getString(R.string.no_results) else getString(R.string.no_transactions_yet)
+            binding.tvEmptyTitle.text =
+                if (filtered) getString(R.string.no_results) else getString(R.string.no_transactions_yet)
             binding.tvEmptySubtitle.text =
                 if (filtered) getString(R.string.try_adjusting_filters)
                 else getString(R.string.add_your_first_transaction)
@@ -331,6 +350,14 @@ class TransactionsFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        lifecycleScope.launch {
+            userDataStore.getUserData().collect { user ->
+                userData = user
+                user.currencySymbol.let { symbol ->
+                    transactionsAdapter.updateCurrencySymbol(symbol)
+                }
+            }
+        }
         viewModel.transactions.observe(viewLifecycleOwner) { transactions ->
             transactionsAdapter.submitList(transactions)
             val filtered = viewModel.isFiltered.value ?: false
