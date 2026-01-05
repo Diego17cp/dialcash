@@ -11,6 +11,7 @@ import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.data.entities.IncomeGroup
 import com.dialcadev.dialcash.data.entities.Transaction
 import com.dialcadev.dialcash.databinding.RecycleTransactionItemBinding
+import com.dialcadev.dialcash.utils.toReadableDate
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -19,6 +20,7 @@ import kotlin.collections.find
 class TransactionBottomSheetHandler(
     private val binding: RecycleTransactionItemBinding,
     private val transaction: TransactionWithDetails,
+    private val currencySymbol: String,
     private val accounts: List<Account>,
     private val incomeGroups: List<IncomeGroup>,
     private val onUpdate: (Transaction) -> Unit,
@@ -49,16 +51,14 @@ class TransactionBottomSheetHandler(
                 "transfer" -> R.color.colorPrimary
                 else -> R.color.negative_amount
             }
-            val amountText = if (transaction.type == "income") "+${
-                root.context.getString(
-                    R.string.currency_format, transaction.amount
-                )
-            }" else "-${root.context.getString(R.string.currency_format, transaction.amount)}"
+            val amountText = if (transaction.type == "income") "+ $currencySymbol${transaction.amount}"
+            else "- $currencySymbol${transaction.amount}"
             ivTransactionType.setImageResource(iconRes)
             ivTransactionType.setColorFilter(root.context.getColor(color))
             tvTransactionAmount.text = amountText
             tvTransactionAmount.setTextColor(root.context.getColor(color))
             etTransactionAmount.setText(transaction.amount.toString())
+            tilTransactionAmount.prefixText = "$currencySymbol "
             tvTransactionDescription.text = transaction.description
             etTransactionDescription.setText(transaction.description)
             tvAccountName.text = transaction.accountName
@@ -68,7 +68,7 @@ class TransactionBottomSheetHandler(
             if (transaction.type == "expense" && transaction.incomeGroupName != null) layoutIncomeGroup.visibility =
                 View.VISIBLE
             tvIncomeGroupName.text = transaction.incomeGroupName ?: "N/A"
-            tvTransactionDate.text = transaction.date?.let { dateFormat.format(it) } ?: "N/A"
+            tvTransactionDate.text = transaction.date.toReadableDate()
         }
     }
 
