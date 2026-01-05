@@ -8,10 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.databinding.ItemAccountBinding
 
-class AccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -> Unit) :
+class AccountsAdapter(
+    private val onAccountClick: (AccountBalanceWithOriginal) -> Unit,
+    currencySymbol: String
+) :
     ListAdapter<AccountBalanceWithOriginal, AccountsAdapter.AccountsViewHolder>(
         AccountDiffCallback()
     ) {
+    private var currentCurrencySymbol = currencySymbol
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountsViewHolder {
         val binding = ItemAccountBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AccountsViewHolder(binding)
@@ -21,16 +25,18 @@ class AccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -
         holder.bind(getItem(position))
     }
 
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
+
     inner class AccountsViewHolder(private val binding: ItemAccountBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(account: AccountBalanceWithOriginal) {
             binding.apply {
                 textAccountName.text = account.name
-                textCurrentBalance.text = root.context.getString(R.string.currency_format, account.balance)
-                textOriginalBalance.text = root.context.getString(
-                    R.string.original_balance_with_value,
-                    root.context.getString(R.string.currency_format, account.originalBalance)
-                )
+                "$currentCurrencySymbol ${"%.2f".format(account.balance)}".also { textCurrentBalance.text = it }
+                "$currentCurrencySymbol ${"%.2f".format(account.originalBalance)}".also { textOriginalBalance.text = it }
                 val iconRes = when(account.type){
                     "cash" -> R.drawable.ic_cash
                     "bank" -> R.drawable.ic_bank

@@ -9,8 +9,12 @@ import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.databinding.ItemMainAccountBinding
 
-class MainAccountsAdapter(private val onAccountClick: (AccountBalanceWithOriginal) -> Unit) : ListAdapter<AccountBalanceWithOriginal, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
+class MainAccountsAdapter(
+    private val onAccountClick: (AccountBalanceWithOriginal) -> Unit,
+    currencySymbol: String
+) : ListAdapter<AccountBalanceWithOriginal, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
 
+    private var currentCurrencySymbol = currencySymbol
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
         val binding = ItemMainAccountBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
@@ -21,12 +25,15 @@ class MainAccountsAdapter(private val onAccountClick: (AccountBalanceWithOrigina
     override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
-
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
     inner class AccountViewHolder(private val binding: ItemMainAccountBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(account: AccountBalanceWithOriginal) {
             binding.apply {
                 textAccountName.text = account.name
-                textAccountBalance.text = root.context.getString(R.string.currency_format, account.balance)
+                "$currentCurrencySymbol ${"%.2f".format(account.balance)}".also { textAccountBalance.text = it }
                 val iconRes = when (account.type) {
                     "bank" -> R.drawable.ic_bank
                     "cash" -> R.drawable.ic_cash
