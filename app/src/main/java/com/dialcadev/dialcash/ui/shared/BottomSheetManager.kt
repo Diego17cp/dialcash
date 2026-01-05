@@ -16,13 +16,14 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 class BottomSheetManager(private val context: Context, private val layoutInflater: LayoutInflater) {
     fun showAccountBottomSheet(
         account: AccountBalanceWithOriginal,
+        currencySymbol: String,
         onUpdate: (Account) -> Unit,
         onDelete: (Account) -> Unit
     ) {
         val dialog = BottomSheetDialog(context)
         val binding = RecycleAccountItemBinding.inflate(layoutInflater)
 
-        AccountBottomSheetHandler(binding, account, onUpdate, onDelete, dialog).setup()
+        AccountBottomSheetHandler(binding, account, currencySymbol, onUpdate, onDelete, dialog).setup()
         dialog.setContentView(binding.root)
         dialog.show()
     }
@@ -31,6 +32,7 @@ class BottomSheetManager(private val context: Context, private val layoutInflate
         transaction: TransactionWithDetails,
         accounts: List<Account>,
         incomeGroups: List<IncomeGroup>,
+        currencySymbol: String,
         onUpdate: (Transaction) -> Unit,
         onDelete: (Transaction) -> Unit,
         onValidateBalance: (Int, String, Int, Double, Int?, Int?, (Boolean, String?) -> Unit) -> Unit
@@ -40,6 +42,7 @@ class BottomSheetManager(private val context: Context, private val layoutInflate
         TransactionBottomSheetHandler(
             binding,
             transaction,
+            currencySymbol,
             accounts,
             incomeGroups,
             onUpdate,
