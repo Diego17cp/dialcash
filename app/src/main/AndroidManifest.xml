@@ -34,10 +34,7 @@
             android:theme="@style/Base.Theme.Dialcash"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".NewTransactionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:theme="@style/Base.Theme.Dialcash"
-            tools:ignore="Instantiatable" />
+            android:theme="@style/Base.Theme.Dialcash" />
         <activity
             android:name=".ui.accounts.NewAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
