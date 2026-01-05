@@ -155,7 +155,6 @@
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:boxBackgroundColor="@color/background"
-                app:prefixText="S/. "
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
