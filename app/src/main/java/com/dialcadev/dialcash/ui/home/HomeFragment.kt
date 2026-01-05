@@ -19,7 +19,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import com.dialcadev.dialcash.data.UserData
+import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.ui.shared.BottomSheetManager
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -32,6 +37,10 @@ class HomeFragment : Fragment() {
     private lateinit var accountsAdapter: MainAccountsAdapter
     private lateinit var transactionsAdapter: RecentTransactionsAdapter
 
+    @Inject
+    lateinit var userDataStore: UserDataStore
+    var userData: UserData? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -41,7 +50,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerViews()
         setupOnClickListeners()
         setupSwipeRefresh()
@@ -56,47 +64,61 @@ class HomeFragment : Fragment() {
 
     private fun setupRecyclerViews() {
         val manager = BottomSheetManager(requireContext(), layoutInflater)
-        accountsAdapter = MainAccountsAdapter { account ->
-            manager.showAccountBottomSheet(
-                account,
-                { updated -> viewModel.updateAccount(updated) },
-                { toDelete -> viewModel.deleteAccount(toDelete) }
-            )
-        }
+        accountsAdapter = MainAccountsAdapter(
+            onAccountClick = { account ->
+                manager.showAccountBottomSheet(
+                    account,
+                    userData?.currencySymbol ?: "$",
+                    { updated -> viewModel.updateAccount(updated) },
+                    { toDelete -> viewModel.deleteAccount(toDelete) }
+                )
+            },
+            currencySymbol = userData?.currencySymbol ?: "$"
+        )
         binding.recyclerViewAccounts.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = accountsAdapter
         }
 
-        transactionsAdapter = RecentTransactionsAdapter { transaction ->
-            fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, onChange: (T) -> Unit) {
-                val observer = object : Observer<T> {
-                    override fun onChanged(value: T) {
-                        onChange(value)
-                        removeObserver(this)
+        transactionsAdapter = RecentTransactionsAdapter(
+            onTransactionClick = { transaction ->
+                fun <T> LiveData<T>.observeOnce(owner: LifecycleOwner, onChange: (T) -> Unit) {
+                    val observer = object : Observer<T> {
+                        override fun onChanged(value: T) {
+                            onChange(value)
+                            removeObserver(this)
+                        }
+                    }
+                    observe(owner, observer)
+                }
+                viewModel.loadAccounts()
+                viewModel.loadIncomeGroups()
+                viewModel.accounts.observeOnce(viewLifecycleOwner) { accounts ->
+                    viewModel.incomeGroups.observeOnce(viewLifecycleOwner) { groups ->
+                        manager.showTransactionBottomSheet(
+                            transaction,
+                            accounts,
+                            groups,
+                            userData?.currencySymbol ?: "$",
+                            { updated -> viewModel.updateTransaction(updated) },
+                            { toDelete -> viewModel.deleteTransaction(toDelete) },
+                            { id, type, accountId, amount, accountToId, incomeGroupId, onResult: (Boolean, String?) -> Unit ->
+                                viewModel.validateTransactionBalance(
+                                    id,
+                                    type,
+                                    accountId,
+                                    amount,
+                                    accountToId,
+                                    incomeGroupId,
+                                    onResult
+                                )
+                            }
+                        )
                     }
                 }
-                observe(owner, observer)
-            }
-            viewModel.loadAccounts()
-            viewModel.loadIncomeGroups()
-            viewModel.accounts.observeOnce(viewLifecycleOwner) { accounts ->
-                viewModel.incomeGroups.observeOnce(viewLifecycleOwner) { groups ->
-                    manager.showTransactionBottomSheet(
-                        transaction,
-                        accounts,
-                        groups,
-                        { updated -> viewModel.updateTransaction(updated) },
-                        { toDelete -> viewModel.deleteTransaction(toDelete) },
-                        { id, type, accountId, amount, accountToId, incomeGroupId, onResult: (Boolean, String?) -> Unit ->
-                            viewModel.validateTransactionBalance(
-                                id, type, accountId, amount, accountToId, incomeGroupId, onResult
-                            )
-                        }
-                    )
-                }
-            }
-        }
+            },
+            currencySymbol = userData?.currencySymbol ?: "$"
+        )
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = transactionsAdapter
@@ -146,8 +168,22 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeViewModel() {
+        lifecycleScope.launch {
+            userDataStore.getUserData().collect { user ->
+                userData = user
+                user.currencySymbol.let { symbol ->
+                    accountsAdapter.updateCurrencySymbol(symbol)
+                    transactionsAdapter.updateCurrencySymbol(symbol)
+                }
+                viewModel.totalBalance.value?.let { total ->
+                    binding.textTotalBalance.text = "${userData?.currencySymbol ?: "$"} $total"
+                }
+            }
+        }
         viewModel.totalBalance.observe(viewLifecycleOwner) { total ->
-            binding.textTotalBalance.text = getString(R.string.currency_format, total)
+            "${userData?.currencySymbol ?: "$"} $total".also {
+                binding.textTotalBalance.text = it
+            }
         }
         viewModel.mainAccounts.observe(viewLifecycleOwner) { accounts ->
             accountsAdapter.submitList(accounts)
