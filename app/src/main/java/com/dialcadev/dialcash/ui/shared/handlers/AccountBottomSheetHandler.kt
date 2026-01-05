@@ -10,11 +10,13 @@ import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.databinding.RecycleAccountItemBinding
 import com.dialcadev.dialcash.domain.AccountType
+import com.dialcadev.dialcash.utils.toReadableDate
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class AccountBottomSheetHandler(
     private val binding: RecycleAccountItemBinding,
     private val account: AccountBalanceWithOriginal,
+    private val currencySymbol: String,
     private val onUpdate: (Account) -> Unit,
     private val onDelete: (Account) -> Unit,
     private val dialog: BottomSheetDialog
@@ -33,12 +35,15 @@ class AccountBottomSheetHandler(
             etEditAccountName.setText(account.name)
             val enumType = AccountType.byCode(account.type)
             tvAccountType.text = root.context.getString(enumType.labelRes)
-            tvAccountBalance.text = root.context.getString(R.string.currency_format, account.originalBalance)
+            "$currencySymbol ${String.format("%.2f", account.originalBalance)}".also { tvAccountBalance.text = it }
             etInitialBalance.setText(account.originalBalance.toString())
-            tvAccountCurrentBalance.text = root.context.getString(R.string.currency_format, account.balance)
+            "$currencySymbol ${String.format("%.2f", account.balance)}".also { tvAccountCurrentBalance.text = it }
+
+            tilInitialBalance.prefixText = "$currencySymbol "
+
             tvCreatedAt.text = root.context.getString(
                 R.string.created_at,
-                account.createdAt
+                account.createdAt?.toReadableDate()
             )
             val iconRes = when (enumType) {
                 AccountType.BANK -> R.drawable.ic_bank
