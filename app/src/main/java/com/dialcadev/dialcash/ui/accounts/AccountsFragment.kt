@@ -7,11 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dialcadev.dialcash.data.UserData
+import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.databinding.FragmentAccountsBinding
 import com.dialcadev.dialcash.ui.shared.BottomSheetManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AccountsFragment : Fragment() {
@@ -19,6 +24,10 @@ class AccountsFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: AccountsViewModel by viewModels()
     private lateinit var accountsAdapter: AccountsAdapter
+
+    @Inject
+    lateinit var userDataStore: UserDataStore
+    var userData: UserData? = null
 
 
     override fun onCreateView(
@@ -46,29 +55,44 @@ class AccountsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         val manager = BottomSheetManager(requireContext(), layoutInflater)
-        accountsAdapter = AccountsAdapter { account ->
-            manager.showAccountBottomSheet(
-                account,
-                { updated -> viewModel.updateAccount(updated) },
-                { toDelete -> viewModel.deleteAccount(toDelete) }
-            )
-        }
+        accountsAdapter = AccountsAdapter(
+            onAccountClick = { account ->
+                manager.showAccountBottomSheet(
+                    account,
+                    userData?.currencySymbol ?: "$",
+                    { updated -> viewModel.updateAccount(updated) },
+                    { toDelete -> viewModel.deleteAccount(toDelete) }
+                )
+            },
+            currencySymbol = userData?.currencySymbol ?: "$"
+        )
         binding.recyclerViewAccounts.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = accountsAdapter
         }
     }
+
     private fun setupListeners() {
         binding.btnNewAccount.setOnClickListener {
             val intent = Intent(requireContext(), NewAccountActivity::class.java)
             startActivity(intent)
         }
     }
+
     private fun updateEmptyState(isEmpty: Boolean) {
         binding.layoutAccounts.visibility = if (isEmpty) View.GONE else View.VISIBLE
         binding.layoutNoAccounts.visibility = if (isEmpty) View.VISIBLE else View.GONE
     }
+
     private fun observeViewModel() {
+        lifecycleScope.launch {
+            userDataStore.getUserData().collect { user ->
+                userData = user
+                user.currencySymbol.let { symbol ->
+                    accountsAdapter.updateCurrencySymbol(symbol)
+                }
+            }
+        }
         viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
             accountsAdapter.submitList(accounts)
             updateEmptyState(accounts.isEmpty())
