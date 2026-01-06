@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">Währung</string>
     <string name="helper_currency">Wählen Sie eine beliebte Währung oder geben Sie Ihre eigene ein</string>
     <string name="currency_cannot_be_empty">Die Währung darf nicht leer sein</string>
+    <string name="from">Von</string>
+    <string name="to">Zu</string>
+    <string name="balance">Kontostand</string>
+    <string name="today">Heute</string>
+    <string name="clear_selection">Auswahl löschen</string>
+    <string name="register_expense">Ausgabe registrieren</string>
+    <string name="register_income">Einnahme registrieren</string>
+    <string name="register_transfer">Überweisung registrieren</string>
 </resources>

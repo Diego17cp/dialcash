@@ -193,4 +193,12 @@
         <item>S/. - PEN</item>
     </string-array>
     <string name="currency_cannot_be_empty">Currency cannot be empty</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="balance">Balance</string>
+    <string name="today">Today</string>
+    <string name="clear_selection">Clear selection</string>
+    <string name="register_expense">Register expense</string>
+    <string name="register_income">Register income</string>
+    <string name="register_transfer">Register transfer</string>
 </resources>

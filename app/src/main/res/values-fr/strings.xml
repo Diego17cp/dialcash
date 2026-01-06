@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">Devise</string>
     <string name="helper_currency">Sélectionnez une devise populaire ou saisissez la vôtre</string>
     <string name="currency_cannot_be_empty">La devise ne peut pas être vide</string>
+    <string name="from">De</string>
+    <string name="to">À</string>
+    <string name="balance">Solde</string>
+    <string name="today">Aujourd'hui</string>
+    <string name="clear_selection">Effacer la sélection</string>
+    <string name="register_expense">Enregistrer une dépense</string>
+    <string name="register_income">Enregistrer un revenu</string>
+    <string name="register_transfer">Enregistrer un transfert</string>
 </resources>

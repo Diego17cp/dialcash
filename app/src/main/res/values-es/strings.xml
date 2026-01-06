@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">Divisa</string>
     <string name="helper_currency">Selecciona una divisa popular o escribe la tuya</string>
     <string name="currency_cannot_be_empty">La divisa no puede estar vacía</string>
+    <string name="from">Desde</string>
+    <string name="to">Hacia</string>
+    <string name="balance">Saldo</string>
+    <string name="today">Hoy</string>
+    <string name="clear_selection">Limpiar selección</string>
+    <string name="register_expense">Registrar gasto</string>
+    <string name="register_income">Registrar ingreso</string>
+    <string name="register_transfer">Registrar transferencia</string>
 </resources>

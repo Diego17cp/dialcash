@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">通貨</string>
     <string name="helper_currency">人気の通貨を選択するか、独自の通貨を入力してください</string>
     <string name="currency_cannot_be_empty">通貨は空にできません</string>
+    <string name="from">送信元</string>
+    <string name="to">送信先</string>
+    <string name="balance">残高</string>
+    <string name="today">今日</string>
+    <string name="clear_selection">選択をクリア</string>
+    <string name="register_expense">支出を登録</string>
+    <string name="register_income">収入を登録</string>
+    <string name="register_transfer">振替を登録</string>
 </resources>

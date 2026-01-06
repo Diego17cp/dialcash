@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">货币</string>
     <string name="helper_currency">选择热门货币或输入您自己的</string>
     <string name="currency_cannot_be_empty">货币不能为空</string>
+    <string name="from">从</string>
+    <string name="to">到</string>
+    <string name="balance">余额</string>
+    <string name="today">今天</string>
+    <string name="clear_selection">清除选择</string>
+    <string name="register_expense">登记支出</string>
+    <string name="register_income">登记收入</string>
+    <string name="register_transfer">登记转账</string>
 </resources>

@@ -182,4 +182,12 @@
     <string name="hint_currency_symbol">Moeda</string>
     <string name="helper_currency">Selecione uma moeda popular ou digite a sua</string>
     <string name="currency_cannot_be_empty">A moeda não pode estar vazia</string>
+    <string name="from">De</string>
+    <string name="to">Para</string>
+    <string name="balance">Saldo</string>
+    <string name="today">Hoje</string>
+    <string name="clear_selection">Limpar seleção</string>
+    <string name="register_expense">Registrar despesa</string>
+    <string name="register_income">Registrar receita</string>
+    <string name="register_transfer">Registrar transferência</string>
 </resources>
