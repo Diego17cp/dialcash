@@ -1,212 +1,419 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/new_transaction_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
+        android:minHeight="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:titleCentered="true"
+        android:paddingTop="10dp"
+        app:title="@string/new_transaction"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnSurface" />
 
-        <!-- Header dinámico -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_header"
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="?attr/colorPrimary"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="10dp"
-            android:layout_marginTop="60dp"
-            app:layout_constraintTop_toTopOf="parent">
-
+            android:padding="24dp">
+            <!-- Amount Text -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <ImageView
-                    android:id="@+id/iv_transaction_icon"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_marginEnd="12dp"
-                    android:src="@drawable/ic_add"
-                    app:tint="?attr/colorOnPrimary" />
-
+                android:id="@+id/amountContainer"
+                app:layout_constraintTop_toTopOf="parent"
+                android:paddingTop="24dp">
                 <TextView
-                    android:id="@+id/tv_transaction_title"
-                    android:layout_width="0dp"
+                    android:id="@+id/tvAmountLabel"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/new_transaction"
-                    android:textAlignment="center"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:textSize="30sp"
-                    android:textStyle="bold" />
+                    android:text="@string/til_amount"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOutline"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center" />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvCurrency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:text="$"
+                        android:textSize="36sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="8dp"/>
+                    <TextView
+                        android:id="@+id/tvAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="48dp"
+                        android:layout_marginEnd="48dp"
+                        android:text="0.00"
+                        android:textSize="56sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOutline"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:gravity="center"/>
 
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/tvAmountError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="?attr/colorError"
+                    android:visibility="gone"
+                    android:layout_marginTop="6dp"/>
+                <EditText
+                    android:id="@+id/etAmount"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:inputType="numberDecimal"
+                    android:background="@null"
+                    android:cursorVisible="false"
+                    android:focusable="true"
+                    android:importantForAutofill="no"
+                    android:textColor="@android:color/transparent"/>
+            </LinearLayout>
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardExpenseForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp"
+                app:cardUseCompatPadding="true"
+                app:layout_constraintTop_toBottomOf="@id/amountContainer"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <!-- From account selector -->
+                    <LinearLayout
+                        android:id="@+id/fromAccountItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_accounts_filled"
+                            app:tint="?attr/colorPrimary" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/from"
+                                android:visibility="gone"
+                                android:id="@+id/tvFrom"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOutline" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_account"
+                                android:id="@+id/tv_account_from"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:id="@+id/tvFromAccountBalance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/balance"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorSurfaceVariant" />
+                    <!-- To account selector -->
+                    <LinearLayout
+                        android:id="@+id/toAccountItem"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_bank"
+                            app:tint="?attr/colorPrimary" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/to"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOutline" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_account"
+                                android:maxLines="1"
+                                android:ellipsize="end"
+                                android:id="@+id/tv_account_to"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:id="@+id/tvToAccountBalance"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/balance"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:id="@+id/toAccountDivider"
+                        android:visibility="gone"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorSurfaceVariant" />
+                    <LinearLayout
+                        android:id="@+id/incomeGroupItem"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_income_item"
+                            app:tint="?attr/colorPrimary" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_ic_g_optional"
+                                android:id="@+id/tv_income_group"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:id="@+id/tvIncomeGroupRemaining"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/remaining"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:visibility="gone"
+                        android:id="@+id/incomeGroupDivider"
+                        android:background="?attr/colorSurfaceVariant" />
+                    <LinearLayout
+                        android:id="@+id/dateItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="80dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="?attr/selectableItemBackground">
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_calendar"
+                            app:tint="?attr/colorPrimary" />
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_date_optional"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                            <TextView
+                                android:id="@+id/tvDateValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/today"
+                                android:textAppearance="?attr/textAppearanceBodySmall"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                        <EditText
+                            android:id="@+id/et_date"
+                            android:layout_width="1dp"
+                            android:layout_height="1dp"
+                            android:background="@null"
+                            android:cursorVisible="false"
+                            android:focusable="true"
+                            android:importantForAutofill="no"
+                            android:textColor="@android:color/transparent"/>
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorSurfaceVariant" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+                            <ImageView
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:src="@drawable/ic_edit_note"
+                                app:tint="?attr/colorPrimary" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/hint_description"
+                                android:textAppearance="?attr/textAppearanceBodyLarge"
+                                android:textColor="?attr/colorOnSurface" />
+                        </LinearLayout>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:cardCornerRadius="14dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                            <EditText
+                                android:id="@+id/etDescription"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="96dp"
+                                android:padding="16dp"
+                                android:background="@color/surface"
+                                android:gravity="top"
+                                android:hint="@string/hint_description"
+                                android:textAppearance="?attr/textAppearanceBodyMedium"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textColorHint="?attr/colorOnSurfaceVariant"
+                                android:inputType="textMultiLine"
+                                android:maxLines="5"
+                                android:scrollbars="vertical" />
+                        </com.google.android.material.card.MaterialCardView>
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/tvDescriptionError"
+                                android:textColor="?attr/colorError"
+                                android:textSize="12sp"
+                                android:layout_marginTop="5dp"
+                                android:layout_marginStart="5dp"
+                                android:visibility="gone"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="84dp"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/cardExpenseForm"
+                tools:layout_editor_absoluteX="24dp">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    app:cornerRadius="15dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="?attr/colorPrimary"
+                    android:text="@string/save"
+                    android:textSize="20dp"
+                    android:textColor="?attr/colorOnPrimary" />
             </LinearLayout>
 
-        </com.google.android.material.card.MaterialCardView>
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_amount"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
-            android:hint="@string/til_amount"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/card_header"
-            tools:layout_editor_absoluteX="24dp">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_description"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:hint="@string/hint_description"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/til_amount"
-            tools:layout_editor_absoluteX="24dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textCapSentences"
-                android:textColor="?attr/colorOnSurface" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_account_from"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:hint="@string/hint_account"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/til_description"
-            tools:layout_editor_absoluteX="24dp">
-
-            <AutoCompleteTextView
-                android:id="@+id/dropdown_account_from"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textColor="?attr/colorOnSurface" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_account_to"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/hint_to_account"
-            android:visibility="gone"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/til_account_from">
-
-            <AutoCompleteTextView
-                android:id="@+id/dropdown_account_to"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textColor="?attr/colorOnSurface" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Income group (expenses only) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_income_group"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/hint_ic_g_optional"
-            android:visibility="gone"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/til_account_to">
-
-            <AutoCompleteTextView
-                android:id="@+id/dropdown_income_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none"
-                android:textColor="?attr/colorOnSurface" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/til_date"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:hint="@string/hint_date_optional"
-            app:hintTextColor="?attr/colorPrimary"
-            app:layout_constraintTop_toBottomOf="@id/til_income_group"
-            tools:layout_editor_absoluteX="24dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:inputType="none"
-                android:textColor="?attr/colorOnSurface" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="84dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@id/til_date"
-            tools:layout_editor_absoluteX="24dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_cancel"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/cancel"
-                android:textColor="?attr/colorOnSurface"
-                app:strokeColor="?attr/colorOnSurface" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:backgroundTint="?attr/colorPrimary"
-                android:text="@string/save"
-                android:textColor="?attr/colorOnPrimary" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
