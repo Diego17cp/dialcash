@@ -1,165 +1,189 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/new_transaction_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:fillViewport="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_height="match_parent">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
-
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/new_acc_title"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/new_acc_subtitle"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
-
-        <!-- Account Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAccountName"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:hint="@string/hint_account_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-            app:startIconDrawable="@drawable/ic_account_circle">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAccountName"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:titleCentered="true"
+        android:paddingTop="10dp"
+        app:title="@string/new_acc_title"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnSurface" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp">
+            <LinearLayout
+                android:id="@+id/inputNameContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:maxLines="1" />
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hint_account_name"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/etAccountName"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_rounded"
+                        android:hint="@string/account_name_example"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="?attr/colorOutline"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="44dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp"
+                        android:inputType="text"
+                        android:importantForAutofill="no"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_pen_filled"
+                        android:tint="?attr/colorOnSurfaceVariant"/>
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/tvNameError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_name_required"
+                    android:textSize="12sp"
+                    android:textColor="@color/negative_balance"
+                    android:layout_marginTop="6dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Account Type -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAccountType"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/hint_account_type"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilAccountName">
-
-            <AutoCompleteTextView
-                android:id="@+id/actvAccountType"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAccountTypes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Initial Balance -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilInitialBalance"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/hint_initial_balance"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilAccountType"
-            app:prefixText="S/.">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etInitialBalance"
-                android:layout_width="match_parent"
+                android:layout_marginTop="20dp"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputNameContainer"
+                app:spanCount="2" />
+            <TextView
+                android:id="@+id/tvTypeAccountError"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1"
-                android:text="0.00" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Info Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardInfo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilInitialBalance"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp">
+                android:text="@string/account_type_required"
+                android:textSize="12sp"
+                android:textColor="@color/negative_balance"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvAccountTypes"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
+                android:gravity="center"
+                android:id="@+id/amountContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/rvAccountTypes"
+                android:layout_marginTop="20dp"
+                android:paddingTop="24dp">
                 <TextView
+                    android:id="@+id/tvAmountLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/new_acc_tip_title"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
+                    android:text="@string/hint_initial_balance"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOutline"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center" />
+                <FrameLayout
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvCurrency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:text="$"
+                        android:textSize="36sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="8dp"/>
+                    <TextView
+                        android:id="@+id/tvInitialBalance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="48dp"
+                        android:layout_marginEnd="48dp"
+                        android:text="0.00"
+                        android:textSize="56sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOutline"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:gravity="center"/>
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/tvInitialBalanceError"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:lineSpacingExtra="4dp"
-                    android:text="@string/new_acc_tip_bullets"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
+                    android:textSize="12sp"
+                    android:text="@string/initial_balance_required"
+                    android:textColor="?attr/colorError"
+                    android:visibility="gone"
+                    android:layout_marginTop="6dp"/>
+                <EditText
+                    android:id="@+id/etInitialBalance"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:inputType="numberDecimal"
+                    android:background="@null"
+                    android:cursorVisible="false"
+                    android:focusable="true"
+                    android:importantForAutofill="no"
+                    android:textColor="@android:color/transparent"/>
             </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Create Account Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCreateAccount"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:text="@string/add_account"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardInfo" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCreateAccount"
+                android:layout_marginTop="50dp"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                app:cornerRadius="15dp"
+                android:layout_weight="1"
+                android:backgroundTint="?attr/colorPrimary"
+                android:text="@string/add_account"
+                android:textSize="20sp"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/amountContainer" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
