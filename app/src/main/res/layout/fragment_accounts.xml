@@ -17,6 +17,8 @@
             android:id="@+id/layoutAccounts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
