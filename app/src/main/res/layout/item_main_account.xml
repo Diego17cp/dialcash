@@ -1,47 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="150dp"
-    android:layout_height="120dp"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    android:backgroundTint="@color/colorSecondaryVariant"
-    app:cardElevation="4dp">
-
-    <LinearLayout
+    android:layout_width="180dp"
+    android:layout_height="140dp"
+    android:layout_margin="12dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="?attr/colorSurface">
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <ImageView
-            android:id="@+id/imageAccountIcon"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/ic_accounts_outline"
-            app:tint="?attr/colorSurface" />
-
-        <TextView
-            android:id="@+id/textAccountName"
+        android:layout_height="match_parent">
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="Cuenta"
-            android:textSize="14sp"
-            android:textColor="@color/surface"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/textAccountBalance"
+            android:layout_height="6dp"
+            android:background="@drawable/bg_card_top_border" />
+        <FrameLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_icon_circle"
+            android:layout_gravity="top|start">
+            <ImageView
+                android:id="@+id/imageAccountIcon"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_accounts_outline"
+                app:tint="@color/colorSecondary" />
+        </FrameLayout>
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:text="$0.00"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:orientation="vertical"
+            android:gravity="bottom">
+            <TextView
+                android:id="@+id/textAccountName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bank Account"
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+            <TextView
+                android:id="@+id/textAccountBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="$0.00"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+        </LinearLayout>
+    </FrameLayout>
 </androidx.cardview.widget.CardView>

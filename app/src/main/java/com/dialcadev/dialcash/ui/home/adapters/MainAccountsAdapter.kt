@@ -42,7 +42,7 @@ class MainAccountsAdapter(
                     else -> R.drawable.ic_account_default
                 }
                 imageAccountIcon.setImageResource(iconRes)
-                val colorRes = if (account.balance >= 0) R.color.colorPositive else R.color.negative_balance
+                val colorRes = if (account.balance >= 0) R.color.positive_amount else R.color.negative_amount
                 textAccountBalance.setTextColor(root.context.getColor(colorRes))
                 root.setOnClickListener { onAccountClick(account) }
             }
