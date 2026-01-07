@@ -56,8 +56,6 @@ class NewTransactionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = NewTransactionActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Log.d("NewTransaction", "onCreate: Setting up toolbar")
-
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
