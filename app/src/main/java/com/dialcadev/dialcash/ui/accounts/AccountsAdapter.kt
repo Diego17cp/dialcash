@@ -1,6 +1,7 @@
 package com.dialcadev.dialcash.ui.accounts
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import com.dialcadev.dialcash.R
 import androidx.recyclerview.widget.ListAdapter
@@ -32,6 +33,7 @@ class AccountsAdapter(
     inner class AccountsViewHolder(private val binding: ItemAccountBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(account: AccountBalanceWithOriginal) {
+            val isMainAccount = account.type == "bank" || account.type == "cash" || account.type == "wallet" || account.type == "card"
             binding.apply {
                 textAccountName.text = account.name
                 "$currentCurrencySymbol ${"%.2f".format(account.balance)}".also { textCurrentBalance.text = it }
@@ -42,12 +44,15 @@ class AccountsAdapter(
                 )
                 val iconRes = when(account.type){
                     "cash" -> R.drawable.ic_cash
-                    "bank" -> R.drawable.ic_bank
+                    "bank" -> R.drawable.ic_building_bank
                     "card" -> R.drawable.ic_card
                     "wallet" -> R.drawable.ic_accounts_filled
+                    "debt" -> R.drawable.ic_debt_payment
+                    "savings" -> R.drawable.ic_bank
                     else -> R.drawable.ic_account_default
                 }
                 imageAccountIcon.setImageResource(iconRes)
+                if (isMainAccount) mainAccountBadge.visibility = View.VISIBLE
                 root.setOnClickListener { onAccountClick(account) }
             }
         }
