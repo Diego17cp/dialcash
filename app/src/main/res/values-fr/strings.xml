@@ -185,7 +185,7 @@
     <string name="from">De</string>
     <string name="to">À</string>
     <string name="balance">Solde</string>
-    <string name="today">Aujourd'hui</string>
+    <string name="today">Aujourd\'\hui</string>
     <string name="clear_selection">Effacer la sélection</string>
     <string name="register_expense">Enregistrer une dépense</string>
     <string name="register_income">Enregistrer un revenu</string>
