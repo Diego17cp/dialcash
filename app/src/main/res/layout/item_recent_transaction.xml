@@ -22,8 +22,8 @@
             android:background="@drawable/bg_transfer_btn">
             <ImageView
                 android:id="@+id/imageTransactionIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_transactions_outline"
                 app:tint="@color/colorPrimary" />
