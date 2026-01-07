@@ -1,70 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true">
-
-    <ImageView
-        android:id="@+id/imageTransactionIcon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_transactions_outline" />
-
+    android:layout_marginVertical="8dp"
+    app:strokeWidth="0dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/surface"
+    app:rippleColor="?attr/colorControlHighlight">
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginStart="16dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/textTransactionDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Descripción"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+        <FrameLayout
+            android:id="@+id/bgIconTransaction"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_transfer_btn">
+            <ImageView
+                android:id="@+id/imageTransactionIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_transactions_outline"
+                app:tint="@color/colorPrimary" />
+        </FrameLayout>
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:orientation="horizontal">
-
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
             <TextView
-                android:id="@+id/textTransactionAccount"
+                android:id="@+id/textTransactionDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cuenta"
-                android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
-
+                android:text="Candies"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
             <TextView
-                android:id="@+id/textTransactionDate"
+                android:id="@+id/textTransactionMeta"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Fecha"
+                android:layout_marginTop="2dp"
+                android:text="Bank Account • 31 Dec"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
-
+                android:textColor="?attr/colorOnSurfaceVariant" />
         </LinearLayout>
-
+        <TextView
+            android:id="@+id/textTransactionAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-$ 5.00"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimary" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textTransactionAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginStart="16dp"
-        android:text="+$100.00"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

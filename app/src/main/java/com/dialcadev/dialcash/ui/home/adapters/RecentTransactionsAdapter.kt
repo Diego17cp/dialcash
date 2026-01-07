@@ -47,9 +47,10 @@ class RecentTransactionsAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(transaction: TransactionWithDetails) {
             binding.apply {
-                textTransactionDate.text = dateFormat.format(transaction.date)
                 textTransactionDescription.text = transaction.description ?: "No Description"
-                textTransactionAccount.text = "${transaction.accountName} -"
+                val date = dateFormat.format(transaction.date)
+                val account = "${transaction.accountName} • "
+                textTransactionMeta.text = account + date
                 val amount = if (transaction.type == "income") "+$currentCurrencySymbol ${transaction.amount}"
                 else "-$currentCurrencySymbol ${transaction.amount}"
                 textTransactionAmount.text = amount
@@ -74,6 +75,14 @@ class RecentTransactionsAdapter(
                         else -> R.color.negative_amount
                     }
                 imageTransactionIcon.setColorFilter(root.context.getColor(iconColor))
+
+                val bgIcon =
+                    when (transaction.type) {
+                        "income" -> R.drawable.bg_income_btn
+                        "expense" -> R.drawable.bg_expense_btn
+                        else -> R.drawable.bg_transfer_btn
+                    }
+                bgIconTransaction.setBackgroundResource(bgIcon)
 
                 root.setOnClickListener {
                     onTransactionClick(transaction)
