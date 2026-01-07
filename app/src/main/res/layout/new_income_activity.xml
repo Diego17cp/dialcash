@@ -8,157 +8,172 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
         android:background="@android:color/transparent"
-        app:titleCentered="true"
+        android:minHeight="?attr/actionBarSize"
         android:paddingTop="10dp"
+        app:navigationIconTint="?attr/colorOnSurface"
         app:title="@string/new_income_title"
-        app:titleTextColor="?attr/colorOnSurface"
-        app:navigationIconTint="?attr/colorOnSurface" />
-    <androidx.core.widget.NestedScrollView
+        app:titleCentered="true"
+        app:titleTextColor="?attr/colorOnSurface" />
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:fillViewport="true">
-        <androidx.constraintlayout.widget.ConstraintLayout
+        android:padding="24dp">
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="24dp">
-            <LinearLayout
-                android:id="@+id/inputNameContainer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/income_name"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="8dp"/>
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <EditText
-                        android:id="@+id/etIncomeName"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/bg_input_rounded"
-                        android:hint="@string/income_group_name_example"
-                        android:textSize="14sp"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="?attr/colorOutline"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="44dp"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
-                        android:inputType="text"
-                        android:importantForAutofill="no"/>
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_pen_filled"
-                        android:tint="?attr/colorOnSurfaceVariant"/>
-                </FrameLayout>
-                <TextView
-                    android:id="@+id/tvNameError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/account_name_required"
-                    android:textSize="12sp"
-                    android:textColor="@color/negative_balance"
-                    android:layout_marginTop="6dp"
-                    android:visibility="gone"/>
-            </LinearLayout>
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/btnCreateIncome"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center"
-                android:id="@+id/amountContainer"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/inputNameContainer"
-                android:layout_marginTop="20dp"
-                android:paddingTop="24dp">
-                <TextView
-                    android:id="@+id/tvAmountLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/til_amount"
-                    android:textSize="14sp"
-                    android:textColor="?attr/colorOutline"
-                    android:layout_marginBottom="8dp"
-                    android:layout_gravity="center" />
-                <FrameLayout
+                android:padding="24dp">
+                <LinearLayout
+                    android:id="@+id/inputNameContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
                     <TextView
-                        android:id="@+id/tvCurrency"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="start|center_vertical"
-                        android:text="$"
-                        android:textSize="36sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/colorPrimary"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="8dp"/>
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/income_name"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <EditText
+                            android:id="@+id/etIncomeName"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/bg_input_rounded"
+                            android:hint="@string/income_group_name_example"
+                            android:importantForAutofill="no"
+                            android:inputType="text"
+                            android:paddingStart="16dp"
+                            android:paddingTop="12dp"
+                            android:paddingEnd="44dp"
+                            android:paddingBottom="12dp"
+                            android:textColor="@color/text_primary"
+                            android:textColorHint="?attr/colorOutline"
+                            android:textSize="14sp" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_gravity="end|center_vertical"
+                            android:layout_marginEnd="16dp"
+                            android:src="@drawable/ic_pen_filled"
+                            android:tint="?attr/colorOnSurfaceVariant" />
+                    </FrameLayout>
                     <TextView
-                        android:id="@+id/tvAmount"
+                        android:id="@+id/tvNameError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/account_name_required"
+                        android:textColor="@color/negative_balance"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/amountContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/inputNameContainer">
+
+                    <TextView
+                        android:id="@+id/tvAmountLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginStart="48dp"
-                        android:layout_marginEnd="48dp"
-                        android:text="0.00"
-                        android:textSize="56sp"
-                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/til_amount"
                         android:textColor="?attr/colorOutline"
-                        android:maxLines="1"
-                        android:ellipsize="end"
-                        android:gravity="center"/>
-                </FrameLayout>
-                <TextView
-                    android:id="@+id/tvAmountError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    android:text="@string/initial_balance_required"
-                    android:textColor="?attr/colorError"
-                    android:visibility="gone"
-                    android:layout_marginTop="6dp"/>
-                <EditText
-                    android:id="@+id/etAmount"
-                    android:layout_width="1dp"
-                    android:layout_height="1dp"
-                    android:inputType="numberDecimal"
-                    android:background="@null"
-                    android:cursorVisible="false"
-                    android:focusable="true"
-                    android:importantForAutofill="no"
-                    android:textColor="@android:color/transparent"/>
+                        android:textSize="14sp" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvCurrency"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="8dp"
+                            android:text="$"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="36sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="48dp"
+                            android:layout_marginEnd="48dp"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:text="0.00"
+                            android:textColor="?attr/colorOutline"
+                            android:textSize="56sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/tvAmountError"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/initial_balance_required"
+                        android:textColor="?attr/colorError"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <EditText
+                        android:id="@+id/etAmount"
+                        android:layout_width="1dp"
+                        android:layout_height="1dp"
+                        android:background="@null"
+                        android:cursorVisible="false"
+                        android:focusable="true"
+                        android:importantForAutofill="no"
+                        android:inputType="numberDecimal"
+                        android:textColor="@android:color/transparent" />
+                </LinearLayout>
             </LinearLayout>
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCreateIncome"
-                android:layout_marginTop="250dp"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                app:cornerRadius="15dp"
-                android:layout_weight="1"
-                android:backgroundTint="?attr/colorPrimary"
-                android:text="@string/create"
-                android:textSize="20sp"
-                android:textColor="?attr/colorOnPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/amountContainer" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.core.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCreateIncome"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_margin="24dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="@string/create"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="20sp"
+            app:cornerRadius="15dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
