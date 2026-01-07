@@ -16,6 +16,8 @@
         <LinearLayout
             android:id="@+id/layoutIncomes"
             android:layout_width="match_parent"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
