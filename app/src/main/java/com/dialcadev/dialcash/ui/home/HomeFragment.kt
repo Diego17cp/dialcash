@@ -143,6 +143,28 @@ class HomeFragment : Fragment() {
             val bottomNav = requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav)
             bottomNav.selectedItemId = R.id.accountsFragment
         }
+        binding.btnToggleEye.setOnClickListener {
+            lifecycleScope.launch {
+                userDataStore.toggleBalanceVisibility()
+                val isVisible = userData?.let { !it.isBalanceVisible } ?: true
+                userData = userData?.copy(isBalanceVisible = isVisible)
+                updateBalanceVisibility(isVisible)
+            }
+        }
+    }
+
+    private fun updateBalanceVisibility(isVisible: Boolean) {
+        val totalBalance = viewModel.totalBalance.value ?: 0.00
+        val formattedBalance = if (isVisible) {
+            "${userData?.currencySymbol ?: "$"} $totalBalance"
+        } else {
+            val balanceParts = String.format("%.2f", totalBalance).split(".")
+            "${userData?.currencySymbol ?: "$"} ****.${balanceParts[1]}"
+        }
+        binding.textTotalBalance.text = formattedBalance
+        binding.btnToggleEye.setImageResource(
+            if (!isVisible) R.drawable.ic_eye else R.drawable.ic_eye_closed
+        )
     }
 
     private fun navigateToTransactionType(transactionType: String) {
