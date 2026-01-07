@@ -1,10 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <solid android:color="@color/positive_balance_transparent"/>
-    <size android:width="60dp" android:height="60dp"/>
-    <corners android:radius="30dp"/>
-    <stroke
-        android:width="2dp"
-        android:color="@color/positive_balance" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#1A00C853" />
+    <corners android:radius="10dp" />
 </shape>
