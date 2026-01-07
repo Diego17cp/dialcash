@@ -1,199 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/new_transaction_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
-    android:fillViewport="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_height="match_parent">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp">
-
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/new_income_title"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/new_income_subtitle"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
-
-        <!-- Income Name -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilIncomeName"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:hint="@string/income_name"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvSubtitle"
-            app:startIconDrawable="@drawable/ic_account_circle">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etIncomeName"
+        android:minHeight="?attr/actionBarSize"
+        android:background="@android:color/transparent"
+        app:titleCentered="true"
+        android:paddingTop="10dp"
+        app:title="@string/new_income_title"
+        app:titleTextColor="?attr/colorOnSurface"
+        app:navigationIconTint="?attr/colorOnSurface" />
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp">
+            <LinearLayout
+                android:id="@+id/inputNameContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Amount -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilAmount"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="@string/til_amount"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilIncomeName"
-            app:prefixText="S/. ">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAmount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Remaining (Optional) -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilRemaining"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="Remaining (optional)"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tilAmount"
-            android:visibility="gone"
-            app:prefixText="S/.">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etRemaining"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:maxLines="1" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Helper text for remaining -->
-        <TextView
-            android:id="@+id/tvRemainingHint"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:text="If empty, remaining will be set to the amount value"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/tilRemaining" />
-
-        <!-- Info Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardInfo"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvRemainingHint"
-            app:strokeColor="?attr/colorOutlineVariant"
-            app:strokeWidth="1dp">
-
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/income_name"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp"/>
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/etIncomeName"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_input_rounded"
+                        android:hint="@string/income_group_name_example"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="?attr/colorOutline"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="44dp"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp"
+                        android:inputType="text"
+                        android:importantForAutofill="no"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_pen_filled"
+                        android:tint="?attr/colorOnSurfaceVariant"/>
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/tvNameError"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/account_name_required"
+                    android:textSize="12sp"
+                    android:textColor="@color/negative_balance"
+                    android:layout_marginTop="6dp"
+                    android:visibility="gone"/>
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
+                android:gravity="center"
+                android:id="@+id/amountContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputNameContainer"
+                android:layout_marginTop="20dp"
+                android:paddingTop="24dp">
                 <TextView
+                    android:id="@+id/tvAmountLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/income_tip_title"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
+                    android:text="@string/til_amount"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOutline"
+                    android:layout_marginBottom="8dp"
+                    android:layout_gravity="center" />
+                <FrameLayout
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tvCurrency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:text="$"
+                        android:textSize="36sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="8dp"/>
+                    <TextView
+                        android:id="@+id/tvAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="48dp"
+                        android:layout_marginEnd="48dp"
+                        android:text="0.00"
+                        android:textSize="56sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOutline"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:gravity="center"/>
+                </FrameLayout>
+                <TextView
+                    android:id="@+id/tvAmountError"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:lineSpacingExtra="4dp"
-                    android:text="@string/income_tip_bullets"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
+                    android:textSize="12sp"
+                    android:text="@string/initial_balance_required"
+                    android:textColor="?attr/colorError"
+                    android:visibility="gone"
+                    android:layout_marginTop="6dp"/>
+                <EditText
+                    android:id="@+id/etAmount"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:inputType="numberDecimal"
+                    android:background="@null"
+                    android:cursorVisible="false"
+                    android:focusable="true"
+                    android:importantForAutofill="no"
+                    android:textColor="@android:color/transparent"/>
             </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Buttons -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cardInfo">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancel"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="56dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/cancel"
-                android:textSize="16sp" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateIncome"
-                style="@style/Widget.Material3.Button"
+                android:layout_marginTop="250dp"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
-                android:layout_marginStart="8dp"
+                app:cornerRadius="15dp"
                 android:layout_weight="1"
+                android:backgroundTint="?attr/colorPrimary"
                 android:text="@string/create"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+                android:textSize="20sp"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/amountContainer" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
