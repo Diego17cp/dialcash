@@ -20,6 +20,7 @@ class UserDataStore @Inject constructor(private val context: Context) {
         private val IS_REGISTERED = booleanPreferencesKey("is_registered")
         private val SEEN_ONBOARDING = booleanPreferencesKey("seen_onboarding")
         private val CURRENCY_SYMBOL = stringPreferencesKey("currency_symbol")
+        private val IS_BALANCE_VISIBLE = booleanPreferencesKey("is_balance_visible")
     }
 
     suspend fun saveUserData(
@@ -48,13 +49,26 @@ class UserDataStore @Inject constructor(private val context: Context) {
         }
     }
 
+    suspend fun toggleBalanceVisibility() {
+        context.dataStore.edit { prefs ->
+            val current = prefs[IS_BALANCE_VISIBLE] ?: true
+            prefs[IS_BALANCE_VISIBLE] = !current
+        }
+    }
+    suspend fun updateBalanceVisibility(isVisible: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[IS_BALANCE_VISIBLE] = isVisible
+        }
+    }
+
     fun getUserData(): Flow<UserData> {
         return context.dataStore.data.map { prefs ->
             UserData(
                 name = prefs[USER_NAME] ?: "",
                 photoUri = prefs[USER_PHOTO_URI] ?: "",
                 isRegistered = prefs[IS_REGISTERED] ?: false,
-                currencySymbol = prefs[CURRENCY_SYMBOL] ?: "$"
+                currencySymbol = prefs[CURRENCY_SYMBOL] ?: "$",
+                isBalanceVisible = prefs[IS_BALANCE_VISIBLE] ?: true
             )
         }
     }
@@ -69,6 +83,7 @@ class UserDataStore @Inject constructor(private val context: Context) {
             prefs[USER_NAME] = ""
             prefs[USER_PHOTO_URI] = ""
             prefs[CURRENCY_SYMBOL] = "$"
+            prefs[IS_BALANCE_VISIBLE] = true
         }
     }
     suspend fun clearUserData() {
@@ -92,5 +107,6 @@ data class UserData(
     val name: String,
     val photoUri: String,
     val isRegistered: Boolean,
-    val currencySymbol: String
+    val currencySymbol: String,
+    val isBalanceVisible: Boolean = true
 )

@@ -15,6 +15,7 @@ data class DataStoreBackup(
     val username: String,
     val profilePicture: String?, // Uri as String
     val currencySymbol: String, // e.g. "$", "€"
+    val isBalanceVisible: Boolean = true
 )
 
 data class DatabaseBackup(

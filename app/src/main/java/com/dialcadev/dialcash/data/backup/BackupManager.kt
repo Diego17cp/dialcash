@@ -48,7 +48,8 @@ class BackupManager @Inject constructor(
                     datastore = DataStoreBackup(
                         username = userData.name,
                         profilePicture = userData.photoUri.takeIf { it.isNotEmpty() },
-                        currencySymbol = userData.currencySymbol
+                        currencySymbol = userData.currencySymbol,
+                        isBalanceVisible = userData.isBalanceVisible
                     ),
                     db = DatabaseBackup(
                         accounts = accounts,
@@ -166,6 +167,9 @@ class BackupManager @Inject constructor(
                         name = dataStore.username ?: "",
                         photoUri = dataStore.profilePicture ?: "",
                         currencySymbol = dataStore.currencySymbol ?: "$"
+                    )
+                    userDataStore.updateBalanceVisibility(
+                        isVisible = dataStore.isBalanceVisible
                     )
                     Log.d("BackupManager", "User data restored")
                 }
