@@ -190,4 +190,8 @@
     <string name="register_expense">登记支出</string>
     <string name="register_income">登记收入</string>
     <string name="register_transfer">登记转账</string>
+    <string name="main">主要</string>
+    <string name="savings">储蓄</string>
+    <string name="account_name_example">例如：银行账户</string>
+    <string name="income_group_name_example">例如：工资</string>
 </resources>

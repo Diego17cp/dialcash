@@ -190,4 +190,8 @@
     <string name="register_expense">Enregistrer une dépense</string>
     <string name="register_income">Enregistrer un revenu</string>
     <string name="register_transfer">Enregistrer un transfert</string>
+    <string name="main">Principal</string>
+    <string name="savings">Épargne</string>
+    <string name="account_name_example">ex. Compte Bancaire</string>
+    <string name="income_group_name_example">ex. Salaire</string>
 </resources>

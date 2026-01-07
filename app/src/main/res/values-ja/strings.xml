@@ -190,4 +190,8 @@
     <string name="register_expense">支出を登録</string>
     <string name="register_income">収入を登録</string>
     <string name="register_transfer">振替を登録</string>
+    <string name="main">メイン</string>
+    <string name="savings">貯蓄</string>
+    <string name="account_name_example">例：銀行口座</string>
+    <string name="income_group_name_example">例：給料</string>
 </resources>

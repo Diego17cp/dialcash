@@ -201,4 +201,8 @@
     <string name="register_expense">Register expense</string>
     <string name="register_income">Register income</string>
     <string name="register_transfer">Register transfer</string>
+    <string name="main">Main</string>
+    <string name="savings">Savings</string>
+    <string name="account_name_example">e.g. Bank Account</string>
+    <string name="income_group_name_example">e.g. Salary</string>
 </resources>
