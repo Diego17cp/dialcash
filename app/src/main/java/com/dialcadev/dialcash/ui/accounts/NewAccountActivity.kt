@@ -163,8 +163,12 @@ class NewAccountActivity : AppCompatActivity() {
 
         if (accountName.isNullOrEmpty()) {
             binding.tvNameError.visibility = View.VISIBLE
+            binding.etAccountName.background = getDrawable(R.drawable.bg_input_error)
             isValid = false
-        } else binding.tvNameError.visibility = View.GONE
+        } else {
+            binding.etAccountName.background = getDrawable(R.drawable.bg_input_rounded)
+            binding.tvNameError.visibility = View.GONE
+        }
 
         if (selectedAccountTypeId == null) {
             binding.tvTypeAccountError.visibility = View.VISIBLE

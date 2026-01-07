@@ -124,8 +124,12 @@ class NewIncomeActivity : AppCompatActivity() {
         var isValid = true
         if (name.isNullOrEmpty()) {
             binding.tvNameError.visibility = View.VISIBLE
+            binding.etIncomeName.background = getDrawable(R.drawable.bg_input_error)
             isValid = false
-        } else binding.tvNameError.visibility = View.GONE
+        } else {
+            binding.etIncomeName.background = getDrawable(R.drawable.bg_input_rounded)
+            binding.tvNameError.visibility = View.GONE
+        }
         if (amountText.isNullOrEmpty() || amountText == "0.00" || amountText.toDoubleOrNull() == null) {
             binding.tvAmountError.visibility = View.VISIBLE
             isValid = false
