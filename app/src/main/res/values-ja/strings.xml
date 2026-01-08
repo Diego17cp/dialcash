@@ -195,4 +195,14 @@
     <string name="account_name_example">例：銀行口座</string>
     <string name="income_group_name_example">例：給料</string>
     <string name="apply_filters">フィルターを適用</string>
+    <string name="blog_title">ブログとニュース</string>
+    <string name="blog_subtitle">Dialcashの最新リリース、機能、お知らせをチェックしましょう。ニュースをタップして詳細を表示します。</string>
+    <string name="no_posts">投稿なし</string>
+    <string name="empty_posts_title">まだ投稿がありません</string>
+    <string name="empty_posts_subtitle">Dialcashの最新ニュースとアップデートは後ほどご確認ください</string>
+    <string name="post_image">投稿画像</string>
+    <string name="unknown_error">不明なエラー</string>
+    <string name="connection_error">接続エラー</string>
+    <string name="cannot_load_content">コンテンツを読み込めません。インターネット接続を確認してください。</string>
+    <string name="error_updating">更新エラー</string>
 </resources>

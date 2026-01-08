@@ -195,4 +195,14 @@
     <string name="account_name_example">z.B. Bankkonto</string>
     <string name="income_group_name_example">z.B. Gehalt</string>
     <string name="apply_filters">Filter anwenden</string>
+    <string name="blog_title">Blog &amp; Nachrichten</string>
+    <string name="blog_subtitle">Bleiben Sie auf dem Laufenden über die neuesten Dialcash-Versionen, Funktionen und Ankündigungen. Tippen Sie auf eine Nachricht, um Details anzuzeigen.</string>
+    <string name="no_posts">Keine Beiträge</string>
+    <string name="empty_posts_title">Noch keine Beiträge</string>
+    <string name="empty_posts_subtitle">Schauen Sie später wieder vorbei für die neuesten Dialcash-Nachrichten und Updates</string>
+    <string name="post_image">Beitragsbild</string>
+    <string name="unknown_error">Unbekannter Fehler</string>
+    <string name="connection_error">Verbindungsfehler</string>
+    <string name="cannot_load_content">Inhalt kann nicht geladen werden. Überprüfen Sie Ihre Internetverbindung.</string>
+    <string name="error_updating">Fehler beim Aktualisieren</string>
 </resources>

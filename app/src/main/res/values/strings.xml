@@ -206,4 +206,14 @@
     <string name="account_name_example">e.g. Bank Account</string>
     <string name="income_group_name_example">e.g. Salary</string>
     <string name="apply_filters">Apply filters</string>
+    <string name="blog_title">Blog &amp; News</string>
+    <string name="blog_subtitle">Stay up to date with the latest Dialcash releases, features, and announcements. Tap on any news to view details.</string>
+    <string name="no_posts">No posts</string>
+    <string name="empty_posts_title">No Posts Yet</string>
+    <string name="empty_posts_subtitle">Check back later for the latest Dialcash news and updates</string>
+    <string name="post_image">Post image</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="connection_error">Connection error</string>
+    <string name="cannot_load_content">Cannot load content. Verify your internet connection.</string>
+    <string name="error_updating">Error updating</string>
 </resources>

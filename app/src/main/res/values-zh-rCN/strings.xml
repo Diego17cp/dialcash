@@ -195,4 +195,14 @@
     <string name="account_name_example">例如：银行账户</string>
     <string name="income_group_name_example">例如：工资</string>
     <string name="apply_filters">应用筛选</string>
+    <string name="blog_title">博客与新闻</string>
+    <string name="blog_subtitle">了解 Dialcash 的最新版本、功能和公告。点击任何新闻查看详情。</string>
+    <string name="no_posts">暂无帖子</string>
+    <string name="empty_posts_title">暂无帖子</string>
+    <string name="empty_posts_subtitle">稍后回来查看 Dialcash 的最新新闻和更新</string>
+    <string name="post_image">帖子图片</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="connection_error">连接错误</string>
+    <string name="cannot_load_content">无法加载内容。请检查您的互联网连接。</string>
+    <string name="error_updating">更新错误</string>
 </resources>
