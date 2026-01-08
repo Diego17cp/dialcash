@@ -2,12 +2,16 @@ package com.dialcadev.dialcash.ui.transactions
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.OvershootInterpolator
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.MenuProvider
@@ -20,7 +24,6 @@ import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +33,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -37,6 +41,8 @@ import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.data.UserData
 import com.dialcadev.dialcash.data.UserDataStore
 import com.dialcadev.dialcash.ui.shared.BottomSheetManager
+import com.dialcadev.dialcash.utils.toReadableDate
+import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -90,7 +96,6 @@ class TransactionsFragment : Fragment() {
             viewModel.refreshTransactions()
         }
     }
-
     private fun showFiltersBottomSheet() {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
         val bottomSheetView = LayoutInflater.from(requireContext())
@@ -109,58 +114,86 @@ class TransactionsFragment : Fragment() {
             } else false
         }
 
-        val cbIncome = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbIncome)
-        val cbExpense = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbExpense)
-        val cbTransfer = bottomSheetView.findViewById<MaterialCheckBox>(R.id.cbTransfer)
-        val cardIncome = bottomSheetView.findViewById<MaterialCardView>(R.id.cardIncome)
-        val cardExpense = bottomSheetView.findViewById<MaterialCardView>(R.id.cardExpense)
-        val cardTransfer = bottomSheetView.findViewById<MaterialCardView>(R.id.cardTransfer)
+        val cardIncome = bottomSheetView.findViewById<MaterialCardView>(R.id.incomeSelectorCard)
+        val cardExpense = bottomSheetView.findViewById<MaterialCardView>(R.id.expenseSelectorCard)
+        val cardTransfer = bottomSheetView.findViewById<MaterialCardView>(R.id.transferSelectorCard)
 
-        fun updateCardBg(card: MaterialCardView, isChecked: Boolean) {
-            if (isChecked) {
+        val checkIncome = bottomSheetView.findViewById<ImageView>(R.id.checkIncomeSelector)
+        val checkExpense = bottomSheetView.findViewById<ImageView>(R.id.checkExpenseSelector)
+        val checkTransfer = bottomSheetView.findViewById<ImageView>(R.id.checkTransferSelector)
+
+        val titleIncome = bottomSheetView.findViewById<TextView>(R.id.titleIncomeSelector)
+        val titleExpense = bottomSheetView.findViewById<TextView>(R.id.titleExpenseSelector)
+        val titleTransfer = bottomSheetView.findViewById<TextView>(R.id.titleTransferSelector)
+
+        val currentTypes = viewModel.getTypesFilter()
+        val selectedTypes = mutableSetOf<String>().apply { addAll(currentTypes) }
+
+        fun updateCardState(card: MaterialCardView, check: ImageView, title: TextView, isSelected: Boolean) {
+            if (isSelected) {
                 val primaryColor = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
-                val transparentBg =
-                    ColorUtils.setAlphaComponent(primaryColor, (0.10f * 255).toInt())
+                val transparentBg = ColorUtils.setAlphaComponent(primaryColor, (0.10f * 255).toInt())
                 card.setCardBackgroundColor(transparentBg)
                 card.strokeColor = primaryColor
+                card.strokeWidth = 5
+                check.visibility = View.VISIBLE
+                title.setTextColor(primaryColor)
+                check.scaleX = 0f
+                check.scaleY = 0f
+                check.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(140)
+                    .setInterpolator(OvershootInterpolator())
+                    .start()
             } else {
-                card.setCardBackgroundColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.surface
-                    )
+                card.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background))
+                val typedValue = TypedValue()
+                requireContext().theme.resolveAttribute(
+                    com.google.android.material.R.attr.colorOutline,
+                    typedValue,
+                    true
                 )
-                card.strokeColor = ContextCompat.getColor(requireContext(), R.color.surface)
+                val colorOutline = typedValue.data
+                card.strokeColor = colorOutline
+                card.strokeWidth = 4
+                check.visibility = View.GONE
+                title.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
             }
         }
+        fun updateTypesFilter() {
+            viewModel.setTypesFilter(selectedTypes.toList())
+        }
         cardIncome.setOnClickListener {
-            cbIncome.isChecked = !cbIncome.isChecked
-            updateCardBg(cardIncome, cbIncome.isChecked)
+            val isSelected = selectedTypes.contains("INCOME")
+            if (isSelected) selectedTypes.remove("INCOME")
+            else selectedTypes.add("INCOME")
+            updateCardState(cardIncome, checkIncome, titleIncome, !isSelected)
+            updateTypesFilter()
         }
         cardExpense.setOnClickListener {
-            cbExpense.isChecked = !cbExpense.isChecked
-            updateCardBg(cardExpense, cbExpense.isChecked)
+            val isSelected = selectedTypes.contains("EXPENSE")
+            if (isSelected) selectedTypes.remove("EXPENSE")
+            else selectedTypes.add("EXPENSE")
+            updateCardState(cardExpense, checkExpense, titleExpense, !isSelected)
+            updateTypesFilter()
         }
         cardTransfer.setOnClickListener {
-            cbTransfer.isChecked = !cbTransfer.isChecked
-            updateCardBg(cardTransfer, cbTransfer.isChecked)
+            val isSelected = selectedTypes.contains("TRANSFER")
+            if (isSelected) selectedTypes.remove("TRANSFER")
+            else selectedTypes.add("TRANSFER")
+            updateCardState(cardTransfer, checkTransfer, titleTransfer, !isSelected)
+            updateTypesFilter()
         }
 
-
-        fun updateTypesFilter() {
-            val selected = mutableListOf<String>()
-            if (cbIncome.isChecked) selected.add("INCOME")
-            if (cbExpense.isChecked) selected.add("EXPENSE")
-            if (cbTransfer.isChecked) selected.add("TRANSFER")
-            viewModel.setTypesFilter(selected)
-        }
-
-        cbIncome.setOnCheckedChangeListener { _, _ -> updateTypesFilter() }
-        cbExpense.setOnCheckedChangeListener { _, _ -> updateTypesFilter() }
-        cbTransfer.setOnCheckedChangeListener { _, _ -> updateTypesFilter() }
-
-        val etStartDate = bottomSheetView.findViewById<TextInputEditText>(R.id.etStartDate)
-        val etEndDate = bottomSheetView.findViewById<TextInputEditText>(R.id.etEndDate)
+        val startDateCard = bottomSheetView.findViewById<MaterialCardView>(R.id.startDateCard)
+        val endDateCard = bottomSheetView.findViewById<MaterialCardView>(R.id.endDateCard)
+        val etStartDate = bottomSheetView.findViewById<TextInputEditText>(R.id.et_start_date)
+        val etEndDate = bottomSheetView.findViewById<TextInputEditText>(R.id.et_end_date)
+        val tvStartDateValue = bottomSheetView.findViewById<TextView>(R.id.tvStartDateValue)
+        val tvEndDateValue = bottomSheetView.findViewById<TextView>(R.id.tvEndDateValue)
+        val startDateChevron = bottomSheetView.findViewById<ImageView>(R.id.chevronStartDate)
+        val endDateChevron = bottomSheetView.findViewById<ImageView>(R.id.chevronEndDate)
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         fun openDatePicker(isStart: Boolean) {
@@ -183,9 +216,13 @@ class TransactionsFragment : Fragment() {
                     val selectedTimestamp = calendar.timeInMillis
                     val formattedDate = dateFormat.format(calendar.time)
                     if (isStart) {
+                        tvStartDateValue.text = formattedDate.toReadableDate()
+                        startDateChevron.visibility = View.GONE
                         etStartDate.setText(formattedDate)
                         viewModel.setStartDate(selectedTimestamp)
                     } else {
+                        tvEndDateValue.text = formattedDate.toReadableDate()
+                        endDateChevron.visibility = View.GONE
                         etEndDate.setText(formattedDate)
                         viewModel.setEndDate(selectedTimestamp)
                     }
@@ -196,9 +233,30 @@ class TransactionsFragment : Fragment() {
             )
             datePickerDialog.show()
         }
-        etStartDate.setOnClickListener { openDatePicker(true) }
-        etEndDate.setOnClickListener { openDatePicker(false) }
-
+        startDateCard.setOnClickListener { openDatePicker(true) }
+        endDateCard.setOnClickListener { openDatePicker(false) }
+        etEndDate.addTextChangedListener { date ->
+            if (date.isNullOrEmpty()) {
+                endDateChevron.visibility = View.VISIBLE
+                tvEndDateValue.text = "DD/MM/YYYY"
+            }
+            else {
+                val parsedDate = date.toString()
+                tvEndDateValue.text = parsedDate.toReadableDate()
+                endDateChevron.visibility = View.GONE
+            }
+        }
+        etStartDate.addTextChangedListener { date ->
+            if (date.isNullOrEmpty()) {
+                startDateChevron.visibility = View.VISIBLE
+                tvStartDateValue.text = "DD/MM/YYYY"
+            }
+            else {
+                val parsedDate = date.toString()
+                tvStartDateValue.text = parsedDate.toReadableDate()
+                startDateChevron.visibility = View.GONE
+            }
+        }
         val chipGroup = bottomSheetView.findViewById<ChipGroup>(R.id.chipGroupAccounts)
         viewModel.accounts.observe(viewLifecycleOwner) { accounts ->
             val currentSelection = try {
@@ -207,6 +265,10 @@ class TransactionsFragment : Fragment() {
                 selectedAccountsChips
             }
             populateAccountsChips(chipGroup, accounts, currentSelection)
+        }
+        val btnApplyFilters = bottomSheetView.findViewById<MaterialButton>(R.id.btnApplyFilters)
+        btnApplyFilters.setOnClickListener {
+            bottomSheetDialog.dismiss()
         }
     }
 

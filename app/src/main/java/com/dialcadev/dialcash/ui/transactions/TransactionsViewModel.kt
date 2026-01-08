@@ -210,7 +210,9 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
         _isFiltered.value =
             query.isNotBlank() || filteredTransactions.size != initialTransactions.size || startDate != null || endDate != null
     }
-
+    fun getTypesFilter(): List<String> {
+        return _typesFilter.value ?: emptyList()
+    }
     fun clearFilters() {
         _searchQuery.value = ""
         _typesFilter.value = emptyList()
