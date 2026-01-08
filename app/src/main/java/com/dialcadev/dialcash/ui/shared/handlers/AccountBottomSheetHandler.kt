@@ -1,5 +1,8 @@
 package com.dialcadev.dialcash.ui.shared.handlers
 
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.view.View
 import android.widget.ArrayAdapter
 import androidx.core.view.isGone
@@ -38,6 +41,21 @@ class AccountBottomSheetHandler(
             "$currencySymbol ${String.format("%.2f", account.originalBalance)}".also { tvAccountBalance.text = it }
             etInitialBalance.setText(account.originalBalance.toString())
             "$currencySymbol ${String.format("%.2f", account.balance)}".also { tvAccountCurrentBalance.text = it }
+            binding.tvAccountCurrentBalance.post {
+                val paint = binding.tvAccountCurrentBalance.paint
+                val width = paint.measureText(binding.tvAccountCurrentBalance.text.toString())
+                    val textShader = LinearGradient(
+                        0f, 0f, width, 0f,
+                        intArrayOf(
+                            Color.parseColor("#60A5FA"),
+                            Color.parseColor("#cbd5e4")
+                        ),
+                        null,
+                        Shader.TileMode.CLAMP
+                    )
+                    binding.tvAccountCurrentBalance.paint.shader = textShader
+                    binding.tvAccountCurrentBalance.invalidate()
+            }
 
             tilInitialBalance.prefixText = "$currencySymbol "
 
