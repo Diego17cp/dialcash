@@ -1,6 +1,7 @@
 package com.dialcadev.dialcash.ui.transactions
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -71,16 +72,20 @@ class TransactionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.chart_menu, menu)
                 menuInflater.inflate(R.menu.filters_menu, menu)
             }
-
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_filters -> {
                         showFiltersBottomSheet()
                         true
                     }
-
+                    R.id.action_chart -> {
+                        val intent = Intent(requireContext(), ChartsActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
                     else -> false
                 }
             }
