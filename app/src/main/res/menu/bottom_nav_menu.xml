@@ -16,4 +16,8 @@
         android:id="@+id/incomesFragment"
         android:icon="@drawable/ic_incomes_selector"
         android:title="@string/incomes" />
+    <item
+        android:id="@+id/blogFragment"
+        android:icon="@drawable/ic_blog_selector"
+        android:title="Blog" />
 </menu>

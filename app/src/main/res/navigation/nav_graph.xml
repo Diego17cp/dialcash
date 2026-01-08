@@ -25,8 +25,8 @@
         tools:layout="@layout/fragment_incomes"
         android:label="@string/incomes_toolbar_t" />
     <fragment
-        android:id="@+id/checkpointFragment"
-        android:name="com.dialcadev.dialcash.ui.CheckpointFragment"
-        tools:layout="@layout/fragment_checkpoint"
-        android:label="Checkpoints" />
+        android:id="@+id/blogFragment"
+        android:name="com.dialcadev.dialcash.ui.blog.BlogFragment"
+        tools:layout="@layout/fragment_blog"
+        android:label="Blog" />
 </navigation>
