@@ -194,4 +194,5 @@
     <string name="savings">Poupança</string>
     <string name="account_name_example">ex. Conta Bancária</string>
     <string name="income_group_name_example">ex. Salário</string>
+    <string name="apply_filters">Aplicar filtros</string>
 </resources>
