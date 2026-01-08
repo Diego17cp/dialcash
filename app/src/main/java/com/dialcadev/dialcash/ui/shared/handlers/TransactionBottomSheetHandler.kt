@@ -40,6 +40,11 @@ class TransactionBottomSheetHandler(
 
     private fun initializeViews() {
         binding.apply {
+            val bgDrawable = when (transaction.type) {
+                "income" -> R.drawable.bg_transaction_income
+                "expense" -> R.drawable.bg_transaction_expense
+                else -> R.drawable.bg_transaction_transfer
+            }
             val iconRes = when (transaction.type) {
                 "income" -> R.drawable.ic_income
                 "expense" -> R.drawable.ic_expense
@@ -52,6 +57,7 @@ class TransactionBottomSheetHandler(
             }
             val amountText = if (transaction.type == "income") "+$currencySymbol ${transaction.amount}"
             else "-$currencySymbol ${transaction.amount}"
+            containerLayout.setBackgroundResource(bgDrawable)
             ivTransactionType.setImageResource(iconRes)
             ivTransactionType.setColorFilter(root.context.getColor(color))
             tvTransactionAmount.text = amountText
@@ -225,14 +231,14 @@ class TransactionBottomSheetHandler(
                 tilTransactionAmount.visibility = View.GONE
                 tvTransactionDescription.visibility = View.VISIBLE
                 tilTransactionDescription.visibility = View.GONE
-                tvAccountName.visibility = View.VISIBLE
+                fromAccountCard.visibility = View.VISIBLE
                 tilAccountName.visibility = View.GONE
                 if (transaction.type == "transfer" && transaction.accountToName != null) {
-                    tvAccountToName.visibility = View.VISIBLE
+                    toAccountCard.visibility = View.VISIBLE
                     tilAccountToName.visibility = View.GONE
                 }
                 if (transaction.type == "expense" && transaction.incomeGroupName != null) {
-                    tvIncomeGroupName.visibility = View.VISIBLE
+                    incomeGroupCard.visibility = View.VISIBLE
                     tilIncomeGroupName.visibility = View.GONE
                 }
                 actionsRow.visibility = View.VISIBLE
@@ -334,14 +340,14 @@ class TransactionBottomSheetHandler(
                 tilTransactionAmount.visibility = View.VISIBLE
                 tvTransactionDescription.visibility = View.GONE
                 tilTransactionDescription.visibility = View.VISIBLE
-                tvAccountName.visibility = View.GONE
+                fromAccountCard.visibility = View.GONE
                 tilAccountName.visibility = View.VISIBLE
                 if (transaction.type == "transfer" && transaction.accountToName != null) {
-                    tvAccountToName.visibility = View.GONE
+                    toAccountCard.visibility = View.GONE
                     tilAccountToName.visibility = View.VISIBLE
                 }
                 if (transaction.type == "expense" && transaction.incomeGroupName != null) {
-                    tvIncomeGroupName.visibility = View.GONE
+                    incomeGroupCard.visibility = View.GONE
                     tilIncomeGroupName.visibility = View.VISIBLE
                 }
                 actionsRow.visibility = View.GONE
