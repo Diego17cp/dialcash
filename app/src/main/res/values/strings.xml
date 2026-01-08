@@ -216,4 +216,10 @@
     <string name="connection_error">Connection error</string>
     <string name="cannot_load_content">Cannot load content. Verify your internet connection.</string>
     <string name="error_updating">Error updating</string>
+    <string name="charts">Charts</string>
+    <string name="previous_month">Previous month</string>
+    <string name="next_month">Next month</string>
+    <string name="no_transactions_this_month">There are not transactions this month</string>
+    <string name="add_transaction_to_see_charts">Add transactions to see the charts</string>
+    <string name="error">Error</string>
 </resources>

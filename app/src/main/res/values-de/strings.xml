@@ -205,4 +205,10 @@
     <string name="connection_error">Verbindungsfehler</string>
     <string name="cannot_load_content">Inhalt kann nicht geladen werden. Überprüfen Sie Ihre Internetverbindung.</string>
     <string name="error_updating">Fehler beim Aktualisieren</string>
+    <string name="charts">Diagramme</string>
+    <string name="previous_month">Vorheriger Monat</string>
+    <string name="next_month">Nächster Monat</string>
+    <string name="no_transactions_this_month">Es gibt keine Transaktionen in diesem Monat</string>
+    <string name="add_transaction_to_see_charts">Fügen Sie Transaktionen hinzu, um die Diagramme zu sehen</string>
+    <string name="error">Fehler</string>
 </resources>

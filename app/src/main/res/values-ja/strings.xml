@@ -205,4 +205,10 @@
     <string name="connection_error">接続エラー</string>
     <string name="cannot_load_content">コンテンツを読み込めません。インターネット接続を確認してください。</string>
     <string name="error_updating">更新エラー</string>
+    <string name="charts">グラフ</string>
+    <string name="previous_month">前月</string>
+    <string name="next_month">翌月</string>
+    <string name="no_transactions_this_month">今月は取引がありません</string>
+    <string name="add_transaction_to_see_charts">グラフを表示するには取引を追加してください</string>
+    <string name="error">エラー</string>
 </resources>

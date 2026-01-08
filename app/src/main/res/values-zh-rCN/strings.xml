@@ -205,4 +205,10 @@
     <string name="connection_error">连接错误</string>
     <string name="cannot_load_content">无法加载内容。请检查您的互联网连接。</string>
     <string name="error_updating">更新错误</string>
+    <string name="charts">图表</string>
+    <string name="previous_month">上个月</string>
+    <string name="next_month">下个月</string>
+    <string name="no_transactions_this_month">本月没有交易</string>
+    <string name="add_transaction_to_see_charts">添加交易以查看图表</string>
+    <string name="error">错误</string>
 </resources>
