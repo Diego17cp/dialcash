@@ -22,6 +22,8 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
     ViewModel(), TransactionsOperations {
     private val _transactions = MutableLiveData<List<TransactionWithDetails>>()
     val transactions: LiveData<List<TransactionWithDetails>> = _transactions
+    private val _forChartTransactions = MutableLiveData<List<Transaction>>()
+    val forChartTransactions: LiveData<List<Transaction>> = _forChartTransactions
     private val _accounts = MutableLiveData<List<Account>>()
     val accounts: LiveData<List<Account>> = _accounts
     private val _incomeGroups = MutableLiveData<List<IncomeGroup>>()
@@ -62,6 +64,20 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
                 applyFilters()
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching transactions: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    fun fetchTransactionsBetweenDates(startDate: Long, endDate: Long) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val transactions = repository.getTransactionBetween(startDate, endDate).first()
+                _forChartTransactions.value = transactions
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching transactions for charts: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
