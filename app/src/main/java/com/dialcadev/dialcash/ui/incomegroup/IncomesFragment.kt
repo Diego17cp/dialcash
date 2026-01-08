@@ -72,6 +72,22 @@ class IncomesFragment : Fragment() {
                     etInitialBalance.setText(income.amount.toString())
                     "${userData?.currencySymbol ?: "$"} ${"%.2f".format(income.remaining)}"
                         .also { tvIncomeGroupRemaining.text = it }
+                    val remainingText = binding.tvIncomeGroupRemaining
+                    remainingText.post {
+                        val paint = remainingText.paint
+                        val width = paint.measureText(remainingText.text.toString())
+                        val textShader = android.graphics.LinearGradient(
+                            0f, 0f, width, 0f,
+                            intArrayOf(
+                                android.graphics.Color.parseColor("#f7b777"),
+                                android.graphics.Color.parseColor("#cbd5e4")
+                            ),
+                            null,
+                            android.graphics.Shader.TileMode.CLAMP
+                        )
+                        remainingText.paint.shader = textShader
+                        remainingText.invalidate()
+                    }
                     tvCreatedAt.text = getString(R.string.created_at, income.createdAt.toReadableDate())
 
                     fun validateForm() {
