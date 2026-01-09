@@ -21,6 +21,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.dialcadev.dialcash.data.UserDataStore
+import com.dialcadev.dialcash.data.updates.UpdateManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -32,6 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userDataStore: UserDataStore
+
+    @Inject
+    lateinit var updateManager: UpdateManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -53,6 +57,8 @@ class MainActivity : AppCompatActivity() {
                 finish()
                 return@launch
             }
+
+            updateManager.checkForUpdates(activity = this@MainActivity, onUpToDate = {})
 
             enableEdgeToEdge()
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -135,5 +141,10 @@ class MainActivity : AppCompatActivity() {
 
             insets
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updateManager.onActivityDestroyed()
     }
 }
