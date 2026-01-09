@@ -211,4 +211,20 @@
     <string name="no_transactions_this_month">Não há transações este mês</string>
     <string name="add_transaction_to_see_charts">Adicione transações para ver os gráficos</string>
     <string name="error">Erro</string>
+    <string name="update_available">Atualização disponível</string>
+    <string name="new_version">Nova versão</string>
+    <string name="update">Atualizar</string>
+    <string name="later">Mais tarde</string>
+    <string name="updating_app">Atualizando aplicação</string>
+    <string name="downloading_new_version">Descarregando nova versão</string>
+    <string name="app_updates">Atualizações da aplicação</string>
+    <string name="app_update_notifications">Notificações de atualização da aplicação</string>
+    <string name="downloading_update">Descarregando atualização</string>
+    <string name="download_complete">Descarga concluída</string>
+    <string name="install_update_message">A atualização foi descarregada. Deseja instalá-la agora?</string>
+    <string name="install">Instalar</string>
+    <string name="download_failed">Erro ao descarregar a atualização</string>
+    <string name="permission_required">Permissão necessária</string>
+    <string name="install_permission_message">Para instalar atualizações, precisa permitir a instalação de fontes desconhecidas.</string>
+    <string name="grant_permission">Conceder permissão</string>
 </resources>

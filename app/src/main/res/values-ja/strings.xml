@@ -211,4 +211,20 @@
     <string name="no_transactions_this_month">今月は取引がありません</string>
     <string name="add_transaction_to_see_charts">グラフを表示するには取引を追加してください</string>
     <string name="error">エラー</string>
+    <string name="update_available">アップデートが利用可能です</string>
+    <string name="new_version">新しいバージョン</string>
+    <string name="update">更新</string>
+    <string name="later">後で</string>
+    <string name="updating_app">アプリを更新中</string>
+    <string name="downloading_new_version">新しいバージョンをダウンロード中</string>
+    <string name="app_updates">アプリの更新</string>
+    <string name="app_update_notifications">アプリ更新通知</string>
+    <string name="downloading_update">更新をダウンロード中</string>
+    <string name="download_complete">ダウンロード完了</string>
+    <string name="install_update_message">更新がダウンロードされました。今すぐインストールしますか？</string>
+    <string name="install">インストール</string>
+    <string name="download_failed">更新のダウンロードエラー</string>
+    <string name="permission_required">権限が必要です</string>
+    <string name="install_permission_message">更新をインストールするには、提供元不明のアプリのインストールを許可する必要があります。</string>
+    <string name="grant_permission">権限を付与</string>
 </resources>

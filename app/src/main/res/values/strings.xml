@@ -222,4 +222,20 @@
     <string name="no_transactions_this_month">There are not transactions this month</string>
     <string name="add_transaction_to_see_charts">Add transactions to see the charts</string>
     <string name="error">Error</string>
+    <string name="update_available">Update available</string>
+    <string name="new_version">New version</string>
+    <string name="update">Update</string>
+    <string name="later">Later</string>
+    <string name="updating_app">Updating app</string>
+    <string name="downloading_new_version">Downloading new version</string>
+    <string name="app_updates">App updates</string>
+    <string name="app_update_notifications">App update notifications</string>
+    <string name="downloading_update">Downloading update</string>
+    <string name="download_complete">Download Complete</string>
+    <string name="install_update_message">The update has been downloaded. Would you like to install it now?</string>
+    <string name="install">Install</string>
+    <string name="download_failed">Error downloading the update</string>
+    <string name="permission_required">Permission required</string>
+    <string name="install_permission_message">To install updates, you need to allow installation from unknown sources.</string>
+    <string name="grant_permission">Grant permission</string>
 </resources>

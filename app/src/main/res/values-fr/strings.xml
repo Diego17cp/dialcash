@@ -208,7 +208,23 @@
     <string name="charts">Graphiques</string>
     <string name="previous_month">Mois précédent</string>
     <string name="next_month">Mois suivant</string>
-    <string name="no_transactions_this_month">Il n'y a pas de transactions ce mois-ci</string>
+    <string name="no_transactions_this_month">Il n\'\y a pas de transactions ce mois-ci</string>
     <string name="add_transaction_to_see_charts">Ajoutez des transactions pour voir les graphiques</string>
     <string name="error">Erreur</string>
+    <string name="update_available">Mise à jour disponible</string>
+    <string name="new_version">Nouvelle version</string>
+    <string name="update">Mettre à jour</string>
+    <string name="later">Plus tard</string>
+    <string name="updating_app">Mise à jour de l\'application</string>
+    <string name="downloading_new_version">Téléchargement de la nouvelle version</string>
+    <string name="app_updates">Mises à jour de l\'application</string>
+    <string name="app_update_notifications">Notifications de mise à jour de l\'application</string>
+    <string name="downloading_update">Téléchargement de la mise à jour</string>
+    <string name="download_complete">Téléchargement terminé</string>
+    <string name="install_update_message">La mise à jour a été téléchargée. Voulez-vous l\'installer maintenant?</string>
+    <string name="install">Installer</string>
+    <string name="download_failed">Erreur lors du téléchargement de la mise à jour</string>
+    <string name="permission_required">Permission requise</string>
+    <string name="install_permission_message">Pour installer les mises à jour, vous devez autoriser l\'installation à partir de sources inconnues.</string>
+    <string name="grant_permission">Accorder la permission</string>
 </resources>

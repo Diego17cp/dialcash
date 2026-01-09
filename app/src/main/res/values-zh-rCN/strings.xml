@@ -211,4 +211,20 @@
     <string name="no_transactions_this_month">本月没有交易</string>
     <string name="add_transaction_to_see_charts">添加交易以查看图表</string>
     <string name="error">错误</string>
+    <string name="update_available">可用更新</string>
+    <string name="new_version">新版本</string>
+    <string name="update">更新</string>
+    <string name="later">稍后</string>
+    <string name="updating_app">正在更新应用</string>
+    <string name="downloading_new_version">正在下载新版本</string>
+    <string name="app_updates">应用更新</string>
+    <string name="app_update_notifications">应用更新通知</string>
+    <string name="downloading_update">正在下载更新</string>
+    <string name="download_complete">下载完成</string>
+    <string name="install_update_message">更新已下载。您想现在安装吗？</string>
+    <string name="install">安装</string>
+    <string name="download_failed">下载更新时出错</string>
+    <string name="permission_required">需要权限</string>
+    <string name="install_permission_message">要安装更新，您需要允许从未知来源安装。</string>
+    <string name="grant_permission">授予权限</string>
 </resources>
