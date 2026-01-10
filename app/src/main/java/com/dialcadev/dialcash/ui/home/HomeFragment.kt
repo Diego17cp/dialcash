@@ -146,9 +146,6 @@ class HomeFragment : Fragment() {
         binding.btnToggleEye.setOnClickListener {
             lifecycleScope.launch {
                 userDataStore.toggleBalanceVisibility()
-                val isVisible = userData?.let { !it.isBalanceVisible } ?: true
-                userData = userData?.copy(isBalanceVisible = isVisible)
-                updateBalanceVisibility(isVisible)
             }
         }
     }
@@ -197,14 +194,12 @@ class HomeFragment : Fragment() {
                     accountsAdapter.updateCurrencySymbol(symbol)
                     transactionsAdapter.updateCurrencySymbol(symbol)
                 }
-                viewModel.totalBalance.value?.let { total ->
-                    binding.textTotalBalance.text = "${userData?.currencySymbol ?: "$"} $total"
-                }
+                updateBalanceVisibility(user.isBalanceVisible)
             }
         }
         viewModel.totalBalance.observe(viewLifecycleOwner) { total ->
-            "${userData?.currencySymbol ?: "$"} $total".also {
-                binding.textTotalBalance.text = it
+            userData?.let { userData ->
+                updateBalanceVisibility(userData.isBalanceVisible)
             }
         }
         viewModel.mainAccounts.observe(viewLifecycleOwner) { accounts ->
