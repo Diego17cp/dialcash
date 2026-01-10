@@ -101,7 +101,7 @@ class UpdateManager @Inject constructor(
         Handler(Looper.getMainLooper()).post {
             AlertDialog.Builder(activity)
                 .setTitle(R.string.update_available)
-                .setMessage("${activity.getString(R.string.new_version)} ${release.tag_name}\n\n${release.body}")
+                .setMessage("${activity.getString(R.string.new_version)} ${release.tag_name}\n\n${release.name}")
                 .setCancelable(true)
                 .setPositiveButton(R.string.update) { _, _ ->
                     checkInstallPermissionAndDownload(apkUrl)
