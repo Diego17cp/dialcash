@@ -19,7 +19,7 @@ fun String.fromISOToReadable(): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).apply {
             timeZone = java.util.TimeZone.getTimeZone("UTC")
         }
-        val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
         val date = inputFormat.parse(this)
         date?.let { outputFormat.format(it) } ?: this
     } catch (e: Exception) {

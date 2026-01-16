@@ -9,4 +9,8 @@
     <color name="surface">#1E1E1E</color>
     <color name="text_primary">#FFFFFF</color>
     <color name="text_secondary">#CCCCCC</color>
+    <!-- Blog category colors -->
+    <color name="category_release">#804CAF50</color>
+    <color name="category_fix">#80FF9800</color>
+    <color name="category_other">#802196F3</color>
 </resources>

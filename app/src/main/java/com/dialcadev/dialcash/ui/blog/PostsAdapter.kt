@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.data.dto.BlogPostPreview
+import com.dialcadev.dialcash.utils.capitalize
 import com.dialcadev.dialcash.utils.fromISOToReadable
 import com.dialcadev.dialcash.utils.toReadableDate
 import com.google.android.material.chip.Chip
@@ -41,9 +42,16 @@ class PostsAdapter(
         private val chipCategory: Chip = itemView.findViewById(R.id.chipCategory)
 
         fun bind(post: BlogPostPreview) {
+            val categoryBg = when (post.category.lowercase()) {
+                "release" -> R.color.category_release
+                "fix" -> R.color.category_fix
+                // More categories if I think of any xd
+                else -> R.color.category_other
+            }
             tvPostTitle.text = post.title
             tvPostDescription.text = post.description
-            chipCategory.text = post.category
+            chipCategory.text = post.category.capitalize()
+            chipCategory.setChipBackgroundColorResource(categoryBg)
             chipDate.text = post.publishedAt.fromISOToReadable()
             Glide.with(itemView.context)
                 .load(post.portrait)

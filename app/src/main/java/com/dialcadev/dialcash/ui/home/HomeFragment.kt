@@ -153,7 +153,7 @@ class HomeFragment : Fragment() {
     private fun updateBalanceVisibility(isVisible: Boolean) {
         val totalBalance = viewModel.totalBalance.value ?: 0.00
         val formattedBalance = if (isVisible) {
-            "${userData?.currencySymbol ?: "$"} $totalBalance"
+            "${userData?.currencySymbol ?: "$"} ${String.format("%.2f", totalBalance)}"
         } else {
             val balanceParts = String.format("%.2f", totalBalance).split(".")
             "${userData?.currencySymbol ?: "$"} ****.${balanceParts[1]}"

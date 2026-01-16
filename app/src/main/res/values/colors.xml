@@ -21,5 +21,10 @@
     <color name="positive_balance_transparent">#804CAF50</color> <!-- 50% alpha de positive_balance -->
     <color name="negative_balance_transparent">#80F44336</color>
 
+    <!-- Blog category colors -->
+    <color name="category_release">#8081C784</color>
+    <color name="category_fix">#80FFB74D</color>
+    <color name="category_other">#8064B5F6</color>
+
     <color name="ic_launcher_background">#01223f</color>
 </resources>
