@@ -1,0 +1,89 @@
+package com.dialcadev.dialcash.features.accounts.data.dao
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Update
+import com.dialcadev.dialcash.data.dto.AccountBalance
+import com.dialcadev.dialcash.features.accounts.domain.dtos.AccountBalanceWithOriginal
+import com.dialcadev.dialcash.features.accounts.domain.models.Account
+
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface AccountDao {
+    @Query("INSERT INTO accounts (name, type, balance) VALUES (:name, :type, :balance)")
+    suspend fun insert(name: String, type: String, balance: Double): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertBatch(accounts: List<Account>)
+
+    @Query("UPDATE accounts SET name = :name, type = :type, balance = :balance WHERE id = :id")
+    suspend fun updateAccount(id: Int, name: String, type: String, balance: Double)
+
+    @Delete
+    suspend fun delete(account: Account)
+
+    @Query("SELECT * FROM accounts ORDER BY id ASC")
+    fun getAllAccounts(): Flow<List<Account>>
+
+    @Query("SELECT * FROM accounts WHERE id = :accountId LIMIT 1")
+    suspend fun getAccountById(accountId: Int): Account?
+
+    @Query("SELECT * FROM accounts WHERE name LIKE :name LIMIT 1")
+    suspend fun getAccountByName(name: String): Account?
+
+    @Query("SELECT COUNT(*) FROM accounts")
+    suspend fun getAccountCount(): Int
+
+    @Query("SELECT * FROM accounts WHERE type IN ('bank', 'card', 'cash', 'wallet') ORDER BY name ASC")
+    fun getMainAccounts(): Flow<List<Account>>
+
+    @Query("""
+        SELECT a.id, a.name, a.type, a.balance as originalBalance, a.created_at as createdAt,
+        a.balance + IFNULL(SUM(
+            CASE 
+                WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 
+            END
+        ), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        WHERE a.type IN ('bank', 'card', 'cash', 'wallet')
+        GROUP BY a.id
+    """)
+    fun getMainAccountBalances(): Flow<List<AccountBalanceWithOriginal>>
+
+    @Query("""
+        SELECT a.id, a.name, a.type, a.balance as originalBalance, a.created_at as createdAt,
+        a.balance + IFNULL(SUM(
+            CASE WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 END), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        GROUP BY a.id
+    """)
+    fun getAccountBalances(): Flow<List<AccountBalanceWithOriginal>>
+
+    @Query("""
+        SELECT a.balance + IFNULL(SUM(
+            CASE WHEN t.type = 'income' THEN t.amount
+                WHEN t.type = 'expense' THEN -t.amount
+                WHEN t.type = 'transfer' AND t.account_id = a.id THEN -t.amount
+                WHEN t.type = 'transfer' AND t.transfer_account_id = a.id THEN t.amount
+                ELSE 0 END), 0) AS balance
+        FROM accounts a
+        LEFT JOIN transactions t ON (a.id = t.account_id OR a.id = t.transfer_account_id)
+        WHERE a.id = :accountId
+        GROUP BY a.id
+    """)
+    suspend fun getAccountBalance(accountId: Int) : Double?
+}
