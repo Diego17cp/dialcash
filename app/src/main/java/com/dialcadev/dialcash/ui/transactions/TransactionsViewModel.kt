@@ -163,6 +163,9 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
         _searchQuery.value = query
         applyFilters()
     }
+    fun getSearchQuery(): String {
+        return _searchQuery.value ?: ""
+    }
 
     fun setTypesFilter(types: List<String>) {
         _typesFilter.value = types

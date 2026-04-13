@@ -110,6 +110,7 @@ class TransactionsFragment : Fragment() {
         bottomSheetDialog.show()
 
         val etSearch = bottomSheetView.findViewById<TextInputEditText>(R.id.etSearch)
+        etSearch.setText(viewModel.getSearchQuery())
         etSearch.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
                 val query = etSearch.text.toString()
@@ -273,6 +274,8 @@ class TransactionsFragment : Fragment() {
         }
         val btnApplyFilters = bottomSheetView.findViewById<MaterialButton>(R.id.btnApplyFilters)
         btnApplyFilters.setOnClickListener {
+            val query = etSearch.text.toString()
+            viewModel.setSearchQuery(query)
             bottomSheetDialog.dismiss()
         }
     }
