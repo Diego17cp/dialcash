@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.room.withTransaction
+import com.dialcadev.dialcash.BuildConfig
 
 @Singleton
 class BackupManager @Inject constructor(
@@ -39,7 +40,7 @@ class BackupManager @Inject constructor(
                 val bundle = BackupBundleDto(
                     metadata = BackupMetadata(
                         schemaVersion = 1,
-                        appVersion = "1.0.0",
+                        appVersion = BuildConfig.VERSION_NAME,
                         exportedAt = System.currentTimeMillis(),
                         totalAccounts = accounts.size,
                         totalTransactions = transactions.size,
