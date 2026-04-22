@@ -82,6 +82,21 @@ interface AccountDao {
         GROUP BY a.id
     """)
     suspend fun getAccountBalance(accountId: Int) : Double?
+
+    @Query("""
+        SELECT 
+            (SELECT balance FROM accounts WHERE id = :accountId) 
+            + COALESCE((SELECT SUM(
+                CASE 
+                    WHEN type = 'income' THEN amount
+                    WHEN type = 'expense' THEN -amount
+                    WHEN type = 'transfer' AND account_id = :accountId THEN -amount
+                    WHEN type = 'transfer' AND transfer_account_id = :accountId THEN amount
+                    ELSE 0 
+                END
+            ) FROM transactions WHERE (account_id = :accountId OR transfer_account_id = :accountId) AND date <= :targetDate), 0)
+    """)
+    suspend fun getBalanceAtDate(accountId: Int, targetDate: Long): Double
 }
 
 data class AccountBalanceWithOriginal(

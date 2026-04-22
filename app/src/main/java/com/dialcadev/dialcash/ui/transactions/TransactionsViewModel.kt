@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.data.AppRepository
 import com.dialcadev.dialcash.data.ValidationResult
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.data.dto.TransactionWithDetails
 import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.data.entities.IncomeGroup
@@ -15,6 +16,7 @@ import com.dialcadev.dialcash.ui.shared.contracts.TransactionsOperations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,9 +28,15 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
     val forChartTransactions: LiveData<List<Transaction>> = _forChartTransactions
     private val _accounts = MutableLiveData<List<Account>>()
     val accounts: LiveData<List<Account>> = _accounts
+    private val _accountBalances = MutableLiveData<List<AccountBalanceWithOriginal>>()
+    val accountBalances: LiveData<List<AccountBalanceWithOriginal>> = _accountBalances
+    private val _specificDateBalance = MutableLiveData<Double>()
+    val specificDateBalance: LiveData<Double> = _specificDateBalance
+
+    private val _specificDateTransactions = MutableLiveData<List<TransactionWithDetails>>()
+    val specificDateTransactions: LiveData<List<TransactionWithDetails>> = _specificDateTransactions
     private val _incomeGroups = MutableLiveData<List<IncomeGroup>>()
     val incomeGroups: LiveData<List<IncomeGroup>> = _incomeGroups
-
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
@@ -50,6 +58,7 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
     init {
         fetchTransactions()
         fetchAccounts()
+        fetchAccountBalances()
     }
 
     fun fetchTransactions() {
@@ -94,6 +103,61 @@ class TransactionsViewModel @Inject constructor(private val repository: AppRepos
                 _errorMessage.value = "Error fetching accounts: ${e.message}"
             }
         }
+    }
+    fun fetchAccountBalances() {
+        viewModelScope.launch {
+            try {
+                repository.getAllAccountBalances().collect { accounts ->
+                    _accountBalances.value = accounts
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching account balances: ${e.message}"
+            }
+        }
+    }
+    fun fetchBalanceAtDate(accountId: Int, targetDate: Long) {
+        viewModelScope.launch {
+//            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val calendar = Calendar.getInstance().apply { timeInMillis = targetDate }
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfDay = calendar.timeInMillis
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                calendar.set(Calendar.MILLISECOND, 999)
+                val endOfDay = calendar.timeInMillis
+                val balance = repository.getBalanceAtDate(accountId, targetDate)
+                _specificDateBalance.value = balance
+                repository.getTransactionsForAccountBetween(accountId, startOfDay, endOfDay).collect { transactions ->
+                    _specificDateTransactions.value = transactions.map { tx ->
+                        TransactionWithDetails(
+                            id = tx.id,
+                            amount = tx.amount,
+                            type = tx.type,
+                            date = tx.date,
+                            description = tx.description,
+                            accountName = repository.getAccountById(tx.accountId)?.name ?: "",
+                            accountToName = repository.getAccountById(tx.transferAccountId ?: 0)?.name ?: "",
+                            incomeGroupName = repository.getIncomeGroupById(tx.relatedIncomeId ?: 0)?.name ?: ""
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching balance at date: ${e.message}"
+                Log.d("TransactionsViewModel", "fetchBalanceAtDate: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+    fun clearDateSearch() {
+        _specificDateBalance.value = 0.0
+        _specificDateTransactions.value = emptyList()
     }
     fun loadIncomeGroups() {
         viewModelScope.launch {
