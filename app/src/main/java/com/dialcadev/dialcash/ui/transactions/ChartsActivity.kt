@@ -1,15 +1,32 @@
 package com.dialcadev.dialcash.ui.transactions
 
+import android.app.DatePickerDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.data.UserData
+import com.dialcadev.dialcash.data.UserDataStore
+import com.dialcadev.dialcash.data.dao.AccountBalanceWithOriginal
+import com.dialcadev.dialcash.data.entities.Account
 import com.dialcadev.dialcash.databinding.ChartsActivityBinding
+import com.dialcadev.dialcash.ui.accounts.SelectorAccountAdapter
+import com.github.AAChartModel.AAChartCore.AAChartCreator.AAChartModel
+import com.github.AAChartModel.AAChartCore.AAChartCreator.AASeriesElement
+import com.github.AAChartModel.AAChartCore.AAChartEnum.AAChartStackingType
+import com.github.AAChartModel.AAChartCore.AAChartEnum.AAChartType
+import com.github.AAChartModel.AAChartCore.AAOptionsModel.AAStyle
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
@@ -18,15 +35,27 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.datepicker.MaterialDatePicker
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChartsActivity : AppCompatActivity() {
+    @Inject
+    lateinit var userDataStore: UserDataStore
+    private var userData: UserData? = null
     private lateinit var binding: ChartsActivityBinding
+    private lateinit var transactionsAdapter: TransactionsAdapter
     private val viewModel: TransactionsViewModel by viewModels()
+    private var accountsList: List<AccountBalanceWithOriginal> = emptyList()
+    private var selectedAccountId: Int? = null
+    private var selectedDate: Long? = null
 
     object ChartColors {
         val EXPENSE = "#FF4D4D".toColorInt()
@@ -47,12 +76,17 @@ class ChartsActivity : AppCompatActivity() {
         binding = ChartsActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lifecycleScope.launch {
+            userDataStore.getUserData().collect { user -> userData = user }
+        }
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel)
         }
         setupListeners()
+        setupTransactionsRecyclerView()
         setupObservers()
         updateMonthUI()
     }
@@ -63,7 +97,43 @@ class ChartsActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+    private fun setupTransactionsRecyclerView() {
+        transactionsAdapter = TransactionsAdapter(
+            onTransactionClick = { transaction ->
+                // Handle transaction click if needed
+            },
+            currencySymbol = userData?.currencySymbol ?: "$"
+        )
+        binding.recyclerViewTransactions.apply {
+            layoutManager = LinearLayoutManager(this@ChartsActivity)
+            adapter = transactionsAdapter
+        }
+    }
     private fun setupObservers() {
+        viewModel.accountBalances.observe(this) { accounts ->
+            accountsList = accounts
+            if (accounts.isNotEmpty() && selectedAccountId == null) {
+                val firstAccount = accounts.first()
+                selectedAccountId = firstAccount.id
+                binding.tvAccountName.text = firstAccount.name
+            }
+        }
+        viewModel.specificDateBalance.observe(this) { balance ->
+            balance.let {
+                val formattedBalance = "${userData?.currencySymbol ?: "$"} ${String.format("%.2f", it)}"
+                binding.tvBalance.text = formattedBalance
+            }
+        }
+        viewModel.specificDateTransactions.observe(this) { transactions ->
+            transactionsAdapter.submitList(transactions)
+            if (transactions.isEmpty()) {
+                binding.layoutTransactions.visibility = View.GONE
+                binding.layoutNoInfo.visibility = View.VISIBLE
+            } else {
+                binding.layoutTransactions.visibility = View.VISIBLE
+                binding.layoutNoInfo.visibility = View.GONE
+            }
+        }
         viewModel.forChartTransactions.observe(this) { transactions ->
             if (transactions.isEmpty()) {
                 showEmptyState()
@@ -79,7 +149,6 @@ class ChartsActivity : AppCompatActivity() {
                 showContent()
             }
         }
-
         viewModel.isLoading.observe(this) { isLoading ->
             if (isLoading) showLoading() else hideLoading()
         }
@@ -89,12 +158,23 @@ class ChartsActivity : AppCompatActivity() {
             }
         }
     }
-
     private fun showContent() {
         binding.contentLayout.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
         binding.emptyStateLayout.visibility = View.GONE
         binding.errorStateLayout.visibility = View.GONE
+    }
+    private fun checkAndFetchDateBalance() {
+        val accountId = selectedAccountId
+        val date = selectedDate
+        if (accountId != null && date != null) {
+            viewModel.fetchBalanceAtDate(accountId, date)
+            binding.layoutDateData.visibility = View.VISIBLE
+            binding.btnClearSearch.visibility = View.VISIBLE
+        } else {
+            binding.layoutDateData.visibility = View.GONE
+            binding.btnClearSearch.visibility = View.GONE
+        }
     }
 
     private fun showLoading() {
@@ -137,7 +217,66 @@ class ChartsActivity : AppCompatActivity() {
         binding.btnRetry.setOnClickListener {
             loadChartData()
         }
+        binding.accountSelector.setOnClickListener { showAccountSelector() }
+        binding.dateSelector.setOnClickListener { showDatePicker() }
+        binding.etDate.setOnClickListener { showDatePicker() }
+        binding.btnClearSearch.setOnClickListener {
+            selectedAccountId = null
+            selectedDate = null
+            binding.tvAccountName.text = getString(R.string.select_valid_acc)
+            binding.tvDateValue.text = getString(R.string.today)
+            binding.btnClearSearch.visibility = View.GONE
+            binding.layoutDateData.visibility = View.GONE
+            viewModel.clearDateSearch()
+        }
+        binding.btnViewAllTransactions.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
     }
+        private fun showDatePicker() {
+            val calendar = Calendar.getInstance()
+            val datePickerDialog = DatePickerDialog(
+                this,
+                { _, year, month, dayOfMonth ->
+                    calendar.set(year, month, dayOfMonth)
+                    selectedDate = calendar.timeInMillis
+                    if (selectedAccountId != null) {
+                        checkAndFetchDateBalance()
+                    }
+                    binding.etDate.setText(SimpleDateFormat("dd/MM/YYYY").format(calendar.time))
+                    binding.tvDateValue.text = SimpleDateFormat("dd MMMM yyyy", Locale(System.getProperty("user.language") ?: "en"))
+                        .format(calendar.time)
+                        .replaceFirstChar { it.uppercase() }
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.show()
+        }
+
+        private fun showAccountSelector() {
+            val dialog = BottomSheetDialog(this)
+            val view = LayoutInflater.from(this)
+                .inflate(R.layout.accounts_selector_bottomsheet, null)
+            val rv = view.findViewById<RecyclerView>(R.id.rvAccounts)
+            rv.layoutManager = LinearLayoutManager(this)
+            val adapter = SelectorAccountAdapter(
+                onClick = { selected ->
+                    selectedAccountId = selected.id
+                    if (selectedDate != null) {
+                        checkAndFetchDateBalance()
+                    }
+                    binding.tvAccountName.text = selected.name
+                    dialog.dismiss()
+                },
+                currencySymbol = userData?.currencySymbol ?: "$"
+            )
+            rv.adapter = adapter
+            adapter.submitList(accountsList)
+            dialog.setContentView(view)
+            dialog.show()
+        }
 
     private fun updateMonthUI() {
         val monthFormat = SimpleDateFormat("MMMM yyyy", Locale(System.getProperty("user.language") ?: "en"))
@@ -148,79 +287,38 @@ class ChartsActivity : AppCompatActivity() {
     }
 
     private fun setupChart(income: Float, expense: Float, transfer: Float) {
-        val entriesIncome = BarEntry(0f, income)
-        val entriesExpense = BarEntry(1f, expense)
-        val entriesTransfer = BarEntry(2f, transfer)
-
-        val incomeSet = BarDataSet(listOf(entriesIncome), "").apply {
-            color = ChartColors.INCOME
-            valueTextColor = Color.TRANSPARENT
-        }
-
-        val expenseSet = BarDataSet(listOf(entriesExpense), "").apply {
-            color = ChartColors.EXPENSE
-            valueTextColor = Color.TRANSPARENT
-        }
-
-        val transferSet = BarDataSet(listOf(entriesTransfer), "").apply {
-            color = ChartColors.TRANSFER
-            valueTextColor = Color.TRANSPARENT
-        }
-
-        val data = BarData(incomeSet, expenseSet, transferSet)
-        data.barWidth = 0.5f
-
-        binding.barChart.apply {
-            this.data = data
-            description.isEnabled = false
-            legend.isEnabled = false
-            axisRight.isEnabled = false
-
-            axisLeft.apply {
-                textColor = getColor(R.color.text_secondary)
-                gridColor = Color.TRANSPARENT
-                axisMinimum = 0f
-            }
-
-            xAxis.apply {
-                valueFormatter = IndexAxisValueFormatter(
-                    listOf(
-                        getString(R.string.incomes),
-                        getString(R.string.expenses),
-                        getString(R.string.transfers)
-                    )
+        val isDarkMode = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val textColor = if (isDarkMode) "#FFFFFF" else "#333333"
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
+        val surfaceColorHex = String.format("#%06X", 0xFFFFFF and typedValue.data)
+        val model = AAChartModel()
+            .chartType(AAChartType.Pie)
+            .title("")
+            .backgroundColor(surfaceColorHex)
+            .dataLabelsEnabled(true)
+            .dataLabelsStyle(AAStyle().color(textColor))
+            .legendEnabled(true)
+            .colorsTheme(arrayOf("#4CAF50", "#FF4D4D", "#2196F3"))
+            .series(
+                arrayOf(
+                    AASeriesElement()
+                        .name(getString(R.string.til_amount))
+                        .innerSize("60%")
+                        .data(
+                            arrayOf(
+                                arrayOf(getString(R.string.incomes), income),
+                                arrayOf(getString(R.string.expenses), expense),
+                                arrayOf(getString(R.string.transfers), transfer)
+                            )
+                        )
                 )
-                position = XAxis.XAxisPosition.BOTTOM
-                textColor = getColor(R.color.text_secondary)
-                setDrawGridLines(false)
-                granularity = 1f
-                labelCount = 3
-            }
-            setDrawValueAboveBar(true)
-            setTouchEnabled(true)
-            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry?, h: Highlight?) {
-                    e?.let {
-                        val value = it.y
-                        val type = when (it.x.toInt()) {
-                            0 -> getString(R.string.incomes)
-                            1 -> getString(R.string.expenses)
-                            2 -> getString(R.string.transfers)
-                            else -> ""
-                        }
-                        Toast.makeText(
-                            this@ChartsActivity,
-                            "$type: ${String.format("%.2f", value)}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-                override fun onNothingSelected() {
-                }
-            })
-            animateY(600)
-            invalidate()
-        }
+            )
+
+        val options = model.aa_toAAOptions()
+        options.legend?.itemStyle?.color(textColor)
+
+        binding.speciaAreaChart.aa_drawChartWithChartOptions(options)
     }
 
     private fun loadChartData() {
