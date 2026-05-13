@@ -1,7 +1,7 @@
 package com.dialcadev.dialcash.core.di
 
 import android.content.Context
-import com.dialcadev.dialcash.data.UserDataStore
+import com.dialcadev.dialcash.core.datastore.UserDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
