@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
+
 class UserDataStore @Inject constructor(private val context: Context) {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_prefs")
 
     companion object {
         private val USER_NAME = stringPreferencesKey("user_name")
