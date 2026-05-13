@@ -167,6 +167,7 @@
     <string name="created_at">作成日：%1$s</string>
     <string name="skip">スキップ</string>
     <string name="next">次へ</string>
+    <string name="finish">完了</string>
     <string name="onb_title_1">DialCashへようこそ</string>
     <string name="onb_subtitle_1">口座管理、支出追跡、財務目標の達成を簡単にサポートするあなたの個人財務パートナーです。</string>
     <string name="onb_title_2">複数アカウント</string>

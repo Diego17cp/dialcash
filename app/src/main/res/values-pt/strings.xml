@@ -167,6 +167,7 @@
     <string name="created_at">Criado em: %1$s</string>
     <string name="skip">Pular</string>
     <string name="next">Próximo</string>
+    <string name="finish">Finalizar</string>
     <string name="onb_title_1">Bem-vindo ao DialCash</string>
     <string name="onb_subtitle_1">Seu companheiro de finanças pessoais que ajuda a gerir contas, rastrear despesas e alcançar seus objetivos financeiros sem esforço.</string>
     <string name="onb_title_2">Múltiplas Contas</string>
