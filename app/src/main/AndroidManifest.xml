@@ -37,7 +37,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
-            android:name=".FirstAccountActivity"
+            android:name=".features.accounts.presentation.ui.FirstAccountActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Dialcash"
@@ -45,7 +45,7 @@
         <activity android:name=".NewTransactionActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
-            android:name=".ui.accounts.NewAccountActivity"
+            android:name=".features.accounts.presentation.ui.NewAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".SettingsActivity"
             android:theme="@style/Base.Theme.Dialcash" />
