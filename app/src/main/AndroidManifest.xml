@@ -27,19 +27,18 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".features.onboarding.presentation.ui.OnboardingActivity"
+            android:theme="@style/Base.Theme.Dialcash" />
         <activity
             android:name=".RegisterActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
             android:name=".features.accounts.presentation.ui.FirstAccountActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/Base.Theme.Dialcash"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".NewTransactionActivity"
@@ -58,8 +57,6 @@
         <activity android:name=".DownloadDataActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".ImportDataActivity"
-            android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".OnboardingActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".ui.transactions.ChartsActivity"
             android:theme="@style/Base.Theme.Dialcash" />
