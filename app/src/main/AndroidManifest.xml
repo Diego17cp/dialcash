@@ -33,7 +33,7 @@
         <activity android:name=".features.onboarding.presentation.ui.OnboardingActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".features.register.presentation.ui.RegisterActivity"
             android:exported="false"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
