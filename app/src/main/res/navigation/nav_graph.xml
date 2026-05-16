@@ -26,7 +26,7 @@
         android:label="@string/incomes_toolbar_t" />
     <fragment
         android:id="@+id/blogFragment"
-        android:name="com.dialcadev.dialcash.ui.blog.BlogFragment"
+        android:name="com.dialcadev.dialcash.features.blog.presentation.ui.BlogFragment"
         tools:layout="@layout/fragment_blog"
         android:label="Blog" />
 </navigation>
