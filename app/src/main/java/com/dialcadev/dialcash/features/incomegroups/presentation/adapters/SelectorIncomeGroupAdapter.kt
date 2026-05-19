@@ -1,0 +1,55 @@
+package com.dialcadev.dialcash.features.incomegroups.presentation.adapters
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
+import com.dialcadev.dialcash.databinding.ItemIncomeGroupBinding
+import com.dialcadev.dialcash.features.incomegroups.domain.dtos.IncomeGroupRemaining
+
+class SelectorIncomeGroupAdapter(
+    private val onClick: (IncomeGroupRemaining) -> Unit,
+    currencySymbol: String
+): ListAdapter<IncomeGroupRemaining, SelectorIncomeGroupAdapter.IncomesViewHolder>(IncomeDiffCallback()) {
+    private var currentCurrencySymbol = currencySymbol
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IncomesViewHolder {
+        val binding =
+            ItemIncomeGroupBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return IncomesViewHolder(binding)
+    }
+    override fun onBindViewHolder(holder: IncomesViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+    inner class IncomesViewHolder(private val binding: ItemIncomeGroupBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(income: IncomeGroupRemaining) {
+            binding.apply {
+                textIncomeName.text = income.name
+                "$currentCurrencySymbol ${income.remaining.toCurrencyFormat()}"
+                    .also { textIncomeRemaining.text = it }
+                val formattedBalance = "$currentCurrencySymbol ${income.amount.toCurrencyFormat()}"
+                textIncomeBalance.text = root.context.getString(
+                    R.string.original_balance_with_value,
+                    formattedBalance
+                )
+                root.setOnClickListener { onClick(income) }
+            }
+        }
+    }
+
+    private class IncomeDiffCallback : DiffUtil.ItemCallback<IncomeGroupRemaining>() {
+        override fun areContentsTheSame(oldItem: IncomeGroupRemaining, newItem: IncomeGroupRemaining): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areItemsTheSame(oldItem: IncomeGroupRemaining, newItem: IncomeGroupRemaining): Boolean {
+            return oldItem == newItem
+        }
+    }
+}
