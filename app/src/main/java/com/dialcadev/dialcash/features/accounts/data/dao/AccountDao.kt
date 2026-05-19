@@ -5,8 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
-import com.dialcadev.dialcash.data.dto.AccountBalance
 import com.dialcadev.dialcash.features.accounts.domain.dtos.AccountBalanceWithOriginal
 import com.dialcadev.dialcash.features.accounts.domain.models.Account
 
