@@ -2,7 +2,6 @@ package com.dialcadev.dialcash.core.di
 
 import android.content.Context
 import com.dialcadev.dialcash.core.database.AppDB
-import com.dialcadev.dialcash.features.accounts.data.dao.AccountDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,7 +18,11 @@ object DatabaseModule {
         return AppDB.getInstance(context)
     }
     @Provides
-    fun provideAccountDao(db: AppDB): AccountDao {
-        return db.accountDao()
-    }
+    fun provideAccountDao(db: AppDB) = db.accountDao()
+    @Provides
+    fun provideTransactionDao(db: AppDB) = db.transactionDao()
+    @Provides
+    fun provideIncomeGroupDao(db: AppDB) = db.incomeGroupDao()
+    @Provides
+    fun provideCheckpointDao(db: AppDB) = db.checkpointDao()
 }
