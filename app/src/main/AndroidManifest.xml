@@ -41,7 +41,7 @@
             android:exported="false"
             android:theme="@style/Base.Theme.Dialcash"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".NewTransactionActivity"
+        <activity android:name=".features.transactions.presentation.ui.NewTransactionActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity
             android:name=".features.accounts.presentation.ui.NewAccountActivity"
