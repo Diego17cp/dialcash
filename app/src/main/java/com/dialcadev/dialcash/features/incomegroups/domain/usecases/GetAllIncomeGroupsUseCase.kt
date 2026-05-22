@@ -8,7 +8,7 @@ import javax.inject.Inject
 class GetAllIncomeGroupsUseCase @Inject constructor(
     private val repository: IncomeGroupRepository
 ) {
-    suspend operator fun invoke(): Flow<List<IncomeGroup>> {
+    operator fun invoke(): Flow<List<IncomeGroup>> {
         return repository.getAllIncomeGroups()
     }
 }
