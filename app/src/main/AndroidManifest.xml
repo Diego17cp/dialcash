@@ -48,7 +48,7 @@
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".SettingsActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".NewIncomeActivity"
+        <activity android:name=".features.incomegroups.presentation.ui.NewIncomeGroupActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".EditProfileActivity"
             android:theme="@style/Base.Theme.Dialcash" />
