@@ -154,7 +154,7 @@ class NewTransactionActivity : AppCompatActivity() {
 
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
-        DatePickerDialog(
+        val datePicker = DatePickerDialog(
             this,
             { _, year, month, dayOfMonth ->
                 calendar.set(year, month, dayOfMonth)
@@ -166,6 +166,7 @@ class NewTransactionActivity : AppCompatActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
+        datePicker.show()
     }
 
     private fun observeViewModel() {
