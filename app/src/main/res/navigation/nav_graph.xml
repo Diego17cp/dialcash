@@ -11,7 +11,7 @@
         android:label="DialCash" />
     <fragment
         android:id="@+id/transactionsFragment"
-        android:name="com.dialcadev.dialcash.ui.transactions.TransactionsFragment"
+        android:name="com.dialcadev.dialcash.features.transactions.presentation.ui.TransactionsFragment"
         tools:layout="@layout/fragment_transactions"
         android:label="@string/transactions_toolbar_t" />
     <fragment
