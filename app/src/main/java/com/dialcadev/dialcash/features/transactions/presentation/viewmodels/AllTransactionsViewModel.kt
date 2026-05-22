@@ -2,7 +2,7 @@ package com.dialcadev.dialcash.features.transactions.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dialcadev.dialcash.features.accounts.domain.usecases.DeleteTransactionUseCase
+import com.dialcadev.dialcash.features.transactions.domain.usecases.DeleteTransactionUseCase
 import com.dialcadev.dialcash.features.accounts.domain.usecases.GetAllAccountsUseCase
 import com.dialcadev.dialcash.features.incomegroups.domain.usecases.GetAllIncomeGroupsUseCase
 import com.dialcadev.dialcash.features.transactions.domain.models.Transaction

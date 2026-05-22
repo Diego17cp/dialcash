@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dialcadev.dialcash.features.accounts.domain.models.Account
 import com.dialcadev.dialcash.features.accounts.domain.usecases.DeleteAccountUseCase
-import com.dialcadev.dialcash.features.accounts.domain.usecases.DeleteTransactionUseCase
+import com.dialcadev.dialcash.features.transactions.domain.usecases.DeleteTransactionUseCase
 import com.dialcadev.dialcash.features.accounts.domain.usecases.GetAllAccountsUseCase
 import com.dialcadev.dialcash.features.accounts.domain.usecases.GetMainAccountBalancesUseCase
 import com.dialcadev.dialcash.features.accounts.domain.usecases.UpdateAccountUseCase

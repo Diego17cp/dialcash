@@ -1,4 +1,4 @@
-package com.dialcadev.dialcash.features.accounts.domain.usecases
+package com.dialcadev.dialcash.features.transactions.domain.usecases
 
 import com.dialcadev.dialcash.features.transactions.domain.repositories.TransactionRepository
 import javax.inject.Inject
