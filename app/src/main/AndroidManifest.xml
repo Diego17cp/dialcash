@@ -46,13 +46,13 @@
         <activity
             android:name=".features.accounts.presentation.ui.NewAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".SettingsActivity"
+        <activity android:name=".features.settings.presentation.ui.SettingsActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".features.incomegroups.presentation.ui.NewIncomeGroupActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".EditProfileActivity"
+        <activity android:name=".features.settings.presentation.ui.EditProfileActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".DeleteAccountActivity"
+        <activity android:name=".features.settings.presentation.ui.DeleteAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".DownloadDataActivity"
             android:theme="@style/Base.Theme.Dialcash" />
