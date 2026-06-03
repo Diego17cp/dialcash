@@ -54,9 +54,9 @@
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".features.settings.presentation.ui.DeleteAccountActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".DownloadDataActivity"
+        <activity android:name=".features.settings.presentation.ui.DownloadDataActivity"
             android:theme="@style/Base.Theme.Dialcash" />
-        <activity android:name=".ImportDataActivity"
+        <activity android:name=".features.settings.presentation.ui.ImportDataActivity"
             android:theme="@style/Base.Theme.Dialcash" />
         <activity android:name=".ui.transactions.ChartsActivity"
             android:theme="@style/Base.Theme.Dialcash" />
