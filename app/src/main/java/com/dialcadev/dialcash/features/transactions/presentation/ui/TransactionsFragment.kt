@@ -24,7 +24,6 @@ import com.dialcadev.dialcash.core.ui.components.showTransactionFiltersBottomShe
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
 import com.dialcadev.dialcash.features.transactions.presentation.adapters.TransactionsAdapter
 import com.dialcadev.dialcash.features.transactions.presentation.viewmodels.AllTransactionsViewModel
-import com.dialcadev.dialcash.ui.transactions.ChartsActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -85,7 +84,6 @@ class TransactionsFragment : Fragment() {
                     R.id.action_chart -> {
                         val intent = Intent(
                             requireContext(),
-                            // Todo: Change this class when refactorize it in the new arch
                             ChartsActivity::class.java
                         )
                         startActivity(intent)
