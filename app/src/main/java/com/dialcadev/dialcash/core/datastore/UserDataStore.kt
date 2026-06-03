@@ -1,11 +1,13 @@
 package com.dialcadev.dialcash.core.datastore
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +25,7 @@ class UserDataStore @Inject constructor(private val context: Context) {
         private val SEEN_ONBOARDING = booleanPreferencesKey("seen_onboarding")
         private val CURRENCY_SYMBOL = stringPreferencesKey("currency_symbol")
         private val IS_BALANCE_VISIBLE = booleanPreferencesKey("is_balance_visible")
+        private val THEME_MODE = intPreferencesKey("theme_mode")
     }
 
     suspend fun saveUserData(
@@ -63,6 +66,12 @@ class UserDataStore @Inject constructor(private val context: Context) {
         }
     }
 
+    suspend fun updateThemeMode(mode: Int) {
+        context.dataStore.edit { prefs ->
+            prefs[THEME_MODE] = mode
+        }
+    }
+
     fun getUserData(): Flow<UserPreferences> {
         return context.dataStore.data.map { prefs ->
             UserPreferences(
@@ -70,7 +79,8 @@ class UserDataStore @Inject constructor(private val context: Context) {
                 photoUri = prefs[USER_PHOTO_URI] ?: "",
                 isRegistered = prefs[IS_REGISTERED] ?: false,
                 currencySymbol = prefs[CURRENCY_SYMBOL] ?: "$",
-                isBalanceVisible = prefs[IS_BALANCE_VISIBLE] ?: true
+                isBalanceVisible = prefs[IS_BALANCE_VISIBLE] ?: true,
+                themeMode = prefs[THEME_MODE] ?: AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
             )
         }
     }
