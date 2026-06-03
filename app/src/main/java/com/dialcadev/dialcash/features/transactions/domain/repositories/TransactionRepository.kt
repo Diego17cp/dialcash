@@ -31,4 +31,9 @@ interface TransactionRepository {
     fun getTotalIncome(): Flow<Double>
     fun getTotalExpense(): Flow<Double>
     fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>>
+    fun getTransactionsForAccountBetween(
+        accountId: Int,
+        startDate: Long,
+        endDate: Long
+    ): Flow<List<Transaction>>
 }

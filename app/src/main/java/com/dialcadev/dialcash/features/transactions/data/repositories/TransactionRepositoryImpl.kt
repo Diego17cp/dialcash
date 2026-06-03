@@ -70,4 +70,10 @@ class TransactionRepositoryImpl @Inject constructor(
     override fun getTotalIncome(): Flow<Double> = transactionDao.getTotalIncome()
     override fun getTotalExpense(): Flow<Double> = transactionDao.getTotalExpense()
     override fun getRecentTransactions(limit: Int): Flow<List<TransactionWithDetails>> = transactionDao.getRecentTransactions(limit)
+    override fun getTransactionsForAccountBetween(
+        accountId: Int,
+        startDate: Long,
+        endDate: Long
+    ): Flow<List<Transaction>> =
+        transactionDao.getAccountTransactionsBetween(accountId, startDate, endDate)
 }
