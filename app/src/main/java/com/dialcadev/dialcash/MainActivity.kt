@@ -133,14 +133,16 @@ class MainActivity : AppCompatActivity() {
                 when (state) {
                     is UpdateState.UpdateAvailable -> {
                         val apkUrl = state.release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
-                        if (apkUrl != null) {
-                            AlertDialog.Builder(this@MainActivity)
-                                .setTitle(R.string.update_available)
-                                .setMessage("${getString(R.string.new_version)} ${state.release.tag_name}\n\n${state.release.name}")
-                                .setPositiveButton(R.string.update) { _, _ -> appUpdater.downloadUpdate(apkUrl) }
-                                .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
-                                .show()
+                        if (apkUrl == null) {
+                            appUpdater.resetState()
+                            return@collect
                         }
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle(R.string.update_available)
+                            .setMessage("${getString(R.string.new_version)} ${state.release.tag_name}\n\n${state.release.name}")
+                            .setPositiveButton(R.string.update) { _, _ -> appUpdater.downloadUpdate(apkUrl) }
+                            .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
+                            .show()
                     }
                     is UpdateState.Downloading -> {
                         if (progressDialog == null) {
