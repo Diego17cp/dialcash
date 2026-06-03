@@ -55,7 +55,8 @@ class AllIncomeGroupsViewModel @Inject constructor(
         }
     }
     fun refreshIncomeGroups() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }    }
+        loadIncomeGroups()
+    }
     fun deleteIncomeGroup(income: IncomeGroupRemaining) {
         viewModelScope.launch {
             deleteIncomeGroupUseCase(income.id).onFailure { error ->

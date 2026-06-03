@@ -52,7 +52,8 @@ class AllAccountsViewModel @Inject constructor(
     }
 
     fun refreshAccounts() {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }    }
+        loadAllAccounts()
+    }
 
     fun deleteAccount(account: Account) {
         viewModelScope.launch {
