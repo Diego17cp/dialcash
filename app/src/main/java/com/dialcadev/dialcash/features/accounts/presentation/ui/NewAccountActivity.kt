@@ -20,7 +20,7 @@ import com.dialcadev.dialcash.databinding.NewAccountActivityBinding
 import com.dialcadev.dialcash.features.accounts.presentation.adapter.AccountTypeAdapter
 import com.dialcadev.dialcash.features.accounts.presentation.provider.AccountTypeUIProvider
 import com.dialcadev.dialcash.features.accounts.presentation.viewmodels.CreateAccountViewModel
-import com.dialcadev.dialcash.ui.shared.GridSpacingItemDecoration
+import com.dialcadev.dialcash.core.ui.shared.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
