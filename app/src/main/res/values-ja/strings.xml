@@ -228,4 +228,6 @@
     <string name="permission_required">権限が必要です</string>
     <string name="install_permission_message">更新をインストールするには、提供元不明のアプリのインストールを許可する必要があります。</string>
     <string name="grant_permission">権限を付与</string>
+    <string name="no_transactions_for_date">この日付には取引がありません</string>
+    <string name="add_transactions_for_date">残高の推移と取引一覧を表示するには、この日付に取引を追加してください</string>
 </resources>

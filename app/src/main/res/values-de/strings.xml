@@ -228,4 +228,6 @@
     <string name="permission_required">Berechtigung erforderlich</string>
     <string name="install_permission_message">Um Updates zu installieren, müssen Sie die Installation aus unbekannten Quellen zulassen.</string>
     <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="no_transactions_for_date">Für dieses Datum gibt es keine Transaktionen</string>
+    <string name="add_transactions_for_date">Fügen Sie Transaktionen zu diesem Datum hinzu, um die Entwicklung des Kontostands und die Transaktionsliste anzuzeigen</string>
 </resources>

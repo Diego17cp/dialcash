@@ -228,4 +228,6 @@
     <string name="permission_required">Permission requise</string>
     <string name="install_permission_message">Pour installer les mises à jour, vous devez autoriser l\'installation à partir de sources inconnues.</string>
     <string name="grant_permission">Accorder la permission</string>
+    <string name="no_transactions_for_date">Cette date ne comporte aucune transaction</string>
+    <string name="add_transactions_for_date">Ajoutez des transactions à cette date pour voir l\'évolution du solde et la liste des transactions</string>
 </resources>
