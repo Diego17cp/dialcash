@@ -22,4 +22,7 @@ class AccountRepository @Inject constructor(
     suspend fun getAccountBalance(accountId: Int): Double? {
         return accountDao.getAccountBalance(accountId)
     }
+    suspend fun getBalanceAtDate(accountId: Int, targetDate: Long): Double {
+        return accountDao.getBalanceAtDate(accountId, targetDate) ?: 0.0
+    }
 }
