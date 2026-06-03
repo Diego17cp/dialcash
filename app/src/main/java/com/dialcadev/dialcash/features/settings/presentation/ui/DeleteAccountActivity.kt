@@ -12,12 +12,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dialcadev.dialcash.R
-import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.databinding.DeleteAccountActivityBinding
 import com.dialcadev.dialcash.features.settings.presentation.viewmodels.DeleteAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class DeleteAccountActivity : AppCompatActivity() {
@@ -53,14 +51,24 @@ class DeleteAccountActivity : AppCompatActivity() {
         binding.confirmCheckbox.setOnCheckedChangeListener { _, isChecked ->
             if (binding.confirmCheckbox.isChecked != viewModel.uiState.value.isCheckboxChecked) viewModel.setCheckboxChecked(isChecked)
         }
-        binding.btnDelete.setOnClickListener { viewModel.deleteAccount() }
+        binding.btnDelete.setOnClickListener {
+            if (!viewModel.uiState.value.isCheckboxChecked) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.please_confirm_to_proceed),
+                    Toast.LENGTH_SHORT
+                ).show()
+                return@setOnClickListener
+            }
+            viewModel.deleteAccount()
+        }
     }
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.confirmCheckbox.isChecked = state.isCheckboxChecked
-                    binding.btnDelete.isEnabled = state.isCheckboxChecked && !state.isLoading
+                    binding.btnDelete.isEnabled = !state.isLoading
                     if (state.isSuccess) {
                         Toast.makeText(
                             this@DeleteAccountActivity,
