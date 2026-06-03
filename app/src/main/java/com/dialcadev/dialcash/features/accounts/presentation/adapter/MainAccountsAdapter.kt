@@ -1,0 +1,61 @@
+package com.dialcadev.dialcash.features.accounts.presentation.adapter
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
+import com.dialcadev.dialcash.databinding.ItemMainAccountBinding
+import com.dialcadev.dialcash.features.accounts.domain.dtos.AccountBalanceWithOriginal
+
+class MainAccountsAdapter(
+    private val onAccountClick: (AccountBalanceWithOriginal) -> Unit,
+    currencySymbol: String
+) : ListAdapter<AccountBalanceWithOriginal, MainAccountsAdapter.AccountViewHolder>(AccountDiffCallback()) {
+
+    private var currentCurrencySymbol = currencySymbol
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AccountViewHolder {
+        val binding = ItemMainAccountBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return AccountViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: AccountViewHolder, position: Int) {
+        holder.bind(getItem(position))
+    }
+    fun updateCurrencySymbol(newSymbol: String) {
+        currentCurrencySymbol = newSymbol
+        notifyDataSetChanged()
+    }
+    inner class AccountViewHolder(private val binding: ItemMainAccountBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(account: AccountBalanceWithOriginal) {
+            binding.apply {
+                textAccountName.text = account.name
+                "$currentCurrencySymbol ${account.balance.toCurrencyFormat()}".also { textAccountBalance.text = it }
+                val iconRes = when (account.type) {
+                    "bank" -> R.drawable.ic_bank
+                    "cash" -> R.drawable.ic_cash
+                    "card" -> R.drawable.ic_card
+                    "wallet" -> R.drawable.ic_accounts_outline
+                    else -> R.drawable.ic_account_default
+                }
+                imageAccountIcon.setImageResource(iconRes)
+                val colorRes = if (account.balance >= 0) R.color.positive_amount else R.color.negative_amount
+                textAccountBalance.setTextColor(root.context.getColor(colorRes))
+                root.setOnClickListener { onAccountClick(account) }
+            }
+        }
+    }
+    private class AccountDiffCallback: DiffUtil.ItemCallback<AccountBalanceWithOriginal>() {
+        override fun areItemsTheSame(oldItem: AccountBalanceWithOriginal, newItem: AccountBalanceWithOriginal): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: AccountBalanceWithOriginal, newItem: AccountBalanceWithOriginal): Boolean {
+            return oldItem == newItem
+        }
+    }
+}

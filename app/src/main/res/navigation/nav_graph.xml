@@ -6,27 +6,27 @@
     app:startDestination="@id/homeFragment">
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.dialcadev.dialcash.ui.home.HomeFragment"
+        android:name="com.dialcadev.dialcash.features.home.presentation.ui.HomeFragment"
         tools:layout="@layout/fragment_home"
         android:label="DialCash" />
     <fragment
         android:id="@+id/transactionsFragment"
-        android:name="com.dialcadev.dialcash.ui.transactions.TransactionsFragment"
+        android:name="com.dialcadev.dialcash.features.transactions.presentation.ui.TransactionsFragment"
         tools:layout="@layout/fragment_transactions"
         android:label="@string/transactions_toolbar_t" />
     <fragment
         android:id="@+id/accountsFragment"
-        android:name="com.dialcadev.dialcash.ui.accounts.AccountsFragment"
+        android:name="com.dialcadev.dialcash.features.accounts.presentation.ui.AccountsFragment"
         tools:layout="@layout/fragment_accounts"
         android:label="@string/accounts_toolbar_t" />
     <fragment
         android:id="@+id/incomesFragment"
-        android:name="com.dialcadev.dialcash.ui.incomegroup.IncomesFragment"
+        android:name="com.dialcadev.dialcash.features.incomegroups.presentation.ui.IncomeGroupsFragment"
         tools:layout="@layout/fragment_incomes"
         android:label="@string/incomes_toolbar_t" />
     <fragment
         android:id="@+id/blogFragment"
-        android:name="com.dialcadev.dialcash.ui.blog.BlogFragment"
+        android:name="com.dialcadev.dialcash.features.blog.presentation.ui.BlogFragment"
         tools:layout="@layout/fragment_blog"
         android:label="Blog" />
 </navigation>

@@ -167,6 +167,7 @@
     <string name="created_at">Created at: %1$s</string>
     <string name="skip">Skip</string>
     <string name="next">Next</string>
+    <string name="finish">Finish</string>
     <string name="onb_title_1">Welcome to DialCash</string>
     <string name="onb_subtitle_1">Your personal finance companion that helps you manage accounts, track expenses, and achieve your financial goals effortlessly.</string>
     <string name="onb_title_2">Multiple Accounts</string>
@@ -238,4 +239,6 @@
     <string name="permission_required">Permission required</string>
     <string name="install_permission_message">To install updates, you need to allow installation from unknown sources.</string>
     <string name="grant_permission">Grant permission</string>
+    <string name="no_transactions_for_date">This date has no transactions</string>
+    <string name="add_transactions_for_date">Add transactions to this date to see the balance evolution and transaction list</string>
 </resources>

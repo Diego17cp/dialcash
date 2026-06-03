@@ -167,6 +167,7 @@
     <string name="created_at">Erstellt am: %1$s</string>
     <string name="skip">Überspringen</string>
     <string name="next">Weiter</string>
+    <string name="finish">Fertigstellen</string>
     <string name="onb_title_1">Willkommen bei DialCash</string>
     <string name="onb_subtitle_1">Ihr persönlicher Finanzbegleiter, der Ihnen hilft, Konten zu verwalten, Ausgaben zu verfolgen und Ihre finanziellen Ziele mühelos zu erreichen.</string>
     <string name="onb_title_2">Mehrere Konten</string>
@@ -227,4 +228,6 @@
     <string name="permission_required">Berechtigung erforderlich</string>
     <string name="install_permission_message">Um Updates zu installieren, müssen Sie die Installation aus unbekannten Quellen zulassen.</string>
     <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="no_transactions_for_date">Für dieses Datum gibt es keine Transaktionen</string>
+    <string name="add_transactions_for_date">Fügen Sie Transaktionen zu diesem Datum hinzu, um die Entwicklung des Kontostands und die Transaktionsliste anzuzeigen</string>
 </resources>

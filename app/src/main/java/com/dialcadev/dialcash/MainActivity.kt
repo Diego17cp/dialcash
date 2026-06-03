@@ -8,7 +8,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
@@ -17,11 +19,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.size
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
-import com.dialcadev.dialcash.data.UserDataStore
-import com.dialcadev.dialcash.data.updates.UpdateManager
+import com.dialcadev.dialcash.core.datastore.UserDataStore
+import com.dialcadev.dialcash.core.updates.AppUpdater
+import com.dialcadev.dialcash.core.updates.UpdateState
+import com.dialcadev.dialcash.features.onboarding.presentation.ui.OnboardingActivity
+import com.dialcadev.dialcash.features.register.presentation.ui.RegisterActivity
+import com.dialcadev.dialcash.features.settings.presentation.ui.SettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -33,15 +38,17 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userDataStore: UserDataStore
-
     @Inject
-    lateinit var updateManager: UpdateManager
+    lateinit var appUpdater: AppUpdater
+    private var progressDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         lifecycleScope.launch {
-            val isRegistered = userDataStore.isUserRegistered().first()
+            val userPreferences = userDataStore.getUserData().first()
+            AppCompatDelegate.setDefaultNightMode(userPreferences.themeMode)
+            val isRegistered = userPreferences.isRegistered
             val hasSeenOnboarding = userDataStore.isOnboardingSeen().first()
             if (!hasSeenOnboarding) {
                 val intent = Intent(this@MainActivity, OnboardingActivity::class.java)
@@ -58,7 +65,6 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
 
-            updateManager.checkForUpdates(activity = this@MainActivity, onUpToDate = {})
 
             enableEdgeToEdge()
             WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -104,7 +110,7 @@ class MainActivity : AppCompatActivity() {
 
             setupNavigation()
             handleBottomNavigationInsets()
-
+            observeUpdates()
         }
     }
 
@@ -120,8 +126,68 @@ class MainActivity : AppCompatActivity() {
             supportActionBar?.title = destination.label
         }
     }
+    private fun observeUpdates() {
+        appUpdater.checkForUpdates()
+        lifecycleScope.launch {
+            appUpdater.state.collect { state ->
+                when (state) {
+                    is UpdateState.UpdateAvailable -> {
+                        val apkUrl = state.release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
+                        if (apkUrl != null) {
+                            AlertDialog.Builder(this@MainActivity)
+                                .setTitle(R.string.update_available)
+                                .setMessage("${getString(R.string.new_version)} ${state.release.tag_name}\n\n${state.release.name}")
+                                .setPositiveButton(R.string.update) { _, _ -> appUpdater.downloadUpdate(apkUrl) }
+                                .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
+                                .show()
+                        }
+                    }
+                    is UpdateState.Downloading -> {
+                        if (progressDialog == null) {
+                            progressDialog = AlertDialog.Builder(this@MainActivity)
+                                .setTitle(R.string.downloading_update)
+                                .setMessage("0%")
+                                .setCancelable(false)
+                                .create()
+                            progressDialog?.show()
+                        }
+                        progressDialog?.setMessage("${state.progress}%")
+                    }
+                    is UpdateState.ReadyToInstall -> {
+                        progressDialog?.dismiss()
+                        progressDialog = null
 
-
+                        AlertDialog.Builder(this@MainActivity)
+                            .setTitle(R.string.download_complete)
+                            .setMessage(R.string.install_update_message)
+                            .setPositiveButton(R.string.install) { _, _ ->
+                                val uri = androidx.core.content.FileProvider.getUriForFile(
+                                    this@MainActivity,
+                                    "${packageName}.provider",
+                                    state.apkFile
+                                )
+                                val intent = Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(uri, "application/vnd.android.package-archive")
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                startActivity(intent)
+                                appUpdater.resetState()
+                            }
+                            .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
+                            .show()
+                    }
+                    is UpdateState.Error -> {
+                        progressDialog?.dismiss()
+                        progressDialog = null
+                        android.widget.Toast.makeText(this@MainActivity, state.message, android.widget.Toast.LENGTH_LONG).show()
+                        appUpdater.resetState()
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
     private fun handleBottomNavigationInsets() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
@@ -145,6 +211,5 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        updateManager.onActivityDestroyed()
     }
 }
