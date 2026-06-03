@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.utils.extensions.capitalize
 import com.dialcadev.dialcash.core.utils.extensions.fromISOToReadable
 import com.dialcadev.dialcash.features.blog.domain.models.BlogPost
-import com.dialcadev.dialcash.utils.capitalize
 import com.google.android.material.chip.Chip
 
 class PostsAdapter(
