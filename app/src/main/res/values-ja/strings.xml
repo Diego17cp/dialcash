@@ -230,4 +230,5 @@
     <string name="grant_permission">権限を付与</string>
     <string name="no_transactions_for_date">この日付には取引がありません</string>
     <string name="add_transactions_for_date">残高の推移と取引一覧を表示するには、この日付に取引を追加してください</string>
+    <string name="blog">ブログ</string>
 </resources>

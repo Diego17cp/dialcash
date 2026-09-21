@@ -241,4 +241,5 @@
     <string name="grant_permission">Grant permission</string>
     <string name="no_transactions_for_date">This date has no transactions</string>
     <string name="add_transactions_for_date">Add transactions to this date to see the balance evolution and transaction list</string>
+    <string name="blog">Blog</string>
 </resources>
