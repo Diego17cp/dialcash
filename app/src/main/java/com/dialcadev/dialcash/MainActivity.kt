@@ -8,27 +8,45 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.size
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import com.dialcadev.dialcash.core.datastore.UserDataStore
+import com.dialcadev.dialcash.core.ui.UiChromeViewModel
+import com.dialcadev.dialcash.core.ui.components.AppBarAction
+import com.dialcadev.dialcash.core.ui.components.FloatingBottomNav
+import com.dialcadev.dialcash.core.ui.components.FragmentNavHost
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.core.updates.AppUpdater
 import com.dialcadev.dialcash.core.updates.UpdateState
 import com.dialcadev.dialcash.features.onboarding.presentation.ui.OnboardingActivity
 import com.dialcadev.dialcash.features.register.presentation.ui.RegisterActivity
 import com.dialcadev.dialcash.features.settings.presentation.ui.SettingsActivity
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,14 +60,37 @@ class MainActivity : AppCompatActivity() {
     lateinit var appUpdater: AppUpdater
     private var progressDialog: AlertDialog? = null
 
+    private val currentDestinationId = mutableStateOf<Int?>(null)
+    private val currentTitle = mutableStateOf("DialCash")
+    private val canGoBack = mutableStateOf(false)
+    private var navController: NavController? = null
+    private val chromeViewModel: UiChromeViewModel by viewModels()
+    private lateinit var navFragmentContainer: FragmentContainerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+
+        var isReady = false
+        splashScreen.setKeepOnScreenCondition { !isReady }
+
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, 0, systemBars.right, 0)
+            insets
+        }
+
+        setupFragmentContainer()
+        setupNavigation()
+
         lifecycleScope.launch {
             val userPreferences = userDataStore.getUserData().first()
-            AppCompatDelegate.setDefaultNightMode(userPreferences.themeMode)
-            val isRegistered = userPreferences.isRegistered
             val hasSeenOnboarding = userDataStore.isOnboardingSeen().first()
+
             if (!hasSeenOnboarding) {
                 val intent = Intent(this@MainActivity, OnboardingActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -57,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
                 return@launch
             }
-            if (!isRegistered) {
+            if (!userPreferences.isRegistered) {
                 val intent = Intent(this@MainActivity, RegisterActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
@@ -65,67 +106,101 @@ class MainActivity : AppCompatActivity() {
                 return@launch
             }
 
-
-            enableEdgeToEdge()
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-
-            setContentView(R.layout.activity_main)
-
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-                insets
-            }
-
-            val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-            setSupportActionBar(toolbar)
-            addMenuProvider(object : MenuProvider {
-                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                    menuInflater.inflate(R.menu.main_menu, menu)
-                }
-
-                override fun onPrepareMenu(menu: Menu) {
-                    val typedValue = TypedValue()
-                    val attRes = com.google.android.material.R.attr.colorOnSurface
-                    if (theme.resolveAttribute(attRes, typedValue, true)) {
-                        val color = typedValue.data
-                        for (i in 0 until menu.size) {
-                            menu.getItem(i).icon?.mutate()?.setTint(color)
-                        }
-                    }
-                }
-
-                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                    return when (menuItem.itemId) {
-                        R.id.action_settings -> {
-                            val intent = Intent(this@MainActivity, SettingsActivity::class.java)
-                            startActivity(intent)
-                            true
-                        }
-
-                        else -> false
-                    }
-                }
-            }, this@MainActivity, Lifecycle.State.RESUMED)
-
-            setupNavigation()
-            handleBottomNavigationInsets()
             observeUpdates()
+            isReady = true
         }
+    }
+
+    private fun setupFragmentContainer() {
+        val root = findViewById<ViewGroup>(R.id.main)
+
+        navFragmentContainer = FragmentContainerView(this).apply {
+            id = R.id.fragment_nav_host_container
+        }
+        root.addView(
+            navFragmentContainer,
+            0,
+            android.widget.LinearLayout.LayoutParams(0, 0)
+        )
+
+        val existing = supportFragmentManager.findFragmentById(R.id.fragment_nav_host_container) as? NavHostFragment
+        val navHostFragment = existing ?: NavHostFragment.create(R.navigation.nav_graph).also {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_nav_host_container, it, "nav_host_fragment")
+                .setPrimaryNavigationFragment(it)
+                .commitNow()
+        }
+        navHostFragment.navController.addOnDestinationChangedListener { controller, destination, _ ->
+            currentDestinationId.value = destination.id
+            currentTitle.value = destination.label?.toString() ?: "DialCash"
+            canGoBack.value = controller.previousBackStackEntry != null
+        }
+        this.navController = navHostFragment.navController
     }
 
     private fun setupNavigation() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
-        bottomNav.setupWithNavController(navController)
-
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            supportActionBar?.title = destination.label
+        val composeRoot = findViewById<ComposeView>(R.id.compose_content_root)
+        val hazeState = HazeState()
+        val topLevelDestinations = setOf(
+            R.id.homeFragment,
+            R.id.transactionsFragment,
+            R.id.accountsFragment,
+            R.id.incomesFragment,
+            R.id.blogFragment
+        )
+        val showBackButton = canGoBack.value && currentDestinationId.value !in topLevelDestinations
+        composeRoot.setContent {
+            MaterialTheme {
+                Box(Modifier.fillMaxSize()) {
+                    FragmentNavHost(
+                        modifier = Modifier.hazeSource(hazeState),
+                        container = navFragmentContainer
+                    )
+                    val extraActions by chromeViewModel.extraActions.collectAsState()
+                    LiquidAppBar(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .onGloballyPositioned {
+                                chromeViewModel.reportTopBarHeight(it.size.height)
+                            },
+                        hazeState = hazeState,
+                        title = currentTitle.value,
+                        onBackClick = if (showBackButton) {
+                            { navController?.popBackStack() }
+                        } else null,
+                        actions = listOf(
+                            AppBarAction(
+                                iconRes = R.drawable.ic_settings,
+                                contentDescription = "Configuración",
+                            ) {
+                                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                            }
+                        ) + extraActions
+                    )
+                    FloatingBottomNav(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .onGloballyPositioned {
+                                chromeViewModel.reportBottomBarHeight(it.size.height)
+                            },
+                        hazeState = hazeState,
+                        currentDestinationId = currentDestinationId.value
+                    ) { selectedItem ->
+                        val nav = navController ?: return@FloatingBottomNav
+                        if (nav.currentDestination?.id != selectedItem.routeId) {
+                            val options = NavOptions.Builder()
+                                .setPopUpTo(nav.graph.startDestinationId, false, saveState = true)
+                                .setLaunchSingleTop(true)
+                                .setRestoreState(true)
+                                .build()
+                            nav.navigate(resId = selectedItem.routeId, null, options)
+                        }
+                    }
+                }
+            }
         }
     }
+
     private fun observeUpdates() {
         appUpdater.checkForUpdates()
         lifecycleScope.launch {
@@ -186,26 +261,6 @@ class MainActivity : AppCompatActivity() {
                     else -> {}
                 }
             }
-        }
-    }
-    private fun handleBottomNavigationInsets() {
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
-
-        ViewCompat.setOnApplyWindowInsetsListener(bottomNav) { view, insets ->
-            val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
-
-            view.setPadding(
-                view.paddingLeft,
-                view.paddingTop,
-                view.paddingRight,
-                0
-            )
-
-            val layoutParams = view.layoutParams as ViewGroup.MarginLayoutParams
-            layoutParams.bottomMargin = navigationBars.bottom
-            view.layoutParams = layoutParams
-
-            insets
         }
     }
 
