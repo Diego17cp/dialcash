@@ -231,4 +231,7 @@
     <string name="no_transactions_for_date">Esta fecha no tiene transacciones</string>
     <string name="add_transactions_for_date">Agrega transacciones a esta fecha para ver la evolución del saldo y la lista de transacciones</string>
     <string name="blog">Blog</string>
+    <string name="back">Atrás</string>
+    <string name="options">Opciones</string>
+    <string name="view_statistics">Ver estadísticas</string>
 </resources>

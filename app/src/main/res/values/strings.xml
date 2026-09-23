@@ -242,4 +242,7 @@
     <string name="no_transactions_for_date">This date has no transactions</string>
     <string name="add_transactions_for_date">Add transactions to this date to see the balance evolution and transaction list</string>
     <string name="blog">Blog</string>
+    <string name="back">Back</string>
+    <string name="options">Options</string>
+    <string name="view_statistics">View statistics</string>
 </resources>

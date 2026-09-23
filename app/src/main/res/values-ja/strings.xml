@@ -231,4 +231,7 @@
     <string name="no_transactions_for_date">この日付には取引がありません</string>
     <string name="add_transactions_for_date">残高の推移と取引一覧を表示するには、この日付に取引を追加してください</string>
     <string name="blog">ブログ</string>
+    <string name="back">戻る</string>
+    <string name="options">オプション</string>
+    <string name="view_statistics">統計を見る</string>
 </resources>
