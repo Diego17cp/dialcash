@@ -12,6 +12,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.dialcadev.dialcash.DialCashApp
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
@@ -20,6 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
@@ -121,6 +123,10 @@ class SettingsActivity : AppCompatActivity() {
                 }
                 lifecycleScope.launch {
                     userDataStore.updateThemeMode(selectedTheme)
+                    getSharedPreferences(DialCashApp.THEME_PREFS_NAME, MODE_PRIVATE)
+                        .edit {
+                            putInt(DialCashApp.KEY_NIGHT_MODE, selectedTheme)
+                        }
                     AppCompatDelegate.setDefaultNightMode(selectedTheme)
                 }
                 dialog.dismiss()
