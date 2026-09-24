@@ -1,6 +1,5 @@
 package com.dialcadev.dialcash.core.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -13,10 +12,15 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,7 +33,8 @@ import dev.chrisbanes.haze.hazeEffect
 data class AppBarAction(
     val iconRes: Int,
     val contentDescription: String,
-    val onClick: () -> Unit
+    val onClick: () -> Unit = {},
+    val subActions: List<AppBarAction>? = null
 )
 
 @Composable
@@ -77,12 +82,11 @@ fun LiquidAppBar(
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp),
                     iconRes = R.drawable.ic_arrow_left,
-                    contentDescription = "Atrás",
+                    contentDescription = stringResource(R.string.back),
                     standalone = false,
                     onClick = onBackClick
                 )
             }
-
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -94,7 +98,6 @@ fun LiquidAppBar(
                     .align(Alignment.Center)
                     .padding(horizontal = 64.dp)
             )
-
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -102,12 +105,30 @@ fun LiquidAppBar(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 actions.forEach { action ->
-                    GlassIconButton(
-                        iconRes = action.iconRes,
-                        contentDescription = action.contentDescription,
-                        standalone = false,
-                        onClick = action.onClick
-                    )
+                    if (action.subActions != null) {
+                        var expanded by remember { mutableStateOf(false) }
+                        Box {
+                            GlassIconButton(
+                                iconRes = action.iconRes,
+                                contentDescription = action.contentDescription,
+                                standalone = false,
+                                onClick = { expanded = true }
+                            )
+                            GlassDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false },
+                                subActions = action.subActions,
+                                hazeState = hazeState
+                            )
+                        }
+                    } else {
+                        GlassIconButton(
+                            iconRes = action.iconRes,
+                            contentDescription = action.contentDescription,
+                            standalone = false,
+                            onClick = action.onClick
+                        )
+                    }
                 }
             }
         }
