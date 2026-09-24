@@ -57,6 +57,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("dev.chrisbanes.haze:haze:1.7.2")
     implementation("androidx.compose.ui:ui-text-google-fonts")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
