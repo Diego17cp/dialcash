@@ -1,48 +1,43 @@
 package com.dialcadev.dialcash.features.settings.presentation.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.theme.DialCashTheme
 import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
-import com.dialcadev.dialcash.databinding.EditProfileActivityBinding
+import com.dialcadev.dialcash.features.settings.presentation.ui.components.EditProfileScreen
 import com.dialcadev.dialcash.features.settings.presentation.viewmodels.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
-import kotlinx.coroutines.launch
+import androidx.compose.ui.res.stringResource
 
 @AndroidEntryPoint
 class EditProfileActivity : AppCompatActivity() {
-    private lateinit var binding: EditProfileActivityBinding
-    private val hazeState = HazeState()
 
     private val viewModel: EditProfileViewModel by viewModels()
-    private var isInitialDataBound = false
+
     private val launcher =
         registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             uri?.let {
@@ -61,100 +56,96 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        binding = EditProfileActivityBinding.inflate(layoutInflater)
-        val composeView = ComposeView(this).apply {
-            setContent {
-                MaterialTheme(
-                    typography = AppTypography
-                ) {
-                    Box(Modifier.fillMaxSize()) {
-                        AndroidView(
-                            factory = { binding.root },
-                            modifier = Modifier.fillMaxSize().hazeSource(hazeState)
-                        )
-                        LiquidAppBar(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .onGloballyPositioned {
-                                    binding.nestedScrollView.updatePadding(top = it.size.height)
-                                },
-                            hazeState = hazeState,
-                            title = getString(R.string.edit_profile),
-                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
-                        )
-                    }
+
+        setContent {
+            DialCashTheme (typography = AppTypography) {
+                val hazeState = remember { HazeState() }
+                var topBarHeight by remember { mutableStateOf(0.dp) }
+                val density = LocalDensity.current
+
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                val currencyOptions = remember {
+                    resources.getStringArray(R.array.currency_options).toList()
+                }
+                var name by remember(uiState.isInitialized) {
+                    mutableStateOf(if (uiState.isInitialized) uiState.initialName else "")
+                }
+                var currency by remember(uiState.isInitialized) {
+                    mutableStateOf(if (uiState.isInitialized) uiState.initialCurrency else "")
+                }
+
+                val photoUri = uiState.currentPhotoUri.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+
+                LaunchedEffectMessages(
+                    showSuccess = uiState.showSuccessMessage,
+                    showError = uiState.showErrorMessage,
+                    onShown = { viewModel.onMessagesShown() }
+                )
+
+                Box(Modifier.fillMaxSize()) {
+                    EditProfileScreen(
+                        hazeState = hazeState,
+                        topBarHeight = topBarHeight,
+                        photoUri = photoUri,
+                        name = name,
+                        onNameChanged = {
+                            name = it
+                            viewModel.onNameChanged(it)
+                        },
+                        nameError = if (uiState.isNameError) getString(R.string.name_cannot_be_empty) else null,
+                        currency = currency,
+                        onCurrencyChanged = {
+                            currency = it
+                            viewModel.onCurrencyChanged(it)
+                        },
+                        currencyOptions = currencyOptions,
+                        currencyError = if (uiState.isCurrencyError) getString(R.string.currency_cannot_be_empty) else null,
+                        isSaveEnabled = uiState.isSaveEnabled,
+                        onSaveClick = { viewModel.saveChanges() },
+                        onPickPhotoClick = { launcher.launch(arrayOf("image/*")) }
+                    )
+
+                    LiquidAppBar(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .onGloballyPositioned {
+                                topBarHeight = with(density) { it.size.height.toDp() }
+                            },
+                        hazeState = hazeState,
+                        title = getString(R.string.edit_profile),
+                        onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                    )
                 }
             }
         }
-        setContentView(composeView)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
-            insets
+    }
+}
+
+@Composable
+private fun LaunchedEffectMessages(
+    showSuccess: Boolean,
+    showError: Boolean,
+    onShown: () -> Unit
+) {
+    val context = LocalContext.current
+    val successText = stringResource(R.string.profile_updated)
+    val errorText = stringResource(R.string.failed_to_update_profile)
+    androidx.compose.runtime.LaunchedEffect(showSuccess, showError) {
+        if (showSuccess) {
+            android.widget.Toast.makeText(
+                context,
+                successText,
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            onShown()
         }
-        setupViews()
-        setupListeners()
-        observeViewModel()
-    }
-
-    private fun setupViews() {
-        val currencyOptions = resources.getStringArray(R.array.currency_options)
-        val adapter =
-            ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, currencyOptions)
-        binding.etCurrency.setAdapter(adapter)
-    }
-
-    private fun setupListeners() {
-        binding.overlay.setOnClickListener { launcher.launch(arrayOf("image/*")) }
-        binding.etName.addTextChangedListener { viewModel.onNameChanged(it.toString()) }
-        binding.etCurrency.addTextChangedListener { viewModel.onCurrencyChanged(it.toString()) }
-        binding.btnSaveChanges.setOnClickListener { viewModel.saveChanges() }
-    }
-
-    private fun observeViewModel() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    if (state.isInitialized && !isInitialDataBound) {
-                        binding.etName.setText(state.initialName)
-                        binding.etCurrency.setText(state.initialCurrency, false)
-                        isInitialDataBound = true
-                    }
-                    binding.tilName.error =
-                        if (state.isNameError) getString(R.string.name_cannot_be_empty) else null
-                    binding.tilCurrency.error =
-                        if (state.isCurrencyError) getString(R.string.currency_cannot_be_empty) else null
-                    binding.btnSaveChanges.isEnabled = state.isSaveEnabled
-
-                    val uri = state.currentPhotoUri.takeIf { it.isNotBlank() }?.toUri()
-                    if (uri != null) {
-                        try {
-                            binding.ivProfilePicture.setImageURI(uri)
-                        } catch (e: Exception) {
-                            binding.ivProfilePicture.setImageResource(R.drawable.ic_account_circle)
-                        }
-                    } else {
-                        binding.ivProfilePicture.setImageResource(R.drawable.ic_account_circle)
-                    }
-
-                    if (state.showSuccessMessage) {
-                        Toast.makeText(
-                            this@EditProfileActivity,
-                            getString(R.string.profile_updated),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        viewModel.onMessagesShown()
-                    }
-                    if (state.showErrorMessage) {
-                        Toast.makeText(
-                            this@EditProfileActivity,
-                            getString(R.string.failed_to_update_profile),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        viewModel.onMessagesShown()
-                    }
-                }
-            }
+        if (showError) {
+            android.widget.Toast.makeText(
+                context,
+                errorText,
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+            onShown()
         }
     }
 }
