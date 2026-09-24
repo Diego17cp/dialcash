@@ -2,11 +2,13 @@ package com.dialcadev.dialcash.core.ui
 
 import androidx.lifecycle.ViewModel
 import com.dialcadev.dialcash.core.ui.components.AppBarAction
+import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class UiChromeViewModel : ViewModel() {
+    val hazeState: HazeState = HazeState()
     private val _topBarHeightPx = MutableStateFlow(0)
     val topBarHeightPx: StateFlow<Int> = _topBarHeightPx.asStateFlow()
 

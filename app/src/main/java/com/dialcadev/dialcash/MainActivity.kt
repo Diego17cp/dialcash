@@ -21,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.zIndex
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
@@ -34,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.dialcadev.dialcash.core.datastore.UserDataStore
+import com.dialcadev.dialcash.core.theme.AppTypography
 import com.dialcadev.dialcash.core.ui.UiChromeViewModel
 import com.dialcadev.dialcash.core.ui.components.AppBarAction
 import com.dialcadev.dialcash.core.ui.components.FloatingBottomNav
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userDataStore: UserDataStore
+
     @Inject
     lateinit var appUpdater: AppUpdater
     private var progressDialog: AlertDialog? = null
@@ -123,7 +127,8 @@ class MainActivity : AppCompatActivity() {
             android.widget.LinearLayout.LayoutParams(0, 0)
         )
 
-        val existing = supportFragmentManager.findFragmentById(R.id.fragment_nav_host_container) as? NavHostFragment
+        val existing =
+            supportFragmentManager.findFragmentById(R.id.fragment_nav_host_container) as? NavHostFragment
         val navHostFragment = existing ?: NavHostFragment.create(R.navigation.nav_graph).also {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_nav_host_container, it, "nav_host_fragment")
@@ -140,7 +145,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupNavigation() {
         val composeRoot = findViewById<ComposeView>(R.id.compose_content_root)
-        val hazeState = HazeState()
+        val hazeState = chromeViewModel.hazeState
         val topLevelDestinations = setOf(
             R.id.homeFragment,
             R.id.transactionsFragment,
@@ -150,7 +155,9 @@ class MainActivity : AppCompatActivity() {
         )
         val showBackButton = canGoBack.value && currentDestinationId.value !in topLevelDestinations
         composeRoot.setContent {
-            MaterialTheme {
+            MaterialTheme(
+                typography = AppTypography
+            ) {
                 Box(Modifier.fillMaxSize()) {
                     FragmentNavHost(
                         modifier = Modifier.hazeSource(hazeState),
@@ -171,15 +178,21 @@ class MainActivity : AppCompatActivity() {
                         actions = listOf(
                             AppBarAction(
                                 iconRes = R.drawable.ic_settings,
-                                contentDescription = "Configuración",
-                            ) {
-                                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
-                            }
+                                contentDescription = stringResource(R.string.settings),
+                                onClick = {
+                                    startActivity(
+                                        Intent(
+                                            this@MainActivity,
+                                            SettingsActivity::class.java
+                                        )
+                                    )
+                                })
                         ) + extraActions
                     )
                     FloatingBottomNav(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
+                            .zIndex(1f)
                             .onGloballyPositioned {
                                 chromeViewModel.reportBottomBarHeight(it.size.height)
                             },
@@ -207,16 +220,22 @@ class MainActivity : AppCompatActivity() {
             appUpdater.state.collect { state ->
                 when (state) {
                     is UpdateState.UpdateAvailable -> {
-                        val apkUrl = state.release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
+                        val apkUrl =
+                            state.release.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url
                         if (apkUrl != null) {
                             AlertDialog.Builder(this@MainActivity)
                                 .setTitle(R.string.update_available)
                                 .setMessage("${getString(R.string.new_version)} ${state.release.tag_name}\n\n${state.release.name}")
-                                .setPositiveButton(R.string.update) { _, _ -> appUpdater.downloadUpdate(apkUrl) }
+                                .setPositiveButton(R.string.update) { _, _ ->
+                                    appUpdater.downloadUpdate(
+                                        apkUrl
+                                    )
+                                }
                                 .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
                                 .show()
                         }
                     }
+
                     is UpdateState.Downloading -> {
                         if (progressDialog == null) {
                             progressDialog = AlertDialog.Builder(this@MainActivity)
@@ -228,6 +247,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         progressDialog?.setMessage("${state.progress}%")
                     }
+
                     is UpdateState.ReadyToInstall -> {
                         progressDialog?.dismiss()
                         progressDialog = null
@@ -252,12 +272,18 @@ class MainActivity : AppCompatActivity() {
                             .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
                             .show()
                     }
+
                     is UpdateState.Error -> {
                         progressDialog?.dismiss()
                         progressDialog = null
-                        android.widget.Toast.makeText(this@MainActivity, state.message, android.widget.Toast.LENGTH_LONG).show()
+                        android.widget.Toast.makeText(
+                            this@MainActivity,
+                            state.message,
+                            android.widget.Toast.LENGTH_LONG
+                        ).show()
                         appUpdater.resetState()
                     }
+
                     else -> {}
                 }
             }
