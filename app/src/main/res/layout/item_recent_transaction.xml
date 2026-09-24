@@ -25,7 +25,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_transactions_outline"
+                android:src="@drawable/ic_transfer_outline"
                 app:tint="@color/colorPrimary" />
         </FrameLayout>
         <LinearLayout

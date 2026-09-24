@@ -7,62 +7,113 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.registerForActivityResult
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.databinding.ImportDataActivityBinding
 import com.dialcadev.dialcash.features.settings.presentation.viewmodels.ImportDataViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ImportDataActivity : AppCompatActivity() {
     private lateinit var binding: ImportDataActivityBinding
+    private val hazeState = HazeState()
     private val viewModel: ImportDataViewModel by viewModels()
 
-    private val documentPicker = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                viewModel.startImport(uri.toString())
+    private val documentPicker =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    viewModel.startImport(uri.toString())
+                }
             }
         }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ImportDataActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.import_data_layout)) { v, insets ->
-            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    var appBarHeightPx by remember { mutableIntStateOf(0) }
+                    val extraTopPaddingPx = (12 * resources.displayMetrics.density).toInt()
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeSource(hazeState),
+                            update = {
+                                val nested = binding.nestedScrollView
+                                val desiredTop = appBarHeightPx + extraTopPaddingPx
+                                if (nested.paddingTop != desiredTop) {
+                                    nested.updatePadding(top = desiredTop)
+                                }
+                            }
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned { coordinates ->
+                                    val measured = coordinates.size.height
+                                    if (measured != appBarHeightPx) {
+                                        appBarHeightPx = measured
+                                    }
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.import_data),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         setupListeners()
         observeViewModel()
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
+
     private fun setupListeners() {
         binding.btnCancel.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.confirmText.setOnClickListener { viewModel.toggleCheckbox() }
         binding.confirmCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            if (binding.confirmCheckbox.isChecked != viewModel.uiState.value.isCheckboxChecked) viewModel.setCheckboxChecked(isChecked)
+            if (binding.confirmCheckbox.isChecked != viewModel.uiState.value.isCheckboxChecked) viewModel.setCheckboxChecked(
+                isChecked
+            )
         }
         binding.btnImport.setOnClickListener {
             if (!viewModel.uiState.value.isCheckboxChecked) {
@@ -76,6 +127,7 @@ class ImportDataActivity : AppCompatActivity() {
             openFilePicker()
         }
     }
+
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -83,6 +135,7 @@ class ImportDataActivity : AppCompatActivity() {
         }
         documentPicker.launch(intent)
     }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -102,13 +155,18 @@ class ImportDataActivity : AppCompatActivity() {
                         finish()
                     }
                     state.errorMessage?.let { errorMsg ->
-                        val friendlyError = if (errorMsg.contains("is not a valid backup file") || errorMsg.contains("Invalid backup format")) {
-                            getString(R.string.selected_file_error)
-                        } else {
-                            getString(R.string.failed_open_file) + ": " + errorMsg
-                        }
+                        val friendlyError =
+                            if (errorMsg.contains("is not a valid backup file") || errorMsg.contains(
+                                    "Invalid backup format"
+                                )
+                            ) {
+                                getString(R.string.selected_file_error)
+                            } else {
+                                getString(R.string.failed_open_file) + ": " + errorMsg
+                            }
 
-                        Toast.makeText(this@ImportDataActivity, friendlyError, Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@ImportDataActivity, friendlyError, Toast.LENGTH_LONG)
+                            .show()
                         viewModel.clearError()
                     }
                 }

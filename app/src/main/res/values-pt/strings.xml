@@ -230,4 +230,8 @@
     <string name="grant_permission">Conceder permissão</string>
     <string name="no_transactions_for_date">Esta data não possui transações</string>
     <string name="add_transactions_for_date">Adicione transações a esta data para visualizar a evolução do saldo e a lista de transações</string>
+    <string name="blog">Blog</string>
+    <string name="back">Voltar</string>
+    <string name="options">Opções</string>
+    <string name="view_statistics">Ver estatísticas</string>
 </resources>

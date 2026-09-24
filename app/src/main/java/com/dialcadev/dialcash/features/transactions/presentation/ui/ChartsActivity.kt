@@ -7,8 +7,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,6 +34,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.databinding.ChartsActivityBinding
 import com.dialcadev.dialcash.features.accounts.presentation.adapter.SelectorAccountAdapter
 import com.dialcadev.dialcash.features.transactions.presentation.adapters.TransactionsAdapter
@@ -27,6 +46,8 @@ import com.github.AAChartModel.AAChartCore.AAChartEnum.AAChartType
 import com.github.AAChartModel.AAChartCore.AAOptionsModel.AAStyle
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -36,6 +57,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ChartsActivity : AppCompatActivity() {
     private lateinit var binding: ChartsActivityBinding
+    private val hazeState = HazeState()
     private val viewModel: ChartsViewModel by viewModels()
     private lateinit var transactionsAdapter: TransactionsAdapter
 
@@ -44,8 +66,7 @@ class ChartsActivity : AppCompatActivity() {
     private var userPreferences: UserPreferences? = null
 
     private val locale = Locale(
-        System.getProperty("user.language") ?: "en",
-        System.getProperty("user.language") ?: "en"
+        System.getProperty("user.language") ?: "en", System.getProperty("user.language") ?: "en"
     )
     private val monthFormat = SimpleDateFormat("MMMM yyyy", locale)
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", locale)
@@ -53,12 +74,51 @@ class ChartsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ChartsActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel)
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    var appBarHeightPx by remember { mutableIntStateOf(0) }
+                    val extraTopPaddingPx = (12 * resources.displayMetrics.density).toInt()
+
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeSource(hazeState),
+                            update = {
+                                val nested = binding.nestedScrollView
+                                val desiredTop = appBarHeightPx + extraTopPaddingPx
+                                if (nested.paddingTop != desiredTop) {
+                                    nested.updatePadding(top = desiredTop)
+                                }
+                            })
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned { coordinates ->
+                                    val measured = coordinates.size.height
+                                    if (measured != appBarHeightPx) {
+                                        appBarHeightPx = measured
+                                    }
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.charts),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() })
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+            insets
         }
 
         setupTransactionsRecyclerView()
@@ -66,18 +126,9 @@ class ChartsActivity : AppCompatActivity() {
         observeState()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun setupTransactionsRecyclerView() {
         transactionsAdapter = TransactionsAdapter(
-            onTransactionClick = {},
-            currencySymbol = "$"
+            onTransactionClick = {}, currencySymbol = "$"
         )
         binding.recyclerViewTransactions.apply {
             layoutManager = LinearLayoutManager(this@ChartsActivity)
@@ -138,8 +189,7 @@ class ChartsActivity : AppCompatActivity() {
                 viewModel.selectAccount(selected.id, selected.name)
                 binding.tvAccountName.text = selected.name
                 dialog.dismiss()
-            },
-            currencySymbol = userPreferences?.currencySymbol ?: "$"
+            }, currencySymbol = userPreferences?.currencySymbol ?: "$"
         )
 
         rv.adapter = adapter
@@ -147,94 +197,97 @@ class ChartsActivity : AppCompatActivity() {
         dialog.setContentView(view)
         dialog.show()
     }
+
     private fun setupChart(income: Float, expense: Float, transfer: Float) {
-        val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+        val isDarkMode =
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         val textColor = if (isDarkMode) "#FFFFFF" else "#333333"
 
         val typedValue = android.util.TypedValue()
         theme.resolveAttribute(com.google.android.material.R.attr.colorSurface, typedValue, true)
         val surfaceColorHex = String.format("#%06X", 0xFFFFFF and typedValue.data)
 
-        val model = AAChartModel()
-            .chartType(AAChartType.Pie)
-            .title("")
-            .backgroundColor(surfaceColorHex)
-            .dataLabelsEnabled(true)
-            .dataLabelsStyle(AAStyle().color(textColor))
-            .legendEnabled(true)
-            .colorsTheme(arrayOf("#4CAF50", "#FF4D4D", "#2196F3"))
-            .series(
-                arrayOf(
-                    AASeriesElement()
-                        .name(getString(R.string.til_amount))
-                        .innerSize("60%")
-                        .data(
-                            arrayOf(
-                                arrayOf(getString(R.string.incomes), income),
-                                arrayOf(getString(R.string.expenses), expense),
-                                arrayOf(getString(R.string.transfers), transfer)
+        val model =
+            AAChartModel().chartType(AAChartType.Pie).title("").backgroundColor(surfaceColorHex)
+                .dataLabelsEnabled(true).dataLabelsStyle(AAStyle().color(textColor))
+                .legendEnabled(true).colorsTheme(arrayOf("#4CAF50", "#FF4D4D", "#2196F3")).series(
+                    arrayOf(
+                        AASeriesElement().name(getString(R.string.til_amount)).innerSize("60%")
+                            .data(
+                                arrayOf(
+                                    arrayOf(getString(R.string.incomes), income),
+                                    arrayOf(getString(R.string.expenses), expense),
+                                    arrayOf(getString(R.string.transfers), transfer)
+                                )
                             )
-                        )
+                    )
                 )
-            )
 
         val options = model.aa_toAAOptions()
         options.legend?.itemStyle?.color(textColor)
         binding.speciaAreaChart.aa_drawChartWithChartOptions(options)
     }
+
     private fun observeState() {
         lifecycleScope.launch {
-            userDataStore.getUserData().collectLatest { user ->
-                userPreferences = user
-                transactionsAdapter.updateCurrencySymbol(user.currencySymbol)
-            }
-        }
-        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.tvMonth.text = monthFormat.format(state.currentMonthTimestamp).replaceFirstChar { it.uppercase() }
-                    if (state.isLoading) {
-                        binding.progressBar.visibility = View.VISIBLE
-                        binding.contentLayout.visibility = View.GONE
-                        binding.emptyStateLayout.visibility = View.GONE
-                        binding.errorStateLayout.visibility = View.GONE
-                    } else if (state.errorMessage != null) {
-                        binding.progressBar.visibility = View.GONE
-                        binding.contentLayout.visibility = View.GONE
-                        binding.emptyStateLayout.visibility = View.GONE
-                        binding.errorStateLayout.visibility = View.VISIBLE
-                        binding.tvErrorMessage.text = state.errorMessage
-                    } else if (state.monthTransactions.isEmpty()) {
-                        binding.progressBar.visibility = View.GONE
-                        binding.contentLayout.visibility = View.GONE
-                        binding.emptyStateLayout.visibility = View.VISIBLE
-                        binding.errorStateLayout.visibility = View.GONE
-                    } else {
-                        binding.progressBar.visibility = View.GONE
-                        binding.contentLayout.visibility = View.VISIBLE
-                        binding.emptyStateLayout.visibility = View.GONE
-                        binding.errorStateLayout.visibility = View.GONE
-
-                        setupChart(state.totalIncome, state.totalExpense, state.totalTransfer)
+                launch {
+                    userDataStore.getUserData().collectLatest { user ->
+                        userPreferences = user
+                        transactionsAdapter.updateCurrencySymbol(user.currencySymbol)
                     }
-                    if (state.selectedAccountId != null && state.selectedDate != null) {
-                        binding.layoutDateData.visibility = View.VISIBLE
-                        binding.btnClearSearch.visibility = View.VISIBLE
-
-                        val balance = state.snapshotBalance ?: 0.0
-                        binding.tvBalance.text = "${userPreferences?.currencySymbol ?: "$"} ${String.format("%.2f", balance)}"
-
-                        transactionsAdapter.submitList(state.snapshotTransactions)
-                        if (state.snapshotTransactions.isEmpty()) {
-                            binding.layoutTransactions.visibility = View.GONE
-                            binding.layoutNoInfo.visibility = View.VISIBLE
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.tvMonth.text = monthFormat.format(state.currentMonthTimestamp)
+                            .replaceFirstChar { it.uppercase() }
+                        if (state.isLoading) {
+                            binding.progressBar.visibility = View.VISIBLE
+                            binding.contentLayout.visibility = View.GONE
+                            binding.emptyStateLayout.visibility = View.GONE
+                            binding.errorStateLayout.visibility = View.GONE
+                        } else if (state.errorMessage != null) {
+                            binding.progressBar.visibility = View.GONE
+                            binding.contentLayout.visibility = View.GONE
+                            binding.emptyStateLayout.visibility = View.GONE
+                            binding.errorStateLayout.visibility = View.VISIBLE
+                            binding.tvErrorMessage.text = state.errorMessage
+                        } else if (state.monthTransactions.isEmpty()) {
+                            binding.progressBar.visibility = View.GONE
+                            binding.contentLayout.visibility = View.GONE
+                            binding.emptyStateLayout.visibility = View.VISIBLE
+                            binding.errorStateLayout.visibility = View.GONE
                         } else {
-                            binding.layoutTransactions.visibility = View.VISIBLE
-                            binding.layoutNoInfo.visibility = View.GONE
+                            binding.progressBar.visibility = View.GONE
+                            binding.contentLayout.visibility = View.VISIBLE
+                            binding.emptyStateLayout.visibility = View.GONE
+                            binding.errorStateLayout.visibility = View.GONE
+
+                            setupChart(state.totalIncome, state.totalExpense, state.totalTransfer)
                         }
-                    } else {
-                        binding.layoutDateData.visibility = View.GONE
-                        binding.btnClearSearch.visibility = View.GONE
+                        if (state.selectedAccountId != null && state.selectedDate != null) {
+                            binding.layoutDateData.visibility = View.VISIBLE
+                            binding.btnClearSearch.visibility = View.VISIBLE
+
+                            val balance = state.snapshotBalance ?: 0.0
+                            binding.tvBalance.text = "${userPreferences?.currencySymbol ?: "$"} ${
+                                String.format(
+                                    "%.2f", balance
+                                )
+                            }"
+
+                            transactionsAdapter.submitList(state.snapshotTransactions)
+                            if (state.snapshotTransactions.isEmpty()) {
+                                binding.layoutTransactions.visibility = View.GONE
+                                binding.layoutNoInfo.visibility = View.VISIBLE
+                            } else {
+                                binding.layoutTransactions.visibility = View.VISIBLE
+                                binding.layoutNoInfo.visibility = View.GONE
+                            }
+                        } else {
+                            binding.layoutDateData.visibility = View.GONE
+                            binding.btnClearSearch.visibility = View.GONE
+                        }
                     }
                 }
             }

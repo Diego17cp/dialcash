@@ -230,4 +230,8 @@
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="no_transactions_for_date">Für dieses Datum gibt es keine Transaktionen</string>
     <string name="add_transactions_for_date">Fügen Sie Transaktionen zu diesem Datum hinzu, um die Entwicklung des Kontostands und die Transaktionsliste anzuzeigen</string>
+    <string name="blog">Blog</string>
+    <string name="back">Zurück</string>
+    <string name="options">Optionen</string>
+    <string name="view_statistics">Statistiken anzeigen</string>
 </resources>

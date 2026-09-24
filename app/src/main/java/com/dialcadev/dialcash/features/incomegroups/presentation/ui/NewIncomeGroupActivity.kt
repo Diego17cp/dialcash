@@ -5,8 +5,19 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -15,16 +26,22 @@ import com.dialcadev.dialcash.R
 import com.google.android.material.R.attr
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
 import com.dialcadev.dialcash.databinding.NewIncomeActivityBinding
 import com.dialcadev.dialcash.features.incomegroups.presentation.viewmodels.CreateIncomeGroupViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class NewIncomeGroupActivity : AppCompatActivity() {
     private lateinit var binding: NewIncomeActivityBinding
+    private val hazeState = HazeState()
+
     @Inject
     lateinit var userDataStore: UserDataStore
     var preferences: UserPreferences? = null
@@ -32,26 +49,36 @@ class NewIncomeGroupActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = NewIncomeActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        setupToolbar()
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier.fillMaxSize().hazeSource(hazeState)
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned {
+                                    binding.scrollView.updatePadding(top = it.size.height)
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.new_income),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
         setupListeners()
         observeViewModel()
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel)
-        }
-        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
     private fun showKeyboard(view: View) {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

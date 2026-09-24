@@ -65,7 +65,7 @@ class RecentTransactionsAdapter(
                     when (transaction.type) {
                         "income" -> R.drawable.ic_income
                         "expense" -> R.drawable.ic_expense
-                        else -> R.drawable.ic_transactions_outline
+                        else -> R.drawable.ic_transfer_outline
                     }
                 imageTransactionIcon.setImageResource(iconRes)
                 val iconColor =

@@ -7,13 +7,28 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.core.ui.components.showAccountSelector
 import com.dialcadev.dialcash.core.ui.components.showIncomeGroupsSelector
 import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
@@ -26,6 +41,8 @@ import java.text.DateFormat
 import java.util.Locale
 import java.util.TimeZone
 import com.google.android.material.R.*
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -33,6 +50,7 @@ import java.util.Calendar
 @AndroidEntryPoint
 class NewTransactionActivity : AppCompatActivity() {
     private lateinit var binding: NewTransactionActivityBinding
+    private val hazeState = HazeState()
     private val viewModel: CreateTransactionViewModel by viewModels()
     private lateinit var transactionType: TransactionType
     private val dateFormat: DateFormat =
@@ -42,50 +60,66 @@ class NewTransactionActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = NewTransactionActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+
         val typeString = intent.getStringExtra("transaction_type")
         transactionType = TransactionType.fromString(typeString)
+        val appBarTitle = when (transactionType) {
+            TransactionType.INCOME -> getString(R.string.new_income)
+            TransactionType.EXPENSE -> getString(R.string.new_expense)
+            TransactionType.TRANSFER -> getString(R.string.new_transfer)
+        }
 
-        setupToolbar()
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier.fillMaxSize().hazeSource(hazeState)
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned {
+                                    binding.nestedScrollView.updatePadding(top = it.size.height)
+                                },
+                            hazeState = hazeState,
+                            title = appBarTitle,
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
+            insets
+        }
         setupUI()
         setupListeners()
         observeViewModel()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel)
-        }
-        binding.toolbar.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
-    }
-
     private fun setupUI() {
         when (transactionType) {
             TransactionType.INCOME -> {
-                binding.toolbar.title = getString(R.string.new_income)
                 binding.btnSave.text = getString(R.string.register_income)
             }
 
             TransactionType.EXPENSE -> {
-                binding.toolbar.title = getString(R.string.new_expense)
                 binding.btnSave.text = getString(R.string.register_expense)
                 binding.incomeGroupItem.visibility = View.VISIBLE
                 binding.incomeGroupDivider.visibility = View.VISIBLE
             }
 
             TransactionType.TRANSFER -> {
-                binding.toolbar.title = getString(R.string.new_transfer)
                 binding.btnSave.text = getString(R.string.register_transfer)
                 binding.tvFrom.visibility = View.VISIBLE
                 binding.toAccountItem.visibility = View.VISIBLE
@@ -160,7 +194,7 @@ class NewTransactionActivity : AppCompatActivity() {
                 calendar.set(year, month, dayOfMonth)
                 viewModel.onDateSelected(calendar.timeInMillis)
                 binding.etDate.setText(dateFormat.format(calendar.time))
-                binding.tvDateValue.text = calendar.timeInMillis.toString().toReadableDate()
+                binding.tvDateValue.text = calendar.timeInMillis.toReadableDate()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
