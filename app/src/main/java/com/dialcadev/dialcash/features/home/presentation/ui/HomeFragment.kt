@@ -189,8 +189,8 @@ class HomeFragment : Fragment() {
                             val iconRes = when (transaction.type) {
                                 "income" -> R.drawable.ic_income
                                 "expense" -> R.drawable.ic_expense
-                                "transfer" -> R.drawable.ic_transactions_outline
-                                else -> R.drawable.ic_transactions_outline
+                                "transfer" -> R.drawable.ic_transfer_outline
+                                else -> R.drawable.ic_transfer_outline
                             }
                             val date = dateFormat.format(transaction.date)
 

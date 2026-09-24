@@ -42,10 +42,10 @@ sealed class NavigationItem(
     val activeIconRes: Int,
     val titleRes: Int
 ) {
-    object Home : NavigationItem(R.id.homeFragment, R.drawable.ic_home_outline, R.drawable.ic_home_filled, R.string.home)
-    object Transactions : NavigationItem(R.id.transactionsFragment, R.drawable.ic_transactions_outline, R.drawable.ic_transactions_filled, R.string.transactions)
-    object Accounts : NavigationItem(R.id.accountsFragment, R.drawable.ic_accounts_outline, R.drawable.ic_accounts_filled, R.string.accounts)
-    object Incomes : NavigationItem(R.id.incomesFragment, R.drawable.ic_incomes_outline, R.drawable.ic_incomes_filled, R.string.incomes)
+    object Home : NavigationItem(R.id.homeFragment, R.drawable.ic_home_outline, R.drawable.ic_home_fill, R.string.home)
+    object Transactions : NavigationItem(R.id.transactionsFragment, R.drawable.ic_transfer_outline, R.drawable.ic_transfer_fill, R.string.transactions)
+    object Accounts : NavigationItem(R.id.accountsFragment, R.drawable.ic_wallet_outline, R.drawable.ic_wallet_fill, R.string.accounts)
+    object Incomes : NavigationItem(R.id.incomesFragment, R.drawable.ic_pig_money_outline, R.drawable.ic_pig_money_fill, R.string.incomes)
     object Blog : NavigationItem(R.id.blogFragment, R.drawable.ic_megaphone, R.drawable.ic_megaphone_filled, R.string.blog)
 }
 
@@ -165,7 +165,6 @@ fun FloatingBottomNav(
                             .fillMaxHeight()
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
-                                indication = null
                             ) { onItemClick(item) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center

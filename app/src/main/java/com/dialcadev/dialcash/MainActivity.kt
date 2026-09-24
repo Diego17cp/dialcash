@@ -177,7 +177,7 @@ class MainActivity : AppCompatActivity() {
                         } else null,
                         actions = listOf(
                             AppBarAction(
-                                iconRes = R.drawable.ic_settings,
+                                iconRes = R.drawable.ic_settings_fill,
                                 contentDescription = stringResource(R.string.settings),
                                 onClick = {
                                     startActivity(

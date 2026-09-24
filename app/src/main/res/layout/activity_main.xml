@@ -12,18 +12,4 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:itemActiveIndicatorStyle="@style/App.Custom.Indicator"
-        app:itemIconTint="@drawable/bottom_nav_colors"
-        app:itemRippleColor="@color/colorPrimaryVariant"
-        app:itemTextColor="@drawable/bottom_nav_colors"
-        app:labelVisibilityMode="labeled"
-        app:backgroundTint="@color/background"
-        android:visibility="gone"
-        app:menu="@menu/bottom_nav_menu" />
-
 </LinearLayout>

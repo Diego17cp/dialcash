@@ -197,7 +197,7 @@
                             android:layout_height="40dp"
                             android:background="@drawable/bg_transfer_btn"
                             android:padding="8dp"
-                            android:src="@drawable/ic_transactions_outline"
+                            android:src="@drawable/ic_transfer_outline"
                             app:tint="@color/colorPrimary" />
 
                         <TextView

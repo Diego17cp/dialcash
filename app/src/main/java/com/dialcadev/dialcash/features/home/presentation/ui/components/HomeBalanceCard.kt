@@ -189,7 +189,7 @@ fun HomeBalanceCard(
 
                 QuickActionButton(
                     modifier = Modifier.weight(1f),
-                    iconRes = R.drawable.ic_transactions_outline,
+                    iconRes = R.drawable.ic_transfer_2_outline,
                     label = stringResource(id = R.string.transfer),
                     enabled = actionsEnabled,
                     hazeState = hazeState,
