@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
@@ -23,142 +22,6 @@
                     android:id="@+id/composeBalanceCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_dashboard_balance"
-                    android:padding="16dp"
-                    android:id="@+id/balance_card"
-                    android:orientation="vertical">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:orientation="vertical"
-                        android:paddingTop="8dp"
-                        android:paddingBottom="8dp">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                            <TextView
-                                android:id="@+id/tvTotalLabel"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="start"
-                                android:text="@string/total_balance"
-                                android:textAlignment="viewStart"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="16sp"
-                                android:textStyle="normal" />
-                            <ImageButton
-                                android:id="@+id/btnToggleEye"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginStart="8dp"
-                                android:background="?attr/selectableItemBackgroundBorderless"
-                                android:src="@drawable/ic_eye_closed"
-                                android:scaleType="centerInside"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-                        </LinearLayout>
-                        <TextView
-                            android:id="@+id/textTotalBalance"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="$0.00"
-                            android:textAlignment="viewStart"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="42sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                    <!-- Quick Actions -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:orientation="horizontal">
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <ImageButton
-                                android:id="@+id/btnQuickIncome"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:layout_marginBottom="6dp"
-                                android:adjustViewBounds="true"
-                                android:background="@drawable/bg_action_circle"
-                                android:contentDescription="@string/income"
-                                android:padding="12dp"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_income"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="@string/income"
-                                android:textAllCaps="false"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <ImageButton
-                                android:id="@+id/btnQuickExpense"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:layout_marginBottom="6dp"
-                                android:background="@drawable/bg_action_circle"
-                                android:contentDescription="@string/expense"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_expense"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="@string/expense"
-                                android:textAllCaps="false"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-                            <ImageButton
-                                android:id="@+id/btnQuickTransfer"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:layout_marginBottom="6dp"
-                                android:adjustViewBounds="true"
-                                android:background="@drawable/bg_action_circle"
-                                android:contentDescription="@string/transfer"
-                                android:padding="12dp"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_transactions_outline"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center"
-                                android:text="@string/transfer"
-                                android:textAllCaps="false"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
                 <!-- Main Accounts Section -->
                 <LinearLayout
                     android:id="@+id/layoutMainAccounts"
@@ -177,7 +40,6 @@
                             android:text="@string/main_accounts"
                             android:textSize="18sp"
                             android:textStyle="bold" />
-
                         <Button
                             android:id="@+id/btnViewAllAccounts"
                             style="@style/Widget.Material3.Button.TextButton"
@@ -185,11 +47,10 @@
                             android:layout_height="wrap_content"
                             android:text="@string/view_all" />
                     </LinearLayout>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerViewAccounts"
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/composeAccountsRow"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
                 <!-- Recent Transactions Section -->
                 <LinearLayout
@@ -216,11 +77,10 @@
                             android:layout_height="wrap_content"
                             android:text="@string/view_all" />
                     </LinearLayout>
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/recyclerViewTransactions"
+                    <androidx.compose.ui.platform.ComposeView
+                        android:id="@+id/composeRecentTransaction"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp" />
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/layoutNoInfo"

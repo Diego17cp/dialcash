@@ -5,10 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.unit.dp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -31,15 +39,19 @@ import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
 import com.dialcadev.dialcash.databinding.FragmentHomeBinding
 import com.dialcadev.dialcash.features.accounts.presentation.adapter.MainAccountsAdapter
 import com.dialcadev.dialcash.features.home.presentation.ui.components.HomeBalanceCard
+import com.dialcadev.dialcash.features.home.presentation.ui.components.MainAccountCard
 import com.dialcadev.dialcash.features.home.presentation.viewmodels.HomeViewModel
 import com.dialcadev.dialcash.features.transactions.presentation.adapters.RecentTransactionsAdapter
 import com.dialcadev.dialcash.features.transactions.presentation.ui.NewTransactionActivity
+import com.dialcadev.dialcash.features.transactions.presentation.ui.components.TransactionCard
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -52,12 +64,11 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
     private val chromeViewModel: UiChromeViewModel by activityViewModels()
 
-    private lateinit var accountsAdapter: MainAccountsAdapter
-    private lateinit var transactionsAdapter: RecentTransactionsAdapter
-
     @Inject
     lateinit var userDataStore: UserDataStore
     private var preferences: UserPreferences? = null
+    private val dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -69,7 +80,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupBalanceCard()
-        setupRecyclerViews()
+        setupAccountsComposeRow()
+        setupRecentTransactionsComposeList()
         setupOnClickListeners()
         setupSwipeRefresh()
         setupChromePadding()
@@ -112,6 +124,119 @@ class HomeFragment : Fragment() {
             }
         }
     }
+    private fun setupAccountsComposeRow() {
+        binding.composeAccountsRow.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MaterialTheme(typography = AppTypography) {
+                    val state by viewModel.uiState.collectAsState()
+                    val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                    val currencySymbol = userPreferences?.currencySymbol ?: "$"
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            items = state.mainAccounts,
+                            key = { it.id }
+                        ) { account ->
+                            val iconRes = when (account.type) {
+                                "bank" -> R.drawable.ic_bank
+                                "cash" -> R.drawable.ic_cash
+                                "card" -> R.drawable.ic_card
+                                "wallet" -> R.drawable.ic_accounts_outline
+                                else -> R.drawable.ic_account_default
+                            }
+                            MainAccountCard(
+                                accountName = account.name,
+                                balanceText = "$currencySymbol ${account.balance.toCurrencyFormat()}",
+                                iconRes = iconRes,
+                                onClick = {
+                                    requireContext().showAccountDetailsBottomSheet(
+                                        account = account,
+                                        currencySymbol = currencySymbol,
+                                        onUpdate = { updated -> viewModel.updateAccount(updated) },
+                                        onDelete = { toDeleted -> viewModel.deleteAccount(toDeleted) }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun setupRecentTransactionsComposeList() {
+        binding.composeRecentTransaction.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MaterialTheme(typography = AppTypography) {
+                    val state by viewModel.uiState.collectAsState()
+                    val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                    val currencySymbol = userPreferences?.currencySymbol ?: "$"
+
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(0.dp),
+                    ) {
+                        state.recentTransactions.forEach { transaction ->
+                            val amountColor = when (transaction.type) {
+                                "income" -> Color(0xFF4CAF50)
+                                "expense" -> Color(0xFFE53935)
+                                "transfer" -> Color(0xFF2196F3)
+                                else -> MaterialTheme.colorScheme.primary
+                            }
+
+                            val iconRes = when (transaction.type) {
+                                "income" -> R.drawable.ic_income
+                                "expense" -> R.drawable.ic_expense
+                                "transfer" -> R.drawable.ic_transactions_outline
+                                else -> R.drawable.ic_transactions_outline
+                            }
+                            val date = dateFormat.format(transaction.date)
+
+                            val metaText = buildString {
+                                append(transaction.accountName ?: "")
+                                if (transaction.accountName.isNotBlank()) {
+                                    append(" • ")
+                                }
+                                append(date)
+                            }
+
+                            TransactionCard(
+                                title = transaction.description ?: "No Description",
+                                meta = metaText,
+                                amountText = "$currencySymbol ${transaction.amount.toCurrencyFormat()}",
+                                amountColor = amountColor,
+                                iconRes = iconRes,
+                                onClick = {
+                                    val uiState = viewModel.uiState.value
+                                    requireContext().showTransactionDetailsBottomSheet(
+                                        transaction = transaction,
+                                        currencySymbol = currencySymbol,
+                                        accounts = uiState.accounts,
+                                        incomeGroups = uiState.incomeGroups,
+                                        onUpdate = { updated -> viewModel.updateTransaction(updated) },
+                                        onDelete = { toDeleted -> viewModel.deleteTransaction(toDeleted) },
+                                        onValidateBalance = { id, type, accId, amount, accToId, incomeId, onResult ->
+                                            viewModel.validateTransactionBalance(
+                                                id,
+                                                type,
+                                                accId,
+                                                amount,
+                                                accToId,
+                                                incomeId,
+                                                onResult
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private fun setupChromePadding() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -137,67 +262,12 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun setupRecyclerViews() {
-        accountsAdapter = MainAccountsAdapter(
-            onAccountClick = { account ->
-                requireContext().showAccountDetailsBottomSheet(
-                    account = account,
-                    currencySymbol = preferences?.currencySymbol ?: "$",
-                    onUpdate = { updated -> viewModel.updateAccount(updated) },
-                    onDelete = { toDeleted -> viewModel.deleteAccount(toDeleted) })
-            }, currencySymbol = preferences?.currencySymbol ?: "$"
-        )
-        binding.recyclerViewAccounts.apply {
-            layoutManager = LinearLayoutManager(
-                context, LinearLayoutManager.HORIZONTAL, false
-            )
-            adapter = accountsAdapter
-        }
-        transactionsAdapter = RecentTransactionsAdapter(
-            onTransactionClick = { transaction ->
-                val uiState = viewModel.uiState.value
-                requireContext().showTransactionDetailsBottomSheet(
-                    transaction = transaction,
-                    currencySymbol = preferences?.currencySymbol ?: "$",
-                    accounts = uiState.accounts,
-                    incomeGroups = uiState.incomeGroups,
-                    onUpdate = { updated -> viewModel.updateTransaction(updated) },
-                    onDelete = { toDeleted -> viewModel.deleteTransaction(toDeleted) },
-                    onValidateBalance = { id, type, accId, amount, accToId, incomeId, onResult ->
-                        viewModel.validateTransactionBalance(
-                            id,
-                            type,
-                            accId,
-                            amount,
-                            accToId,
-                            incomeId,
-                            onResult
-                        )
-                    }
-                )
-            }, currencySymbol = preferences?.currencySymbol ?: "$"
-        )
-        binding.recyclerViewTransactions.apply {
-            layoutManager = LinearLayoutManager(
-                context, LinearLayoutManager.VERTICAL, false
-            )
-            adapter = transactionsAdapter
-        }
-    }
-
     private fun setupOnClickListeners() {
-        binding.btnQuickIncome.setOnClickListener { navigateToTransactionType("income") }
-        binding.btnQuickExpense.setOnClickListener { navigateToTransactionType("expense") }
-        binding.btnQuickTransfer.setOnClickListener { navigateToTransactionType("transfer") }
-
         binding.btnViewAllTransactions.setOnClickListener {
             navigateToTopLevelDestination(R.id.transactionsFragment)
         }
         binding.btnViewAllAccounts.setOnClickListener {
             navigateToTopLevelDestination(R.id.accountsFragment)
-        }
-        binding.btnToggleEye.setOnClickListener {
-            lifecycleScope.launch { userDataStore.toggleBalanceVisibility() }
         }
     }
 
@@ -213,23 +283,7 @@ class HomeFragment : Fragment() {
         nav.navigate(destinationId, null, options)
     }
 
-    private fun updateBalanceVisibility(isVisible: Boolean, totalBalance: Double) {
-        val formattedBalance = if (isVisible) {
-            "${preferences?.currencySymbol ?: "$"} ${totalBalance.toCurrencyFormat()}"
-        } else {
-            val balanceParts = totalBalance.toCurrencyFormat().split(".")
-            val decimals = if (balanceParts.size > 1) balanceParts[1] else "00"
-            "${preferences?.currencySymbol ?: "$"} ****.$decimals"
-        }
-        binding.textTotalBalance.text = formattedBalance
-        binding.btnToggleEye.setImageResource(if (!isVisible) R.drawable.ic_eye else R.drawable.ic_eye_closed)
-    }
-
     private fun updateEmptyState(accountsEmpty: Boolean, transactionsEmpty: Boolean) {
-        binding.btnQuickIncome.isEnabled = !accountsEmpty
-        binding.btnQuickExpense.isEnabled = !accountsEmpty
-        binding.btnQuickTransfer.isEnabled = !accountsEmpty
-
         binding.layoutNoInfo.visibility =
             if (accountsEmpty && transactionsEmpty) View.VISIBLE else View.GONE
         binding.layoutMainAccounts.visibility = if (accountsEmpty) View.GONE else View.VISIBLE
@@ -250,28 +304,10 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    userDataStore.getUserData().collect { userPreferences ->
-                        preferences = userPreferences
-                        accountsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-                        transactionsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-                        updateBalanceVisibility(
-                            isVisible = preferences?.isBalanceVisible ?: true,
-                            totalBalance = viewModel.uiState.value.totalBalance
-                        )
-                    }
-                }
-                launch {
                     viewModel.uiState.collect { state ->
                         binding.swipeRefreshLayout.isRefreshing = state.isLoading
                         binding.progressBar.visibility =
                             if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
-                        accountsAdapter.submitList(state.mainAccounts)
-                        transactionsAdapter.submitList(state.recentTransactions)
-                        preferences?.let {
-                            updateBalanceVisibility(
-                                isVisible = it.isBalanceVisible, totalBalance = state.totalBalance
-                            )
-                        }
                         updateEmptyState(
                             accountsEmpty = state.mainAccounts.isEmpty(),
                             transactionsEmpty = state.recentTransactions.isEmpty()
