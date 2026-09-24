@@ -82,22 +82,4 @@
             android:textAppearance="?attr/textAppearanceBody2"
             android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnNewIncome"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:contentDescription="New Income"
-        android:src="@drawable/ic_plus"
-        app:backgroundTint="@color/colorPrimary"
-        app:cornerRadius="28dp"
-        app:elevation="6dp"
-        app:fabSize="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:maxImageSize="25dp"
-        app:pressedTranslationZ="12dp"
-        app:tint="@color/surface" />
 </androidx.constraintlayout.widget.ConstraintLayout>
