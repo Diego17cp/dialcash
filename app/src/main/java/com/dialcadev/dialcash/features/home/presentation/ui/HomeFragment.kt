@@ -180,9 +180,9 @@ class HomeFragment : Fragment() {
                     ) {
                         state.recentTransactions.forEach { transaction ->
                             val amountColor = when (transaction.type) {
-                                "income" -> Color(0xFF4CAF50)
-                                "expense" -> Color(0xFFE53935)
-                                "transfer" -> Color(0xFF2196F3)
+                                "income" -> Color(0xFF26E6A4)
+                                "expense" -> Color(0xFFFF4D6D)
+                                "transfer" -> Color(0xFF00B4D8)
                                 else -> MaterialTheme.colorScheme.primary
                             }
 
