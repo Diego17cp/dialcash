@@ -6,25 +6,32 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.ui.UiChromeViewModel
 import com.dialcadev.dialcash.databinding.FragmentBlogBinding
 import com.dialcadev.dialcash.features.blog.presentation.adapters.PostsAdapter
 import com.dialcadev.dialcash.features.blog.presentation.viewmodels.BlogViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 @AndroidEntryPoint
 class BlogFragment: Fragment() {
     private var _binding: FragmentBlogBinding? = null
     private val binding get() = _binding!!
     private val viewModel: BlogViewModel by viewModels()
+    private val chromeViewModel: UiChromeViewModel by activityViewModels()
+
     private lateinit var postsAdapter: PostsAdapter
 
     private val WEB_URL = "https://dialcash.vercel.app"
@@ -41,6 +48,20 @@ class BlogFragment: Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.rvPosts.clipToPadding = false
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combine(
+                    chromeViewModel.topBarHeightPx,
+                    chromeViewModel.bottomBarHeightPx
+                ) { top, bottom -> top to bottom }
+                    .collect { (top, bottom) ->
+                        binding.layoutBlog.updatePadding(top = top)
+                        binding.rvPosts.updatePadding(bottom = bottom)
+                        binding.layoutNoPosts.updatePadding(top = top, bottom = bottom)
+                    }
+            }
+        }
         setupRecyclerView()
         observeViewModel()
         setupSwipeRefresh()
