@@ -98,7 +98,7 @@ fun FloatingBottomNav(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp)
+                .height(60.dp) // with text is 72
                 .padding(horizontal = 24.dp)
                 .graphicsLayer {
                     shadowElevation = 20f
@@ -179,15 +179,15 @@ fun FloatingBottomNav(
                                 .size(24.dp)
                                 .graphicsLayer(scaleX = iconScale, scaleY = iconScale)
                         )
-                        Text(
-                            text = stringResource(id = item.titleRes),
-                            fontSize = 11.sp,
-                            fontWeight = if (isActive) FontWeight.W600 else FontWeight.W500,
-                            letterSpacing = (-0.1).sp,
-                            color = tintColor,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+//                        Text(
+//                            text = stringResource(id = item.titleRes),
+//                            fontSize = 11.sp,
+//                            fontWeight = if (isActive) FontWeight.W600 else FontWeight.W500,
+//                            letterSpacing = (-0.1).sp,
+//                            color = tintColor,
+//                            maxLines = 1,
+//                            overflow = TextOverflow.Ellipsis
+//                        )
                     }
                 }
             }
