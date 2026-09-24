@@ -8,9 +8,12 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +22,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
+import com.dialcadev.dialcash.core.ui.UiChromeViewModel
+import com.dialcadev.dialcash.core.ui.components.AppBarAction
 import com.dialcadev.dialcash.core.ui.components.showTransactionDetailsBottomSheet
 import com.dialcadev.dialcash.core.ui.components.showTransactionFiltersBottomSheet
 import com.dialcadev.dialcash.databinding.FragmentTransactionsBinding
@@ -27,11 +32,15 @@ import com.dialcadev.dialcash.features.transactions.presentation.viewmodels.AllT
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class TransactionsFragment : Fragment() {
+    private val chromeViewModel: UiChromeViewModel by activityViewModels()
+    private val ownerTag = "TransactionsFragment"
+
     private var _binding: FragmentTransactionsBinding? = null
     private val binding get() = _binding!!
 
@@ -53,11 +62,73 @@ class TransactionsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.recyclerViewTransactions.clipToPadding = false
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                combine(
+                    chromeViewModel.topBarHeightPx,
+                    chromeViewModel.bottomBarHeightPx
+                ) { top, bottom -> top to bottom }
+                    .collect { (top, bottom) ->
+                        binding.recyclerViewTransactions.updatePadding(top = top, bottom = bottom)
+                    }
+            }
+        }
+
         setupMenu()
         setupUI()
         setupRecyclerView()
         setupSwipeToRefresh()
         observeState()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        chromeViewModel.setExtraActions(
+            ownerTag,
+            listOf(
+                AppBarAction(
+                    iconRes = R.drawable.ic_menu_dots,
+                    contentDescription = getString(R.string.options),
+                    subActions = listOf(
+                        AppBarAction(
+                            iconRes = R.drawable.ic_filter_list,
+                            contentDescription = getString(R.string.filters),
+                            onClick = { onOpenFilters() }
+                        ),
+                        AppBarAction(
+                            iconRes = R.drawable.ic_chart,
+                            contentDescription = getString(R.string.view_statistics),
+                            onClick =
+                                {
+                                    startActivity(
+                                        Intent(
+                                            requireContext(),
+                                            ChartsActivity::class.java
+                                        )
+                                    )
+                                })
+                    ),
+                )
+            )
+        )
+    }
+
+    override fun onPause() {
+        chromeViewModel.clearExtraActions(ownerTag)
+        super.onPause()
+    }
+
+    private fun onOpenFilters() {
+        val state = viewModel.uiState.value
+        requireContext().showTransactionFiltersBottomSheet(
+            currentFilters = state.currentFilters,
+            accounts = state.accounts,
+            onApplyFilters = { newFilters ->
+                viewModel.updateFilters(newFilters)
+            }
+        )
     }
 
     private fun setupMenu() {
