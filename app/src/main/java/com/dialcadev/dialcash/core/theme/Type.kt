@@ -47,6 +47,11 @@ val AppTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp
     ),
+    labelLarge = TextStyle(
+        fontFamily = AppFontFamily,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp
+    ),
     labelMedium = TextStyle(
         fontFamily = AppFontFamily,
         fontWeight = FontWeight.Medium,
