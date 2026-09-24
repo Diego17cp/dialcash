@@ -8,6 +8,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,36 +30,59 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.core.content.edit
+import androidx.core.view.WindowCompat
+import androidx.core.view.updatePadding
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: SettingsActivityBinding
+    private val hazeState = HazeState()
+
     @Inject
     lateinit var userDataStore: UserDataStore
     var preferences: UserPreferences? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = SettingsActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { v, insets ->
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier.fillMaxSize().hazeSource(hazeState)
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned {
+                                    binding.nestedScrollView.updatePadding(top = it.size.height)
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.settings),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
         setupViews()
         setupListeners()
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
     private fun setupViews() {
         lifecycleScope.launch {

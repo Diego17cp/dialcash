@@ -5,24 +5,11 @@
     android:id="@+id/new_transaction_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        android:background="@android:color/transparent"
-        app:titleCentered="true"
-        android:paddingTop="10dp"
-        app:title="@string/new_transaction"
-        app:titleTextColor="?attr/colorOnSurface"
-        app:navigationIconTint="?attr/colorOnSurface" />
-
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
+        android:id="@+id/nestedScrollView"
+        android:clipToPadding="false"
         android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout

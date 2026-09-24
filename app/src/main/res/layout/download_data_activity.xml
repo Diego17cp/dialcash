@@ -5,19 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:elevation="0dp"
-        app:title="@string/download_data"
-        app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineSmall"
-        app:titleTextColor="?attr/colorOnSurface" />
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
+        android:clipToPadding="false"
+        android:id="@+id/nestedScrollView"
         android:padding="24dp">
 
         <LinearLayout

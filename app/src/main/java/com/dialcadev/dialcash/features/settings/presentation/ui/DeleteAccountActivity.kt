@@ -15,41 +15,93 @@ import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.databinding.DeleteAccountActivityBinding
 import com.dialcadev.dialcash.features.settings.presentation.viewmodels.DeleteAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.view.WindowCompat
+import androidx.core.view.updatePadding
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
+import dev.chrisbanes.haze.hazeSource
 
 @AndroidEntryPoint
 class DeleteAccountActivity : AppCompatActivity() {
     lateinit var binding: DeleteAccountActivityBinding
+    private val hazeState = HazeState()
+
     private val viewModel: DeleteAccountViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = DeleteAccountActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.delete_account)) { v, insets ->
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    var appBarHeightPx by remember { mutableIntStateOf(0) }
+                    val extraTopPaddingPx = (12 * resources.displayMetrics.density).toInt()
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeSource(hazeState),
+                            update = {
+                                val nested = binding.nestedScrollView
+                                val desiredTop = appBarHeightPx + extraTopPaddingPx
+                                if (nested.paddingTop != desiredTop) {
+                                    nested.updatePadding(top = desiredTop)
+                                }
+                            }
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned { coordinates ->
+                                    val measured = coordinates.size.height
+                                    if (measured != appBarHeightPx) {
+                                        appBarHeightPx = measured
+                                    }
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.delete_account),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
         setupListeners()
         observeViewModel()
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
+
     private fun setupListeners() {
         binding.btnCancel.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.confirmText.setOnClickListener { viewModel.toggleCheckbox() }
         binding.confirmCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            if (binding.confirmCheckbox.isChecked != viewModel.uiState.value.isCheckboxChecked) viewModel.setCheckboxChecked(isChecked)
+            if (binding.confirmCheckbox.isChecked != viewModel.uiState.value.isCheckboxChecked) viewModel.setCheckboxChecked(
+                isChecked
+            )
         }
         binding.btnDelete.setOnClickListener {
             if (!viewModel.uiState.value.isCheckboxChecked) {
@@ -63,6 +115,7 @@ class DeleteAccountActivity : AppCompatActivity() {
             viewModel.deleteAccount()
         }
     }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {

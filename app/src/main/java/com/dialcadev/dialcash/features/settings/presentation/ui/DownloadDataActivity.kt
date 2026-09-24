@@ -8,51 +8,101 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dialcadev.dialcash.R
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
 import com.dialcadev.dialcash.databinding.DownloadDataActivityBinding
 import com.dialcadev.dialcash.features.settings.presentation.viewmodels.DownloadDataViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
+import dev.chrisbanes.haze.hazeSource
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class DownloadDataActivity : AppCompatActivity() {
     private lateinit var binding: DownloadDataActivityBinding
+    private val hazeState = HazeState()
+
     private val viewModel: DownloadDataViewModel by viewModels()
 
-    private val createDocumentLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
-        uri?.let { viewModel.startExport(it.toString()) }
-    }
+    private val createDocumentLauncher =
+        registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
+            uri?.let { viewModel.startExport(it.toString()) }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = DownloadDataActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.download_data_layout)) { v, insets ->
+        val composeView = ComposeView(this).apply {
+            setContent {
+                MaterialTheme(
+                    typography = AppTypography
+                ) {
+                    var appBarHeightPx by remember { mutableIntStateOf(0) }
+                    val extraTopPaddingPx = (12 * resources.displayMetrics.density).toInt()
+
+                    Box(Modifier.fillMaxSize()) {
+                        AndroidView(
+                            factory = { binding.root },
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .hazeSource(hazeState),
+                            update = {
+                                val nested = binding.nestedScrollView
+                                val desiredTop = appBarHeightPx + extraTopPaddingPx
+                                if (nested.paddingTop != desiredTop) {
+                                    nested.updatePadding(top = desiredTop)
+                                }
+                            }
+                        )
+                        LiquidAppBar(
+                            modifier = Modifier
+                                .align(Alignment.TopCenter)
+                                .onGloballyPositioned { coordinates ->
+                                    val measured = coordinates.size.height
+                                    if (measured != appBarHeightPx) {
+                                        appBarHeightPx = measured
+                                    }
+                                },
+                            hazeState = hazeState,
+                            title = getString(R.string.download_data),
+                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                        )
+                    }
+                }
+            }
+        }
+        setContentView(composeView)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
             insets
         }
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-
         setupListeners()
         observeViewModel()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressedDispatcher.onBackPressed()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
     private fun setupListeners() {
         binding.btnCancel.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
         binding.confirmText.setOnClickListener { viewModel.toggleCheckbox() }
@@ -73,6 +123,7 @@ class DownloadDataActivity : AppCompatActivity() {
             launchStoragePicker()
         }
     }
+
     private fun launchStoragePicker() {
         val fileName = "dialcash_data_${System.currentTimeMillis()}.backup"
         try {
@@ -82,22 +133,32 @@ class DownloadDataActivity : AppCompatActivity() {
             Toast.makeText(this, "Error starting file picker", Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun observeViewModel() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.confirmCheckbox.isChecked = state.isCheckboxChecked
                     binding.btnDownload.isEnabled = !state.isLoading
-                    if (state.isLoading) binding.btnDownload.text = getString(R.string.generating_backup)
+                    if (state.isLoading) binding.btnDownload.text =
+                        getString(R.string.generating_backup)
                     else binding.btnDownload.text = getString(R.string.download_data)
                     if (state.isSuccess) {
-                        Toast.makeText(this@DownloadDataActivity, getString(R.string.backup_saved_successfully), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@DownloadDataActivity,
+                            getString(R.string.backup_saved_successfully),
+                            Toast.LENGTH_LONG
+                        ).show()
                         viewModel.onCompleteHandled()
                         onBackPressedDispatcher.onBackPressed()
                     }
 
                     state.errorMessage?.let { error ->
-                        Toast.makeText(this@DownloadDataActivity, "${getString(R.string.failed_to_generate_backup)}: $error", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this@DownloadDataActivity,
+                            "${getString(R.string.failed_to_generate_backup)}: $error",
+                            Toast.LENGTH_LONG
+                        ).show()
                         viewModel.clearError()
                     }
                 }
