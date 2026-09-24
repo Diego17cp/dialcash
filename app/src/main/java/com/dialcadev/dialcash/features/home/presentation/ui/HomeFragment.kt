@@ -5,15 +5,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
+import com.dialcadev.dialcash.core.ui.UiChromeViewModel
 import com.dialcadev.dialcash.core.ui.components.showAccountDetailsBottomSheet
 import com.dialcadev.dialcash.core.ui.components.showTransactionDetailsBottomSheet
 import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
@@ -25,6 +30,7 @@ import com.dialcadev.dialcash.features.transactions.presentation.ui.NewTransacti
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,6 +40,7 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
+    private val chromeViewModel: UiChromeViewModel by activityViewModels()
 
     private lateinit var accountsAdapter: MainAccountsAdapter
     private lateinit var transactionsAdapter: RecentTransactionsAdapter
@@ -54,7 +61,23 @@ class HomeFragment : Fragment() {
         setupRecyclerViews()
         setupOnClickListeners()
         setupSwipeRefresh()
+        setupChromePadding()
         observeState()
+    }
+
+    private fun setupChromePadding() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                combine(chromeViewModel.topBarHeightPx, chromeViewModel.bottomBarHeightPx) { top, bottom -> top to bottom }
+                    .collect { (top, bottom) ->
+                        val extra = (8 * resources.displayMetrics.density).toInt()
+                        binding.nestedScrollView.updatePadding(
+                            top = top + extra,
+                            bottom = bottom + extra
+                        )
+                    }
+            }
+        }
     }
 
     private fun setupSwipeRefresh() {
@@ -117,16 +140,26 @@ class HomeFragment : Fragment() {
         binding.btnQuickTransfer.setOnClickListener { navigateToTransactionType("transfer") }
 
         binding.btnViewAllTransactions.setOnClickListener {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav).selectedItemId =
-                R.id.transactionsFragment
+            navigateToTopLevelDestination(R.id.transactionsFragment)
         }
         binding.btnViewAllAccounts.setOnClickListener {
-            requireActivity().findViewById<BottomNavigationView>(R.id.bottom_nav).selectedItemId =
-                R.id.accountsFragment
+            navigateToTopLevelDestination(R.id.accountsFragment)
         }
         binding.btnToggleEye.setOnClickListener {
             lifecycleScope.launch { userDataStore.toggleBalanceVisibility() }
         }
+    }
+
+    private fun navigateToTopLevelDestination(destinationId: Int) {
+        val nav = findNavController()
+        if (nav.currentDestination?.id == destinationId) return
+
+        val options = NavOptions.Builder()
+            .setPopUpTo(nav.graph.startDestinationId, false, saveState = true)
+            .setLaunchSingleTop(true)
+            .setRestoreState(true)
+            .build()
+        nav.navigate(destinationId, null, options)
     }
 
     private fun updateBalanceVisibility(isVisible: Boolean, totalBalance: Double) {
