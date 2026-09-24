@@ -92,7 +92,7 @@ fun LiquidAppBar(
                     modifier = Modifier
                         .align(Alignment.CenterStart)
                         .padding(start = 8.dp),
-                    iconRes = R.drawable.ic_arrow_left,
+                    iconRes = R.drawable.ic_arrow_back,
                     contentDescription = stringResource(R.string.back),
                     standalone = false,
                     onClick = onBackClick
