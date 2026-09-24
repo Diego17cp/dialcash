@@ -1,135 +1,114 @@
 package com.dialcadev.dialcash.features.settings.presentation.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.RadioGroup
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.Toolbar
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.dialcadev.dialcash.DialCashApp
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
-import com.dialcadev.dialcash.databinding.SettingsActivityBinding
+import com.dialcadev.dialcash.core.theme.AppTypography
+import com.dialcadev.dialcash.core.theme.DialCashTheme
+import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
+import com.dialcadev.dialcash.features.settings.presentation.ui.components.SettingsScreen
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.core.content.edit
-import androidx.core.view.WindowCompat
-import androidx.core.view.updatePadding
-import com.dialcadev.dialcash.core.theme.AppTypography
-import com.dialcadev.dialcash.core.ui.components.LiquidAppBar
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeSource
 
 @AndroidEntryPoint
 class SettingsActivity : AppCompatActivity() {
-    private lateinit var binding: SettingsActivityBinding
-    private val hazeState = HazeState()
 
     @Inject
     lateinit var userDataStore: UserDataStore
-    var preferences: UserPreferences? = null
+    private var preferences: UserPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        binding = SettingsActivityBinding.inflate(layoutInflater)
-        val composeView = ComposeView(this).apply {
-            setContent {
-                MaterialTheme(
-                    typography = AppTypography
-                ) {
-                    Box(Modifier.fillMaxSize()) {
-                        AndroidView(
-                            factory = { binding.root },
-                            modifier = Modifier.fillMaxSize().hazeSource(hazeState)
-                        )
-                        LiquidAppBar(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .onGloballyPositioned {
-                                    binding.nestedScrollView.updatePadding(top = it.size.height)
-                                },
-                            hazeState = hazeState,
-                            title = getString(R.string.settings),
-                            onBackClick = { onBackPressedDispatcher.onBackPressed() }
-                        )
-                    }
-                }
-            }
-        }
-        setContentView(composeView)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, 0, systemBars.right, systemBars.bottom)
-            insets
-        }
-        setupViews()
-        setupListeners()
-    }
-    private fun setupViews() {
-        lifecycleScope.launch {
-            userDataStore.getUserData().collect { userPreferences ->
+
+        setContent {
+            DialCashTheme (typography = AppTypography) {
+                val hazeState = remember { HazeState() }
+                var topBarHeight by remember { mutableStateOf(0.dp) }
+                val density = LocalDensity.current
+
+                val userPreferences by userDataStore.getUserData()
+                    .collectAsStateWithLifecycle(initialValue = null)
+
                 preferences = userPreferences
-                binding.tvUsername.text = userPreferences.name?.takeIf { it.isNotBlank() } ?: "User"
-                val uri = userPreferences.photoUri.takeIf { it.isNotBlank() }?.toUri()
-                if (uri != null) {
-                    try {
-                        binding.imageProfile.setImageURI(uri)
-                    } catch (e: Exception) {
-                        binding.imageProfile.setImageResource(R.drawable.ic_account_circle)
-                    }
-                } else {
-                    binding.imageProfile.setImageResource(R.drawable.ic_account_circle)
+
+                val userName = userPreferences?.name?.takeIf { it.isNotBlank() }
+                    ?: getString(R.string.username)
+                val photoUri = userPreferences?.photoUri?.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
+                val themeSummary = when (userPreferences?.themeMode) {
+                    AppCompatDelegate.MODE_NIGHT_NO -> getString(R.string.light)
+                    AppCompatDelegate.MODE_NIGHT_YES -> getString(R.string.dark)
+                    else -> getString(R.string.system_default)
                 }
-                val themeTextRes = when (userPreferences.themeMode) {
-                    AppCompatDelegate.MODE_NIGHT_NO -> R.string.light
-                    AppCompatDelegate.MODE_NIGHT_YES -> R.string.dark
-                    else -> R.string.system_default
+
+                Box(Modifier.fillMaxSize()) {
+                    SettingsScreen(
+                        hazeState = hazeState,
+                        topBarHeight = topBarHeight,
+                        userName = userName,
+                        photoUri = photoUri,
+                        themeSummary = themeSummary,
+                        onEditProfileClick = { navigateToEditProfile() },
+                        onThemeClick = { openThemeSelector() },
+                        onExportDataClick = { navigateToExportData() },
+                        onImportDataClick = { navigateToImportData() },
+                        onDeleteAccountClick = { navigateToDeleteAccount() }
+                    )
+
+                    LiquidAppBar(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .onGloballyPositioned {
+                                topBarHeight = with(density) { it.size.height.toDp() }
+                            },
+                        hazeState = hazeState,
+                        title = getString(R.string.settings),
+                        onBackClick = { onBackPressedDispatcher.onBackPressed() }
+                    )
                 }
-                binding.textCurrentTheme.text = getString(themeTextRes)
             }
         }
     }
-    private fun setupListeners() {
-        binding.tvEditProfile.setOnClickListener { navigateToEditProfile() }
-        binding.layoutThemeSelector.setOnClickListener { openThemeSelector() }
-        binding.layoutDeleteAccount.setOnClickListener { navigateToDeleteAccount() }
-        binding.layoutExportData.setOnClickListener { navigateToExportData() }
-        binding.layoutImportData.setOnClickListener { navigateToImportData() }
-    }
+
     private fun navigateToEditProfile() {
-        val intent = Intent(this, EditProfileActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, EditProfileActivity::class.java))
     }
     private fun navigateToDeleteAccount() {
-        val intent = Intent(this, DeleteAccountActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, DeleteAccountActivity::class.java))
     }
     private fun navigateToExportData() {
-        val intent = Intent(this, DownloadDataActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, DownloadDataActivity::class.java))
     }
     private fun navigateToImportData() {
-        val intent = Intent(this, ImportDataActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, ImportDataActivity::class.java))
     }
     private fun openThemeSelector() {
         val view = layoutInflater.inflate(R.layout.theme_picker_sheet, null)
