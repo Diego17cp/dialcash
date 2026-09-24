@@ -68,7 +68,10 @@ class HomeFragment : Fragment() {
     private fun setupChromePadding() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                combine(chromeViewModel.topBarHeightPx, chromeViewModel.bottomBarHeightPx) { top, bottom -> top to bottom }
+                combine(
+                    chromeViewModel.topBarHeightPx,
+                    chromeViewModel.bottomBarHeightPx
+                ) { top, bottom -> top to bottom }
                     .collect { (top, bottom) ->
                         val extra = (8 * resources.displayMetrics.density).toInt()
                         binding.nestedScrollView.updatePadding(
@@ -196,39 +199,42 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeState() {
-        lifecycleScope.launch {
-            userDataStore.getUserData().collect { userPreferences ->
-                preferences = userPreferences
-                accountsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-                transactionsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-                updateBalanceVisibility(
-                    isVisible = preferences?.isBalanceVisible ?: true,
-                    totalBalance = viewModel.uiState.value.totalBalance
-                )
-            }
-        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.swipeRefreshLayout.isRefreshing = state.isLoading
-                    binding.progressBar.visibility =
-                        if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
-                    accountsAdapter.submitList(state.mainAccounts)
-                    transactionsAdapter.submitList(state.recentTransactions)
-                    preferences?.let {
+                launch {
+                    userDataStore.getUserData().collect { userPreferences ->
+                        preferences = userPreferences
+                        accountsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
+                        transactionsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
                         updateBalanceVisibility(
-                            isVisible = it.isBalanceVisible, totalBalance = state.totalBalance
+                            isVisible = preferences?.isBalanceVisible ?: true,
+                            totalBalance = viewModel.uiState.value.totalBalance
                         )
                     }
-                    updateEmptyState(
-                        accountsEmpty = state.mainAccounts.isEmpty(),
-                        transactionsEmpty = state.recentTransactions.isEmpty()
-                    )
-                    state.errorMessage?.let { error ->
-                        Snackbar.make(
-                            binding.root, error, Snackbar.LENGTH_LONG
-                        ).setAction(getString(R.string.retry)) { viewModel.refreshData() }.show()
-                        viewModel.clearError()
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.swipeRefreshLayout.isRefreshing = state.isLoading
+                        binding.progressBar.visibility =
+                            if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
+                        accountsAdapter.submitList(state.mainAccounts)
+                        transactionsAdapter.submitList(state.recentTransactions)
+                        preferences?.let {
+                            updateBalanceVisibility(
+                                isVisible = it.isBalanceVisible, totalBalance = state.totalBalance
+                            )
+                        }
+                        updateEmptyState(
+                            accountsEmpty = state.mainAccounts.isEmpty(),
+                            transactionsEmpty = state.recentTransactions.isEmpty()
+                        )
+                        state.errorMessage?.let { error ->
+                            Snackbar.make(
+                                binding.root, error, Snackbar.LENGTH_LONG
+                            ).setAction(getString(R.string.retry)) { viewModel.refreshData() }
+                                .show()
+                            viewModel.clearError()
+                        }
                     }
                 }
             }

@@ -124,7 +124,7 @@ class SettingsActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     userDataStore.updateThemeMode(selectedTheme)
                     getSharedPreferences(DialCashApp.THEME_PREFS_NAME, MODE_PRIVATE)
-                        .edit {
+                        .edit(commit = true) {
                             putInt(DialCashApp.KEY_NIGHT_MODE, selectedTheme)
                         }
                     AppCompatDelegate.setDefaultNightMode(selectedTheme)
