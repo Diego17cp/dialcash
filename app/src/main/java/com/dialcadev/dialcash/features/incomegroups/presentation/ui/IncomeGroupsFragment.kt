@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.compose.setContent
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +43,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.dialcadev.dialcash.core.ui.components.GlassIconButton
+import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
 import com.dialcadev.dialcash.features.accounts.presentation.ui.NewAccountActivity
+import com.dialcadev.dialcash.features.incomegroups.presentation.ui.components.IncomeGroupCard
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
 
@@ -53,7 +57,6 @@ class IncomeGroupsFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: AllIncomeGroupsViewModel by viewModels()
     private val chromeViewModel: UiChromeViewModel by activityViewModels()
-    private lateinit var incomeGroupsAdapter: IncomeGroupsAdapter
 
     @Inject
     lateinit var userDataStore: UserDataStore
@@ -101,7 +104,6 @@ class IncomeGroupsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.recyclerViewIncomes.clipToPadding = false
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 combine(
@@ -109,42 +111,65 @@ class IncomeGroupsFragment : Fragment() {
                     chromeViewModel.bottomBarHeightPx
                 ) { top, bottom -> top to bottom }
                     .collect { (top, bottom) ->
-                        binding.recyclerViewIncomes.updatePadding(top = top, bottom = bottom)
+                        binding.composeIncomeGroupsList.updatePadding(top = top, bottom = bottom)
                         binding.layoutNoIncomes.updatePadding(top = top, bottom = bottom)
                         val density = resources.displayMetrics.density
                         bottomPaddingState.value = (bottom / density).dp
                     }
             }
         }
+        setupIncomeGroupsComposeList()
         setupSwipeToRefresh()
-        setupRecyclerView()
         observeState()
     }
+    private fun setupIncomeGroupsComposeList() {
+        binding.composeIncomeGroupsList.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                MaterialTheme {
+                    val state by viewModel.uiState.collectAsState()
+                    val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                    val currencySymbol = userPreferences?.currencySymbol ?: "$"
 
+                    androidx.compose.foundation.lazy.LazyColumn(
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 8.dp, bottom = 8.dp),
+                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(0.dp)
+                    ) {
+                        items(
+                            items = state.incomeGroups,
+                            key = { it.id }
+                        ) { income ->
+                            val totalText = getString(
+                                R.string.original_balance_with_value,
+                                "$currencySymbol ${income.amount.toCurrencyFormat()}"
+                            )
+                            val remainingText = "$currencySymbol ${income.remaining.toCurrencyFormat()}"
+
+                            IncomeGroupCard(
+                                title = income.name,
+                                totalText = totalText,
+                                remainingText = remainingText,
+                                iconRes = R.drawable.ic_income_item,
+                                onClick = {
+                                    requireContext().showIncomeGroupDetailsBottomSheet(
+                                        incomeGroup = income,
+                                        currencySymbol = currencySymbol,
+                                        onUpdate = { updated -> viewModel.updateIncomeGroup(updated) },
+                                        onDelete = { toDelete -> viewModel.deleteIncomeGroup(toDelete) }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
     private fun setupSwipeToRefresh() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refreshIncomeGroups()
         }
     }
-
-    private fun setupRecyclerView() {
-        incomeGroupsAdapter = IncomeGroupsAdapter(
-            onIncomeClick = { incomeGroup ->
-                requireContext().showIncomeGroupDetailsBottomSheet(
-                    incomeGroup = incomeGroup,
-                    currencySymbol = preferences?.currencySymbol ?: "$",
-                    onUpdate = { updated -> viewModel.updateIncomeGroup(updated) },
-                    onDelete = { toDelete -> viewModel.deleteIncomeGroup(toDelete) }
-                )
-            },
-            currencySymbol = preferences?.currencySymbol ?: "$"
-        )
-        binding.recyclerViewIncomes.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = incomeGroupsAdapter
-        }
-    }
-
     private fun updateEmptyState(incomeGroupsEmpty: Boolean) {
         if (incomeGroupsEmpty) {
             binding.layoutIncomes.visibility = View.GONE
@@ -154,14 +179,12 @@ class IncomeGroupsFragment : Fragment() {
             binding.layoutNoIncomes.visibility = View.GONE
         }
     }
-
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     userDataStore.getUserData().collect { userPreferences ->
                         preferences = userPreferences
-                        incomeGroupsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
                     }
                 }
                 launch {
@@ -169,7 +192,6 @@ class IncomeGroupsFragment : Fragment() {
                         binding.swipeRefreshLayout.isRefreshing = state.isLoading
                         binding.progressBar.visibility =
                             if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
-                        incomeGroupsAdapter.submitList(state.incomeGroups)
                         updateEmptyState(state.incomeGroups.isEmpty())
                         state.errorMessage?.let { error ->
                             Snackbar.make(
@@ -184,12 +206,10 @@ class IncomeGroupsFragment : Fragment() {
             }
         }
     }
-
     override fun onResume() {
         super.onResume()
         viewModel.refreshIncomeGroups()
     }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
