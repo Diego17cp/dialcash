@@ -194,7 +194,7 @@ class NewTransactionActivity : AppCompatActivity() {
                 calendar.set(year, month, dayOfMonth)
                 viewModel.onDateSelected(calendar.timeInMillis)
                 binding.etDate.setText(dateFormat.format(calendar.time))
-                binding.tvDateValue.text = calendar.timeInMillis.toString().toReadableDate()
+                binding.tvDateValue.text = calendar.timeInMillis.toReadableDate()
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
