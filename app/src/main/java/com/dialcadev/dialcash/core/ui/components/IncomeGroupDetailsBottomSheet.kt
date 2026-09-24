@@ -45,7 +45,7 @@ fun Context.showIncomeGroupDetailsBottomSheet(
         binding.etInitialBalance.error = null
     }
     binding.apply {
-        tvIncomeGroupRemaining.text = incomeGroup.name
+        tvIncomeGroupName.text = incomeGroup.name
         etEditAccountName.setText(incomeGroup.name)
         "$currencySymbol ${incomeGroup.amount.toCurrencyFormat()}".also {
             tvIncomeGroupBalance.text = it
