@@ -19,9 +19,14 @@
                 android:orientation="vertical"
                 android:padding="16dp">
                 <!-- Main Card -->
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/composeBalanceCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:background="@drawable/bg_dashboard_balance"
                     android:padding="16dp"
                     android:id="@+id/balance_card"

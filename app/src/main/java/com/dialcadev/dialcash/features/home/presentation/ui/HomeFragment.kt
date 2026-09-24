@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,24 +23,29 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.R
 import com.dialcadev.dialcash.core.datastore.UserDataStore
 import com.dialcadev.dialcash.core.models.UserPreferences
+import com.dialcadev.dialcash.core.theme.AppTypography
 import com.dialcadev.dialcash.core.ui.UiChromeViewModel
 import com.dialcadev.dialcash.core.ui.components.showAccountDetailsBottomSheet
 import com.dialcadev.dialcash.core.ui.components.showTransactionDetailsBottomSheet
 import com.dialcadev.dialcash.core.utils.extensions.toCurrencyFormat
 import com.dialcadev.dialcash.databinding.FragmentHomeBinding
 import com.dialcadev.dialcash.features.accounts.presentation.adapter.MainAccountsAdapter
+import com.dialcadev.dialcash.features.home.presentation.ui.components.HomeBalanceCard
 import com.dialcadev.dialcash.features.home.presentation.viewmodels.HomeViewModel
 import com.dialcadev.dialcash.features.transactions.presentation.adapters.RecentTransactionsAdapter
 import com.dialcadev.dialcash.features.transactions.presentation.ui.NewTransactionActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dev.chrisbanes.haze.HazeState
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
+    private val localHazeState = HazeState()
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
@@ -58,11 +68,49 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupBalanceCard()
         setupRecyclerViews()
         setupOnClickListeners()
         setupSwipeRefresh()
         setupChromePadding()
         observeState()
+    }
+
+    private fun setupBalanceCard() {
+        binding.composeBalanceCard.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                val state by viewModel.uiState.collectAsState()
+
+                val isVisible = userPreferences?.isBalanceVisible ?: true
+                val currencySymbol = userPreferences?.currencySymbol ?: "$"
+
+                val formattedBalance = remember(isVisible, currencySymbol, state.totalBalance) {
+                    if (isVisible) {
+                        "$currencySymbol ${state.totalBalance.toCurrencyFormat()}"
+                    } else {
+                        val balanceParts = state.totalBalance.toCurrencyFormat().split(".")
+                        val decimals = if (balanceParts.size > 1) balanceParts[1] else "00"
+                        "$currencySymbol ****.$decimals"
+                    }
+                }
+                MaterialTheme(typography = AppTypography) {
+                    HomeBalanceCard(
+                        totalBalanceText = formattedBalance,
+                        isBalanceVisible = preferences?.isBalanceVisible ?: true,
+                        hazeState = localHazeState,
+                        actionsEnabled = state.mainAccounts.isNotEmpty(),
+                        onToggleVisibility = {
+                            lifecycleScope.launch { userDataStore.toggleBalanceVisibility() }
+                        },
+                        onQuickIncomeClick = { navigateToTransactionType("income") },
+                        onQuickExpenseClick = { navigateToTransactionType("expense") },
+                        onQuickTransferClick = { navigateToTransactionType("transfer") }
+                    )
+                }
+            }
+        }
     }
 
     private fun setupChromePadding() {
