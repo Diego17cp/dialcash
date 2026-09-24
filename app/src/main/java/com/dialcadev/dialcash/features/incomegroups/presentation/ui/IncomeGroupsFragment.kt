@@ -90,7 +90,7 @@ class IncomeGroupsFragment : Fragment() {
                             contentDescription = getString(R.string.new_acc_title),
                             onClick = {
                                 val intent =
-                                    Intent(requireContext(), NewAccountActivity::class.java)
+                                    Intent(requireContext(), NewIncomeGroupActivity::class.java)
                                 startActivity(intent)
                             })
                     }
