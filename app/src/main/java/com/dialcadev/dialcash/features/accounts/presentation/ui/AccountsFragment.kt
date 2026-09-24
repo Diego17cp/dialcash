@@ -155,29 +155,32 @@ class AccountsFragment : Fragment() {
     }
 
     private fun observeState() {
-        lifecycleScope.launch {
-            userDataStore.getUserData().collect { userPreferences ->
-                preferences = userPreferences
-                accountsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-            }
-        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.swipeRefreshLayout.isRefreshing = state.isLoading
-                    binding.progressBar.visibility =
-                        if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
-                    accountsAdapter.submitList(state.accounts)
-                    updateEmptyState(state.accounts.isEmpty())
-                    state.errorMessage?.let { error ->
-                        Snackbar.make(
-                            binding.root, error, Snackbar.LENGTH_LONG
-                        ).setAction(getString(R.string.retry)) { viewModel.refreshAccounts() }
-                            .show()
-                        viewModel.clearError()
+                launch {
+                    userDataStore.getUserData().collect { userPreferences ->
+                        preferences = userPreferences
+                        accountsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.swipeRefreshLayout.isRefreshing = state.isLoading
+                        binding.progressBar.visibility =
+                            if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
+                        accountsAdapter.submitList(state.accounts)
+                        updateEmptyState(state.accounts.isEmpty())
+                        state.errorMessage?.let { error ->
+                            Snackbar.make(
+                                binding.root, error, Snackbar.LENGTH_LONG
+                            ).setAction(getString(R.string.retry)) { viewModel.refreshAccounts() }
+                                .show()
+                            viewModel.clearError()
+                        }
                     }
                 }
             }
+
         }
     }
 

@@ -76,7 +76,6 @@ class TransactionsFragment : Fragment() {
             }
         }
 
-        setupMenu()
         setupUI()
         setupRecyclerView()
         setupSwipeToRefresh()
@@ -129,42 +128,6 @@ class TransactionsFragment : Fragment() {
                 viewModel.updateFilters(newFilters)
             }
         )
-    }
-
-    private fun setupMenu() {
-        requireActivity().addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.chart_menu, menu)
-                menuInflater.inflate(R.menu.filters_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when (menuItem.itemId) {
-                    R.id.action_filters -> {
-                        val state = viewModel.uiState.value
-                        requireContext().showTransactionFiltersBottomSheet(
-                            currentFilters = state.currentFilters,
-                            accounts = state.accounts,
-                            onApplyFilters = { newFilters ->
-                                viewModel.updateFilters(newFilters)
-                            }
-                        )
-                        true
-                    }
-
-                    R.id.action_chart -> {
-                        val intent = Intent(
-                            requireContext(),
-                            ChartsActivity::class.java
-                        )
-                        startActivity(intent)
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun setupSwipeToRefresh() {
@@ -224,24 +187,27 @@ class TransactionsFragment : Fragment() {
 
     private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
-            userDataStore.getUserData().collectLatest { userPreferences ->
-                preferences = userPreferences
-                transactionsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.progressBar.isVisible = state.isLoading && state.errorMessage == null
-                    if (!state.isLoading) binding.swipeRefreshLayout.isRefreshing = false
-                    transactionsAdapter.submitList(state.filteredTransactions)
-                    binding.btnClearFilters.isVisible = state.isFiltered
-                    updateEmptyState(state.filteredTransactions.isEmpty(), state.isFiltered)
-                    state.errorMessage?.let { error ->
-                        Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG)
-                            .setAction(getString(R.string.retry)) { viewModel.clearError() }
-                            .show()
-                        viewModel.clearError()
+                launch {
+                    userDataStore.getUserData().collectLatest { userPreferences ->
+                        preferences = userPreferences
+                        transactionsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.progressBar.isVisible =
+                            state.isLoading && state.errorMessage == null
+                        if (!state.isLoading) binding.swipeRefreshLayout.isRefreshing = false
+                        transactionsAdapter.submitList(state.filteredTransactions)
+                        binding.btnClearFilters.isVisible = state.isFiltered
+                        updateEmptyState(state.filteredTransactions.isEmpty(), state.isFiltered)
+                        state.errorMessage?.let { error ->
+                            Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG)
+                                .setAction(getString(R.string.retry)) { viewModel.clearError() }
+                                .show()
+                            viewModel.clearError()
+                        }
                     }
                 }
             }

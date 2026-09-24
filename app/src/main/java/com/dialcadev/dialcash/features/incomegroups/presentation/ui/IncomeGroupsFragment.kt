@@ -156,26 +156,29 @@ class IncomeGroupsFragment : Fragment() {
     }
 
     private fun observeState() {
-        lifecycleScope.launch {
-            userDataStore.getUserData().collect { userPreferences ->
-                preferences = userPreferences
-                incomeGroupsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
-            }
-        }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    binding.swipeRefreshLayout.isRefreshing = state.isLoading
-                    binding.progressBar.visibility =
-                        if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
-                    incomeGroupsAdapter.submitList(state.incomeGroups)
-                    updateEmptyState(state.incomeGroups.isEmpty())
-                    state.errorMessage?.let { error ->
-                        Snackbar.make(
-                            binding.root, error, Snackbar.LENGTH_LONG
-                        ).setAction(getString(R.string.retry)) { viewModel.refreshIncomeGroups() }
-                            .show()
-                        viewModel.clearError()
+                launch {
+                    userDataStore.getUserData().collect { userPreferences ->
+                        preferences = userPreferences
+                        incomeGroupsAdapter.updateCurrencySymbol(preferences?.currencySymbol ?: "$")
+                    }
+                }
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.swipeRefreshLayout.isRefreshing = state.isLoading
+                        binding.progressBar.visibility =
+                            if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
+                        incomeGroupsAdapter.submitList(state.incomeGroups)
+                        updateEmptyState(state.incomeGroups.isEmpty())
+                        state.errorMessage?.let { error ->
+                            Snackbar.make(
+                                binding.root, error, Snackbar.LENGTH_LONG
+                            )
+                                .setAction(getString(R.string.retry)) { viewModel.refreshIncomeGroups() }
+                                .show()
+                            viewModel.clearError()
+                        }
                     }
                 }
             }
