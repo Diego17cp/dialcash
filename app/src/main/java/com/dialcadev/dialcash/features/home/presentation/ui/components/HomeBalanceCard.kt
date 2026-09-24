@@ -2,6 +2,7 @@ package com.dialcadev.dialcash.features.home.presentation.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,20 +12,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -66,48 +67,69 @@ fun HomeBalanceCard(
         primaryColor.copy(alpha = 0.18f)
     }
 
+    val cardGradient = if (isDark) {
+        Brush.verticalGradient(
+            colors = listOf(
+                tertiaryColor.copy(alpha = 0.06f),
+                tertiaryColor.copy(alpha = 0.10f),
+                tertiaryColor.copy(alpha = 0.18f),
+                primaryColor.copy(alpha = 0.28f)
+            )
+        )
+    } else {
+        Brush.verticalGradient(
+            colors = listOf(
+                surfaceColor,
+                tertiaryColor.copy(alpha = 0.04f),
+                tertiaryColor.copy(alpha = 0.10f),
+                primaryColor.copy(alpha = 0.22f)
+            )
+        )
+    }
+
     Box(modifier = modifier
         .fillMaxWidth()
-        .graphicsLayer() {
+        .graphicsLayer {
             shadowElevation = 16f
-            spotShadowColor = Color.Black.copy(alpha = if (isDark) 0.35f else 0.08f)
-            ambientShadowColor = Color.Black.copy(alpha = if (isDark) 0.20f else 0.04f)
-            clip = true
-            this.shape = shape
+            spotShadowColor = Color.Black.copy(
+                alpha = if (isDark) 0.35f else 0.08f
+            )
+            ambientShadowColor = Color.Black.copy(
+                alpha = if (isDark) 0.20f else 0.04f
+            )
         }
         .clip(shape)
         .then(
             if (hazeState != null) {
                 Modifier.hazeEffect(
                     state = hazeState, style = HazeStyle(
-                        tint = HazeTint(tintColor.copy(alpha = blurAlpha)),
-                        blurRadius = 24.dp,
-                        noiseFactor = 0.02f
+                        tint = HazeTint(
+                            tintColor.copy(alpha = blurAlpha)
+                        ), blurRadius = 24.dp, noiseFactor = 0.02f
                     )
                 )
-            } else Modifier
+            } else {
+                Modifier
+            }
         )
         .background(
-            brush = Brush.radialGradient(
-                colors = if (isDark) {
-                    listOf(
-                        primaryColor.copy(alpha = 0.30f),
-                        tertiaryColor.copy(alpha = 0.10f),
-                        Color(0xFF12121A).copy(alpha = 0.85f)
-                    )
-                } else {
-                    listOf(
-                        primaryColor.copy(alpha = 0.22f),
-                        tertiaryColor.copy(alpha = 0.08f),
-                        surfaceColor.copy(alpha = 0.65f)
-                    )
-                }, center = Offset(0f, 0f), radius = 900f
-            ), shape = shape
+            brush = cardGradient, shape = shape
         )
-        .border(width = 0.5.dp, color = borderColor, shape = shape)
-        .padding(20.dp)) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        .border(
+            width = 0.5.dp, color = borderColor, shape = shape
+        )
+
+        .padding(
+            start = 20.dp, end = 20.dp, top = 18.dp, bottom = 18.dp
+        )) {
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
                 Text(
                     text = stringResource(id = R.string.total_balance),
                     style = MaterialTheme.typography.titleMedium,
@@ -115,30 +137,40 @@ fun HomeBalanceCard(
                     color = textSecondary,
                     fontSize = 15.sp
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(
+                    modifier = Modifier.size(8.dp)
+                )
                 GlassIconButton(
-                    size = 32.dp,
-                    iconRes = if (isBalanceVisible) R.drawable.ic_eye_closed else R.drawable.ic_eye,
-                    contentDescription = stringResource(id = R.string.total_balance),
-                    hazeState = hazeState,
-                    standalone = true,
-                    onClick = onToggleVisibility
+                    size = 32.dp, iconRes = if (isBalanceVisible) {
+                        R.drawable.ic_eye_closed
+                    } else {
+                        R.drawable.ic_eye
+                    }, contentDescription = stringResource(
+                        id = R.string.total_balance
+                    ), hazeState = hazeState, standalone = true, onClick = onToggleVisibility
                 )
             }
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(
+                modifier = Modifier.height(6.dp)
+            )
             Text(
                 text = totalBalanceText,
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
-                fontSize = 38.sp,
+                fontSize = 36.sp,
                 color = textPrimary,
-                letterSpacing = (-0.5).sp
+                letterSpacing = (-1).sp
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(
+                modifier = Modifier.height(28.dp)
+            )
+
             Row(
-                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 QuickActionButton(
+                    modifier = Modifier.weight(1f),
                     iconRes = R.drawable.ic_income,
                     label = stringResource(id = R.string.income),
                     enabled = actionsEnabled,
@@ -147,6 +179,7 @@ fun HomeBalanceCard(
                 )
 
                 QuickActionButton(
+                    modifier = Modifier.weight(1f),
                     iconRes = R.drawable.ic_expense,
                     label = stringResource(id = R.string.expense),
                     enabled = actionsEnabled,
@@ -155,6 +188,7 @@ fun HomeBalanceCard(
                 )
 
                 QuickActionButton(
+                    modifier = Modifier.weight(1f),
                     iconRes = R.drawable.ic_transactions_outline,
                     label = stringResource(id = R.string.transfer),
                     enabled = actionsEnabled,
@@ -168,27 +202,94 @@ fun HomeBalanceCard(
 
 @Composable
 private fun QuickActionButton(
-    iconRes: Int, label: String, enabled: Boolean, hazeState: HazeState? = null, onClick: () -> Unit
+    modifier: Modifier = Modifier,
+    iconRes: Int,
+    label: String,
+    enabled: Boolean,
+    hazeState: HazeState? = null,
+    onClick: () -> Unit
 ) {
-    val textPrimary = colorResource(id = R.color.text_primary)
-    val primaryColor = colorResource(id = R.color.colorPrimary)
+    val isDark = isSystemInDarkTheme()
+
+    val primaryColor = colorResource(
+        id = R.color.colorPrimary
+    )
+
+    val textPrimary = colorResource(
+        id = R.color.text_primary
+    )
+
+    val surfaceColor = colorResource(
+        id = R.color.surface
+    )
+
+    val shape = RoundedCornerShape(20.dp)
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.graphicsLayer { alpha = if (enabled) 1f else 0.45f }) {
-        GlassIconButton(
-            size = 56.dp,
-            iconRes = iconRes,
-            contentDescription = label,
-            iconTint = primaryColor,
-            hazeState = hazeState,
-            standalone = true,
-            onClick = { if (enabled) onClick() })
+        modifier = modifier.graphicsLayer {
+            alpha = if (enabled) {
+                1f
+            } else {
+                0.45f
+            }
+        }, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .clip(shape)
+                .then(
+                    if (hazeState != null) {
+                        Modifier.hazeEffect(
+                            state = hazeState, style = HazeStyle(
+                                tint = HazeTint(
+                                    surfaceColor.copy(
+                                        alpha = if (isDark) {
+                                            0.18f
+                                        } else {
+                                            0.22f
+                                        }
+                                    )
+                                ), blurRadius = 16.dp, noiseFactor = 0.015f
+                            )
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.White.copy(alpha = 0.18f), Color.White.copy(alpha = 0.06f)
+                        )
+                    ), shape = shape
+                )
+                .border(
+                    width = 0.5.dp, color = Color.White.copy(alpha = 0.20f), shape = shape
+                )
+                .clickable(
+                    enabled = enabled, onClick = onClick
+                ),
 
-        Spacer(modifier = Modifier.height(8.dp))
+            contentAlignment = Alignment.Center
+        ) {
 
+            Icon(
+                painter = painterResource(
+                    id = iconRes
+                ), contentDescription = label, tint = primaryColor, modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(
+            modifier = Modifier.height(7.dp)
+        )
         Text(
-            style = MaterialTheme.typography.labelMedium, text = label, color = textPrimary
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = textPrimary,
+            maxLines = 1,
+            softWrap = false
         )
     }
 }
