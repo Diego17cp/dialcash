@@ -18,7 +18,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,13 +53,24 @@ fun LiquidAppBar(
     val tintColor = if (isDark) Color(0xFF121212) else MaterialTheme.colorScheme.surface
     val blurAlpha = if (isDark) 0.65f else 0.35f
     val textColor = if (isDark) Color.White else MaterialTheme.colorScheme.onSurface
+    val contentHeight = 56.dp
+    val fadeHeight = 24.dp
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .graphicsLayer {
-                shadowElevation = 8f
-                spotShadowColor = Color.Black.copy(alpha = 0.06f)
+            .height(contentHeight + fadeHeight)
+            .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+            .drawWithContent {
+                drawContent()
+                drawRect(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(Color.Transparent, Color.Black),
+                        startY = size.height - fadeHeight.toPx(),
+                        endY = size.height
+                    ),
+                    blendMode = BlendMode.DstOut
+                )
             }
             .hazeEffect(
                 state = hazeState,
@@ -64,10 +79,6 @@ fun LiquidAppBar(
                     blurRadius = 20.dp,
                     noiseFactor = 0.02f
                 )
-            )
-            .border(
-                width = 0.5.dp,
-                color = if (isDark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.05f)
             )
             .statusBarsPadding()
     ) {
