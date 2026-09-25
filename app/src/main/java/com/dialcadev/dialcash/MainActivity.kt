@@ -234,12 +234,6 @@ class MainActivity : AppCompatActivity() {
                                 .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
                                 .show()
                         }
-                        AlertDialog.Builder(this@MainActivity)
-                            .setTitle(R.string.update_available)
-                            .setMessage("${getString(R.string.new_version)} ${state.release.tag_name}\n\n${state.release.name}")
-                            .setPositiveButton(R.string.update) { _, _ -> appUpdater.downloadUpdate(apkUrl) }
-                            .setNegativeButton(R.string.later) { _, _ -> appUpdater.resetState() }
-                            .show()
                     }
 
                     is UpdateState.Downloading -> {
