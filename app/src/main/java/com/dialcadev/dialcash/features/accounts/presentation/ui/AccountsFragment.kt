@@ -12,13 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -63,8 +66,6 @@ class AccountsFragment : Fragment() {
     lateinit var userDataStore: UserDataStore
     private var preferences: UserPreferences? = null
 
-    private val bottomPaddingState = mutableStateOf(0.dp)
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,6 +76,11 @@ class AccountsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
+
+                    val density = LocalDensity.current
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
                     Box(modifier = Modifier.fillMaxSize()) {
                         AndroidView(
                             factory = { binding.root },
@@ -85,7 +91,7 @@ class AccountsFragment : Fragment() {
                         GlassIconButton(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .padding(end = 16.dp, bottom = bottomPaddingState.value + 16.dp),
+                                .padding(end = 16.dp, bottom = bottomDp + 16.dp),
                             iconRes = R.drawable.ic_plus,
                             hazeState = localHazeState,
                             size = 56.dp,
@@ -107,83 +113,83 @@ class AccountsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    chromeViewModel.topBarHeightPx,
-                    chromeViewModel.bottomBarHeightPx
-                ) { top, bottom -> top to bottom }
-                    .collect { (top, bottom) ->
-                        binding.composeAccountsList.updatePadding(top = top, bottom = bottom)
-                        binding.layoutNoAccounts.updatePadding(top = top, bottom = bottom)
-                        val density = resources.displayMetrics.density
-                        bottomPaddingState.value = (bottom / density).dp
-                    }
-            }
-        }
         setupAccountsComposeList()
-        setupSwipeToRefresh()
         observeState()
     }
 
-    private fun setupSwipeToRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshAccounts()
-        }
-    }
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun setupAccountsComposeList() {
         binding.composeAccountsList.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
                     val state by viewModel.uiState.collectAsState()
-                    val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                    val userPreferences by userDataStore.getUserData()
+                        .collectAsState(initial = null)
                     val currencySymbol = userPreferences?.currencySymbol ?: "$"
 
-                    LazyColumn (
-                        contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(0.dp)
+                    val topPx by chromeViewModel.topBarHeightPx.collectAsState()
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
+
+                    val density = LocalDensity.current
+                    val topDp = with(density) { topPx.toDp() }
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
+                    PullToRefreshBox(
+                        isRefreshing = state.isLoading,
+                        onRefresh = { viewModel.refreshAccounts() },
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        items(
-                            items = state.accounts,
-                            key = { it.id }
-                        ) { account ->
-                            val iconRes = when (account.type) {
-                                "cash" -> R.drawable.ic_cash
-                                "bank" -> R.drawable.ic_building_bank
-                                "card" -> R.drawable.ic_card
-                                "wallet" -> R.drawable.ic_accounts_filled
-                                "debt" -> R.drawable.ic_debt_payment
-                                "savings" -> R.drawable.ic_bank
-                                else -> R.drawable.ic_account_default
-                            }
-
-                            val isMain = account.type == "bank" ||
-                                    account.type == "cash" ||
-                                    account.type == "wallet" ||
-                                    account.type == "card"
-
-                            val current = "$currencySymbol ${account.balance.toCurrencyFormat()}"
-                            val original = getString(
-                                R.string.original_balance_with_value,
-                                "$currencySymbol ${account.originalBalance.toCurrencyFormat()}"
-                            )
-
-                            AccountCard(
-                                title = account.name,
-                                originalBalanceText = original,
-                                currentBalanceText = current,
-                                iconRes = iconRes,
-                                isMainAccount = isMain,
-                                onClick = {
-                                    requireContext().showAccountDetailsBottomSheet(
-                                        account = account,
-                                        currencySymbol = currencySymbol,
-                                        onUpdate = { updated -> viewModel.updateAccount(updated) },
-                                        onDelete = { toDelete -> viewModel.deleteAccount(toDelete) }
-                                    )
+                        LazyColumn(
+                            contentPadding = PaddingValues(top = 8.dp + topDp, bottom = 8.dp + bottomDp),
+                            verticalArrangement = Arrangement.spacedBy(0.dp)
+                        ) {
+                            items(
+                                items = state.accounts,
+                                key = { it.id }
+                            ) { account ->
+                                val iconRes = when (account.type) {
+                                    "cash" -> R.drawable.ic_cash
+                                    "bank" -> R.drawable.ic_building_bank
+                                    "card" -> R.drawable.ic_card
+                                    "wallet" -> R.drawable.ic_accounts_filled
+                                    "debt" -> R.drawable.ic_debt_payment
+                                    "savings" -> R.drawable.ic_bank
+                                    else -> R.drawable.ic_account_default
                                 }
-                            )
+
+                                val isMain = account.type == "bank" ||
+                                        account.type == "cash" ||
+                                        account.type == "wallet" ||
+                                        account.type == "card"
+
+                                val current =
+                                    "$currencySymbol ${account.balance.toCurrencyFormat()}"
+                                val original = getString(
+                                    R.string.original_balance_with_value,
+                                    "$currencySymbol ${account.originalBalance.toCurrencyFormat()}"
+                                )
+
+                                AccountCard(
+                                    title = account.name,
+                                    originalBalanceText = original,
+                                    currentBalanceText = current,
+                                    iconRes = iconRes,
+                                    isMainAccount = isMain,
+                                    onClick = {
+                                        requireContext().showAccountDetailsBottomSheet(
+                                            account = account,
+                                            currencySymbol = currencySymbol,
+                                            onUpdate = { updated -> viewModel.updateAccount(updated) },
+                                            onDelete = { toDelete ->
+                                                viewModel.deleteAccount(
+                                                    toDelete
+                                                )
+                                            }
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -211,9 +217,8 @@ class AccountsFragment : Fragment() {
                 }
                 launch {
                     viewModel.uiState.collect { state ->
-                        binding.swipeRefreshLayout.isRefreshing = state.isLoading
                         binding.progressBar.visibility =
-                            if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
+                            if (state.isLoading) View.VISIBLE else View.GONE
                         updateEmptyState(state.accounts.isEmpty())
                         state.errorMessage?.let { error ->
                             Snackbar.make(

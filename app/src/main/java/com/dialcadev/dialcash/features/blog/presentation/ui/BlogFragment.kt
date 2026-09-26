@@ -6,18 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
@@ -49,9 +57,7 @@ class BlogFragment : Fragment() {
     private val BLOG_POST_URL = "$WEB_URL/blog/posts/"
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentBlogBinding.inflate(inflater, container, false)
         return binding.root
@@ -59,21 +65,6 @@ class BlogFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    chromeViewModel.topBarHeightPx,
-                    chromeViewModel.bottomBarHeightPx
-                ) { top, bottom -> top to bottom }
-                    .collect { (top, bottom) ->
-                        binding.layoutBlog.updatePadding(top = top)
-                        binding.composePostsList.updatePadding(bottom = bottom)
-                        binding.layoutNoPosts.updatePadding(top = top, bottom = bottom)
-                    }
-            }
-        }
-
         setupPostsComposeList()
         observeViewModel()
     }
@@ -86,19 +77,46 @@ class BlogFragment : Fragment() {
                 MaterialTheme(typography = AppTypography) {
                     val state by viewModel.uiState.collectAsState()
 
+                    val topPx by chromeViewModel.topBarHeightPx.collectAsState()
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
+
+                    val density = LocalDensity.current
+                    val topDp = with(density) { topPx.toDp() }
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
                     PullToRefreshBox(
                         isRefreshing = state.isLoading && state.posts.isNotEmpty(),
                         onRefresh = { viewModel.loadBlogFeed() },
                         modifier = Modifier.fillMaxSize()
                     ) {
                         LazyColumn(
-                            contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(0.dp)
+                            contentPadding = PaddingValues(
+                                top = topDp + 16.dp,
+                                bottom = bottomDp + 16.dp,
+                                start = 16.dp,
+                                end = 16.dp
+                            ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            item {
+                                Column(modifier = Modifier.padding(bottom = 8.dp)) {
+                                    Text(
+                                        text = stringResource(id = R.string.blog_title),
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = colorResource(id = R.color.text_primary)
+                                    )
+                                    Text(
+                                        text = stringResource(id = R.string.blog_subtitle),
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        color = colorResource(id = R.color.text_secondary),
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    )
+                                }
+                            }
                             items(
-                                items = state.posts,
-                                key = { it.slug }
-                            ) { post ->
+                                items = state.posts, key = { it.slug }) { post ->
                                 BlogPostCard(
                                     title = post.title,
                                     description = post.description,
@@ -111,8 +129,7 @@ class BlogFragment : Fragment() {
                                             ("$BLOG_POST_URL${post.slug}").toUri()
                                         )
                                         startActivity(intent)
-                                    }
-                                )
+                                    })
                             }
                         }
                     }
@@ -128,18 +145,18 @@ class BlogFragment : Fragment() {
                     binding.progressBar.visibility =
                         if (state.isLoading && state.posts.isEmpty()) View.VISIBLE else View.GONE
                     if (state.isLoading && state.posts.isEmpty()) {
-                        binding.layoutBlog.visibility = View.GONE
+                        binding.composePostsList.visibility = View.GONE
                         binding.layoutNoPosts.visibility = View.GONE
                     } else if (state.posts.isEmpty() && state.errorMessage == null) {
-                        binding.layoutBlog.visibility = View.GONE
+                        binding.composePostsList.visibility = View.GONE
                         binding.layoutNoPosts.visibility = View.VISIBLE
                     } else if (state.errorMessage != null && state.posts.isEmpty()) {
-                        binding.layoutBlog.visibility = View.GONE
+                        binding.composePostsList.visibility = View.GONE
                         binding.layoutNoPosts.visibility = View.VISIBLE
                         binding.tvEmptyTitle.text = getString(R.string.connection_error)
                         binding.tvEmptySubtitle.text = getString(R.string.cannot_load_content)
                     } else {
-                        binding.layoutBlog.visibility = View.VISIBLE
+                        binding.composePostsList.visibility = View.VISIBLE
                         binding.layoutNoPosts.visibility = View.GONE
                     }
 

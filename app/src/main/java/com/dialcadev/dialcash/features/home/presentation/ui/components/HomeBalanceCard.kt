@@ -80,8 +80,8 @@ fun HomeBalanceCard(
         Brush.verticalGradient(
             colors = listOf(
                 surfaceColor,
-                tertiaryColor.copy(alpha = 0.04f),
                 tertiaryColor.copy(alpha = 0.10f),
+                tertiaryColor.copy(alpha = 0.48f),
                 primaryColor.copy(alpha = 0.22f)
             )
         )
