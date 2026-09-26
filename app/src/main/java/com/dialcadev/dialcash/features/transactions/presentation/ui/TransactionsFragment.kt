@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dialcadev.dialcash.core.ui.components.GlassIconButton
@@ -92,10 +95,13 @@ class TransactionsFragment : Fragment() {
                         )
                         val state by viewModel.uiState.collectAsState()
                         if (state.isFiltered) {
-                            GlassIconButton (
+                            GlassIconButton(
                                 modifier = Modifier
                                     .align(Alignment.BottomEnd)
-                                    .padding(end = 16.dp, bottom = bottomPaddingState.value + 16.dp),
+                                    .padding(
+                                        end = 16.dp,
+                                        bottom = bottomPaddingState.value + 16.dp
+                                    ),
                                 iconRes = R.drawable.ic_clear_filters,
                                 contentDescription = "Clear filters",
                                 size = 56.dp,
@@ -110,6 +116,7 @@ class TransactionsFragment : Fragment() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -118,16 +125,23 @@ class TransactionsFragment : Fragment() {
             setContent {
                 MaterialTheme(typography = AppTypography) {
                     val state by viewModel.uiState.collectAsState()
-                    val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
+                    val userPreferences by userDataStore.getUserData()
+                        .collectAsState(initial = null)
                     val currencySymbol = userPreferences?.currencySymbol ?: "$"
 
-                    if (state.filteredTransactions.isEmpty()) {
-                    } else {
-                        LazyColumn (
+                    val topPx by chromeViewModel.topBarHeightPx.collectAsState()
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
+
+                    val density = LocalDensity.current
+                    val topDp = with(density) { topPx.toDp() }
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
+                    if (state.filteredTransactions.isNotEmpty()) {
+                        LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
-                                top = 8.dp,
-                                bottom = 8.dp
+                                top = 8.dp + topDp,
+                                bottom = 8.dp + bottomDp
                             ),
                             verticalArrangement = Arrangement.spacedBy(0.dp)
                         ) {
@@ -172,8 +186,16 @@ class TransactionsFragment : Fragment() {
                                             accounts = currentState.accounts,
                                             incomeGroups = currentState.incomeGroups,
                                             currencySymbol = currencySymbol,
-                                            onUpdate = { updated -> viewModel.updateTransaction(updated) },
-                                            onDelete = { toDelete -> viewModel.deleteTransaction(toDelete) },
+                                            onUpdate = { updated ->
+                                                viewModel.updateTransaction(
+                                                    updated
+                                                )
+                                            },
+                                            onDelete = { toDelete ->
+                                                viewModel.deleteTransaction(
+                                                    toDelete
+                                                )
+                                            },
                                             onValidateBalance = { transactionId, type, accountId, amount, accountToId, incomeGroupId, onResult ->
                                                 viewModel.validateTransactionBalance(
                                                     transactionId,
@@ -194,24 +216,6 @@ class TransactionsFragment : Fragment() {
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    chromeViewModel.topBarHeightPx,
-                    chromeViewModel.bottomBarHeightPx
-                ) { top, bottom -> top to bottom }
-                    .collect { (top, bottom) ->
-                        val density = resources.displayMetrics.density
-                        val bottomDp = (bottom / density).dp
-                        bottomPaddingState.value = bottomDp
-                        binding.composeTransactionsList.updatePadding(
-                            top = top,
-                            bottom = bottom
-                        )
-                    }
-            }
-        }
-        setupSwipeToRefresh()
         observeState()
     }
 
@@ -263,11 +267,6 @@ class TransactionsFragment : Fragment() {
         )
     }
 
-    private fun setupSwipeToRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            binding.swipeRefreshLayout.isRefreshing = false
-        }
-    }
     private fun updateEmptyState(transactionsEmpty: Boolean, isFiltered: Boolean) {
         binding.layoutTransactions.isVisible = !transactionsEmpty
         binding.layoutNoTransactions.isVisible = transactionsEmpty
@@ -291,7 +290,6 @@ class TransactionsFragment : Fragment() {
                     viewModel.uiState.collect { state ->
                         binding.progressBar.isVisible =
                             state.isLoading && state.errorMessage == null
-                        if (!state.isLoading) binding.swipeRefreshLayout.isRefreshing = false
                         updateEmptyState(state.filteredTransactions.isEmpty(), state.isFiltered)
                         state.errorMessage?.let { error ->
                             Snackbar.make(binding.root, error, Snackbar.LENGTH_LONG)

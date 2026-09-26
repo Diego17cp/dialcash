@@ -9,13 +9,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
@@ -61,8 +65,6 @@ class IncomeGroupsFragment : Fragment() {
     @Inject
     lateinit var userDataStore: UserDataStore
     var preferences: UserPreferences? = null
-    private val bottomPaddingState = mutableStateOf(0.dp)
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +76,11 @@ class IncomeGroupsFragment : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MaterialTheme {
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
+
+                    val density = LocalDensity.current
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
                     Box(modifier = Modifier.fillMaxSize()) {
                         AndroidView(
                             factory = { binding.root },
@@ -84,7 +91,7 @@ class IncomeGroupsFragment : Fragment() {
                         GlassIconButton(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .padding(end = 16.dp, bottom = bottomPaddingState.value + 16.dp),
+                                .padding(end = 16.dp, bottom = bottomDp + 16.dp),
                             iconRes = R.drawable.ic_plus,
                             hazeState = localHazeState,
                             size = 56.dp,
@@ -104,24 +111,10 @@ class IncomeGroupsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                combine(
-                    chromeViewModel.topBarHeightPx,
-                    chromeViewModel.bottomBarHeightPx
-                ) { top, bottom -> top to bottom }
-                    .collect { (top, bottom) ->
-                        binding.composeIncomeGroupsList.updatePadding(top = top, bottom = bottom)
-                        binding.layoutNoIncomes.updatePadding(top = top, bottom = bottom)
-                        val density = resources.displayMetrics.density
-                        bottomPaddingState.value = (bottom / density).dp
-                    }
-            }
-        }
         setupIncomeGroupsComposeList()
-        setupSwipeToRefresh()
         observeState()
     }
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun setupIncomeGroupsComposeList() {
         binding.composeIncomeGroupsList.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -131,43 +124,65 @@ class IncomeGroupsFragment : Fragment() {
                     val userPreferences by userDataStore.getUserData().collectAsState(initial = null)
                     val currencySymbol = userPreferences?.currencySymbol ?: "$"
 
-                    androidx.compose.foundation.lazy.LazyColumn(
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 8.dp, bottom = 8.dp),
-                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(0.dp)
-                    ) {
-                        items(
-                            items = state.incomeGroups,
-                            key = { it.id }
-                        ) { income ->
-                            val totalText = getString(
-                                R.string.original_balance_with_value,
-                                "$currencySymbol ${income.amount.toCurrencyFormat()}"
-                            )
-                            val remainingText = "$currencySymbol ${income.remaining.toCurrencyFormat()}"
+                    val topPx by chromeViewModel.topBarHeightPx.collectAsState()
+                    val bottomPx by chromeViewModel.bottomBarHeightPx.collectAsState()
 
-                            IncomeGroupCard(
-                                title = income.name,
-                                totalText = totalText,
-                                remainingText = remainingText,
-                                iconRes = R.drawable.ic_income_item,
-                                onClick = {
-                                    requireContext().showIncomeGroupDetailsBottomSheet(
-                                        incomeGroup = income,
-                                        currencySymbol = currencySymbol,
-                                        onUpdate = { updated -> viewModel.updateIncomeGroup(updated) },
-                                        onDelete = { toDelete -> viewModel.deleteIncomeGroup(toDelete) }
-                                    )
-                                }
+                    val density = LocalDensity.current
+                    val topDp = with(density) { topPx.toDp() }
+                    val bottomDp = with(density) { bottomPx.toDp() }
+
+                    PullToRefreshBox(
+                        isRefreshing = state.isLoading,
+                        onRefresh = { viewModel.refreshIncomeGroups() },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        LazyColumn(
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                top = 8.dp + topDp,
+                                bottom = 8.dp + bottomDp
+                            ),
+                            verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(
+                                0.dp
                             )
+                        ) {
+                            items(
+                                items = state.incomeGroups,
+                                key = { it.id }
+                            ) { income ->
+                                val totalText = getString(
+                                    R.string.original_balance_with_value,
+                                    "$currencySymbol ${income.amount.toCurrencyFormat()}"
+                                )
+                                val remainingText =
+                                    "$currencySymbol ${income.remaining.toCurrencyFormat()}"
+
+                                IncomeGroupCard(
+                                    title = income.name,
+                                    totalText = totalText,
+                                    remainingText = remainingText,
+                                    iconRes = R.drawable.ic_income_item,
+                                    onClick = {
+                                        requireContext().showIncomeGroupDetailsBottomSheet(
+                                            incomeGroup = income,
+                                            currencySymbol = currencySymbol,
+                                            onUpdate = { updated ->
+                                                viewModel.updateIncomeGroup(
+                                                    updated
+                                                )
+                                            },
+                                            onDelete = { toDelete ->
+                                                viewModel.deleteIncomeGroup(
+                                                    toDelete
+                                                )
+                                            }
+                                        )
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-    }
-    private fun setupSwipeToRefresh() {
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshIncomeGroups()
         }
     }
     private fun updateEmptyState(incomeGroupsEmpty: Boolean) {
@@ -189,9 +204,8 @@ class IncomeGroupsFragment : Fragment() {
                 }
                 launch {
                     viewModel.uiState.collect { state ->
-                        binding.swipeRefreshLayout.isRefreshing = state.isLoading
                         binding.progressBar.visibility =
-                            if (state.isLoading && !binding.swipeRefreshLayout.isRefreshing) View.VISIBLE else View.GONE
+                            if (state.isLoading) View.VISIBLE else View.GONE
                         updateEmptyState(state.incomeGroups.isEmpty())
                         state.errorMessage?.let { error ->
                             Snackbar.make(
