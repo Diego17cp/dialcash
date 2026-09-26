@@ -165,6 +165,7 @@ fun FloatingBottomNav(
                             .fillMaxHeight()
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
+                                indication = null
                             ) { onItemClick(item) },
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
